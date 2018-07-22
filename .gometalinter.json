@@ -1,0 +1,21 @@
+{
+  "DisableAll": true,
+  "Enable": [
+    "vet",
+    "nakedret",
+    "misspell",
+    "maligned",
+    "interfacer",
+    "unconvert",
+    "goimports",
+    "gofmt",
+
+    "varcheck",
+    "structcheck",
+    "goconst",
+    "megacheck",
+    "golint"
+  ],
+  "Vendor": true,
+  "Deadline": "300s"
+}

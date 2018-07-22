@@ -1,0 +1,6 @@
+vendor
+node_modules
+profile.out
+coverage
+akoi.yml
+dummy

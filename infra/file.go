@@ -1,0 +1,61 @@
+package infra
+
+import (
+	"io"
+	"io/ioutil"
+	"os"
+
+	"gopkg.in/yaml.v2"
+
+	"github.com/suzuki-shunsuke/akoi/domain"
+)
+
+// CopyFile copies a file.
+func CopyFile(src, dest string) error {
+	f, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	w, err := os.Create(dest)
+	if err != nil {
+		return err
+	}
+	_, err = io.Copy(w, f)
+	return err
+}
+
+// ExistFile is an implementation of domain.ExistFile .
+func ExistFile(dst string) bool {
+	_, err := os.Stat(dst)
+	return err == nil
+}
+
+// MkdirAll is an implementation of domain.MkdirAll .
+func MkdirAll(dst string) error {
+	return os.MkdirAll(dst, 0775)
+}
+
+// ReadConfigFile reads a configuration from a file.
+func ReadConfigFile(dst string) (*domain.Config, error) {
+	f, err := os.Open(dst)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	decoder := yaml.NewDecoder(f)
+	cfg := domain.Config{}
+	if err := decoder.Decode(&cfg); err != nil {
+		return nil, err
+	}
+	return &cfg, nil
+}
+
+// TempDir creates a temrapory directory.
+func TempDir() (string, error) {
+	return ioutil.TempDir("", "")
+}
+
+// WriteFile is an implementation of domain.WriteFile .
+func WriteFile(dst string, data []byte) error {
+	return ioutil.WriteFile(dst, data, 0644)
+}
