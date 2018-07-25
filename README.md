@@ -168,7 +168,7 @@ packages:
 
 ### Use akoi at ansible
 
-If you want to install binaries with ansible, run `akoi install` command with `--format` option in [ansible's shell](https://docs.ansible.com/ansible/latest/modules/shell_module.html) or [command](https://docs.ansible.com/ansible/latest/modules/command_module.html) module.
+If you want to install binaries with ansible, run `akoi install` command with `--format` option in [ansible's shell](https://docs.ansible.com/ansible/latest/modules/shell_module.html) module.
 When `--format` option is set `akoi install` outputs the result as json.
 
 ```
@@ -203,7 +203,7 @@ So you can check whether the task's result by passing the output.
 ```yaml
 tasks:
 - name: install consul
-  command: "/usr/local/bin/akoi install -f ansible"
+  shell: "/usr/local/bin/akoi install -f ansible 2>&1"
   register: result
   changed_when: (result.stdout|from_json)["changed"]
 ```
