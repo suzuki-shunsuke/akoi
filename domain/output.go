@@ -43,6 +43,7 @@ func (result *Result) String(params *InstallParams) string {
 			return `{"changed": true}`
 		}
 		return string(b)
+	default:
+		return result.Msg
 	}
-	return ""
 }
