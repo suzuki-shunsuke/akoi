@@ -133,7 +133,7 @@ func installFile(pkgName, dst string, pkg *domain.Package, file *domain.File, pa
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
-		return fileResult, fmt.Errorf("failed to download %s from %s: %d", pkgName, pkg.URL, resp.StatusCode)
+		return fileResult, fmt.Errorf("failed to download %s from %s: %d", pkgName, u, resp.StatusCode)
 	}
 	tmpDir, err := methods.TempDir()
 	if err != nil {
