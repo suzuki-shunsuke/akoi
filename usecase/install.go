@@ -170,6 +170,7 @@ func installFile(pkgName, dst string, pkg *domain.Package, file *domain.File, pa
 					if err := methods.MkdirAll(dir); err != nil {
 						return fileResult, err
 					}
+					fileResult.Changed = true
 				}
 				if params.Format != keyWordAnsible {
 					fmt.Printf("install %s\n", dst)
@@ -177,6 +178,7 @@ func installFile(pkgName, dst string, pkg *domain.Package, file *domain.File, pa
 				if err := methods.CopyFile(filepath.Join(tmpDir, f.Archive), dst); err != nil {
 					return fileResult, err
 				}
+				fileResult.Changed = true
 			}
 			if err == nil && fi.Mode() == 0755 {
 				continue
@@ -184,6 +186,7 @@ func installFile(pkgName, dst string, pkg *domain.Package, file *domain.File, pa
 			if err := methods.Chmod(dst, 0755); err != nil {
 				return fileResult, err
 			}
+			fileResult.Changed = true
 		}
 	}
 	return fileResult, nil
