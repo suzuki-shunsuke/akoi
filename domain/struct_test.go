@@ -27,16 +27,3 @@ func TestConfigGetLinkPathTpl(t *testing.T) {
 		t.Fatal(err)
 	}
 }
-
-func TestPackageGetArchiver(t *testing.T) {
-	pkg := &Package{
-		URL: "http://example.com/foo.zip",
-	}
-	arc, err := pkg.GetArchiver()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !arc.Match("zzz.zip") {
-		t.Fatal("zzz.zip must be matched")
-	}
-}

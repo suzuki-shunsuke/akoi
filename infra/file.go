@@ -7,6 +7,8 @@ import (
 
 	"gopkg.in/yaml.v2"
 
+	"github.com/mholt/archiver"
+
 	"github.com/suzuki-shunsuke/akoi/domain"
 )
 
@@ -58,4 +60,9 @@ func TempDir() (string, error) {
 // WriteFile is an implementation of domain.WriteFile .
 func WriteFile(dst string, data []byte) error {
 	return ioutil.WriteFile(dst, data, 0644)
+}
+
+// GetArchiver converts archiver.Archiver into domain.Archiver .
+func GetArchiver(fpath string) domain.Archiver {
+	return archiver.MatchingFormat(fpath)
 }

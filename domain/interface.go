@@ -35,4 +35,10 @@ type (
 	TempDir func() (string, error)
 	// WriteFile is an interface to write test to file.
 	WriteFile func(dest string, data []byte) error
+	// GetArchiver returns an archiver for a given file
+	GetArchiver func(string) Archiver
+	// Archiver is an interface to read an archive file.
+	Archiver interface {
+		Read(input io.Reader, destination string) error
+	}
 )

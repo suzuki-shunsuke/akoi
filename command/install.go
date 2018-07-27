@@ -15,8 +15,9 @@ func Install(c *cli.Context) error {
 	params := &domain.InstallParams{
 		ConfigFilePath: c.String("config"),
 		Format:         c.String("format"),
+		DryRun:         c.Bool("dry-run"),
 	}
-	result, err := usecase.Install(params, registry.NewInstallMethods())
+	result, err := usecase.Install(params, registry.NewInstallMethods(params.DryRun))
 	if result == nil {
 		result = &domain.Result{}
 	}
