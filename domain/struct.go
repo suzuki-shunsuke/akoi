@@ -2,6 +2,7 @@ package domain
 
 import (
 	"net/url"
+	"os"
 	"text/template"
 
 	"github.com/mholt/archiver"
@@ -21,8 +22,9 @@ type (
 
 	// File represents a file configuration.
 	File struct {
-		Name    string `yaml:"name"`
-		Archive string `yaml:"archive"`
+		Name    string      `yaml:"name"`
+		Archive string      `yaml:"archive"`
+		Mode    os.FileMode `yaml:"mode"`
 	}
 
 	// InitMethods is functions which are used at usecase.Init .
