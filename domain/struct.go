@@ -10,8 +10,8 @@ import (
 type (
 	// Config represents application's configuration.
 	Config struct {
-		binPathTpl  *template.Template
-		linkPathTpl *template.Template
+		BinPathTpl  *template.Template
+		LinkPathTpl *template.Template
 		BinPath     string             `yaml:"bin_path"`
 		LinkPath    string             `yaml:"link_path"`
 		Packages    map[string]Package `yaml:"packages"`
@@ -21,6 +21,8 @@ type (
 	File struct {
 		Name    string      `yaml:"name"`
 		Archive string      `yaml:"archive"`
+		Bin     string      `yaml:"-"`
+		Link    string      `yaml:"-"`
 		Mode    os.FileMode `yaml:"mode"`
 	}
 
@@ -77,44 +79,56 @@ type (
 )
 
 // GetURL returns a download URL.
-func (pkg *Package) GetURL() (string, error) {
-	if pkg.url != "" {
-		return pkg.url, nil
-	}
-	tpl, err := template.New("pkg_url").Parse(pkg.URL)
-	if err != nil {
-		return "", err
-	}
-	u, err := util.RenderTpl(tpl, pkg)
-	if err != nil {
-		return "", err
-	}
-	pkg.url = u
-	return u, nil
+func (pkg *Package) GetURL() string {
+	return pkg.url
 }
 
-// GetBinPathTpl returns a binary installation path's template.
-func (cfg *Config) GetBinPathTpl() (*template.Template, error) {
-	if cfg.binPathTpl != nil {
-		return cfg.binPathTpl, nil
-	}
+// Setup compiles and renders templates.
+func (cfg *Config) Setup() error {
 	tpl, err := template.New("bin_path").Parse(cfg.BinPath)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	cfg.binPathTpl = tpl
-	return tpl, nil
-}
+	cfg.BinPathTpl = tpl
 
-// GetLinkPathTpl returns a symbolic link's path template.
-func (cfg *Config) GetLinkPathTpl() (*template.Template, error) {
-	if cfg.linkPathTpl != nil {
-		return cfg.linkPathTpl, nil
-	}
-	tpl, err := template.New("link_path").Parse(cfg.LinkPath)
+	tpl, err = template.New("link_path").Parse(cfg.LinkPath)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	cfg.linkPathTpl = tpl
-	return tpl, nil
+	cfg.LinkPathTpl = tpl
+
+	for pkgName, pkg := range cfg.Packages {
+		tpl, err := template.New("pkg_url").Parse(pkg.URL)
+		if err != nil {
+			return err
+		}
+		u, err := util.RenderTpl(tpl, pkg)
+		if err != nil {
+			return err
+		}
+		pkg.url = u
+		for i, file := range pkg.Files {
+			dst, err := util.RenderTpl(
+				cfg.BinPathTpl, &TemplateParams{
+					Name: file.Name, Version: pkg.Version,
+				})
+			if err != nil {
+				return err
+			}
+			file.Bin = dst
+
+			lnPath, err := util.RenderTpl(
+				cfg.LinkPathTpl, &TemplateParams{
+					Name: file.Name, Version: pkg.Version,
+				})
+			if err != nil {
+				return err
+			}
+			file.Link = lnPath
+			pkg.Files[i] = file
+		}
+		cfg.Packages[pkgName] = pkg
+	}
+
+	return nil
 }
