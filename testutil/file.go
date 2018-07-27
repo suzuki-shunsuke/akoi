@@ -1,6 +1,7 @@
 package testutil
 
 import (
+	"io"
 	"net/http"
 	"os"
 
@@ -96,4 +97,21 @@ func NewFakeWrite(e error) domain.WriteFile {
 	return func(dest string, data []byte) error {
 		return e
 	}
+}
+
+// NewFakeGetArchiver is a fake of domain.GetArchiver .
+func NewFakeGetArchiver(err error) domain.GetArchiver {
+	return func(path string) domain.Archiver {
+		return &FakeArchiver{err: err}
+	}
+}
+
+// FakeArchiver is a fake of domain.Archiver .
+type FakeArchiver struct {
+	err error
+}
+
+// Read implements domain.Archiver#Read .
+func (arc *FakeArchiver) Read(input io.Reader, destination string) error {
+	return arc.err
 }

@@ -42,6 +42,10 @@ func main() {
 					Usage: "output format",
 					Value: "human",
 				},
+				cli.BoolFlag{
+					Name:  "dry-run, n",
+					Usage: "dry run",
+				},
 			},
 		},
 	}

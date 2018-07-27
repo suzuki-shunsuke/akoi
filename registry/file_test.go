@@ -12,7 +12,7 @@ func TestNewInitMethods(t *testing.T) {
 }
 
 func TestNewInstallMethods(t *testing.T) {
-	methods := NewInstallMethods()
+	methods := NewInstallMethods(false)
 	if methods == nil {
 		t.Fatal("methods is nil")
 	}

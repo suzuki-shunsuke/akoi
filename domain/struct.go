@@ -1,11 +1,8 @@
 package domain
 
 import (
-	"net/url"
 	"os"
 	"text/template"
-
-	"github.com/mholt/archiver"
 
 	"github.com/suzuki-shunsuke/akoi/util"
 )
@@ -45,6 +42,7 @@ type (
 		CopyFile       CopyFile       `validate:"required"`
 		Download       Download       `validate:"required"`
 		Exist          ExistFile      `validate:"required"`
+		GetArchiver    GetArchiver    `validate:"required"`
 		GetFileStat    GetFileStat    `validate:"required"`
 		GetFileLstat   GetFileStat    `validate:"required"`
 		MkdirAll       MkdirAll       `validate:"required"`
@@ -60,6 +58,7 @@ type (
 	InstallParams struct {
 		ConfigFilePath string
 		Format         string
+		DryRun         bool
 	}
 
 	// Package represents a package configuration.
@@ -118,13 +117,4 @@ func (cfg *Config) GetLinkPathTpl() (*template.Template, error) {
 	}
 	cfg.linkPathTpl = tpl
 	return tpl, nil
-}
-
-// GetArchiver returns an archiver for the package.
-func (pkg *Package) GetArchiver() (archiver.Archiver, error) {
-	u, err := url.Parse(pkg.URL)
-	if err != nil {
-		return nil, err
-	}
-	return archiver.MatchingFormat(u.Path), nil
 }

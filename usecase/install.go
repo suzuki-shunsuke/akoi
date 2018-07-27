@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"fmt"
+	"net/url"
 	"path/filepath"
 	"text/template"
 
@@ -147,10 +148,11 @@ func installFile(pkgName, dst string, pkg *domain.Package, file *domain.File, pa
 		return fileResult, err
 	}
 	defer methods.RemoveAll(tmpDir)
-	arc, err := pkg.GetArchiver()
+	u2, err := url.Parse(u)
 	if err != nil {
 		return fileResult, err
 	}
+	arc := methods.GetArchiver(u2.Path)
 	// TODO support not archived file
 	if arc != nil {
 		if params.Format != keyWordAnsible {
