@@ -113,11 +113,18 @@ func installFile(pkgName, dst string, pkg *domain.Package, file *domain.File, pa
 	fileResult := &domain.FileResult{
 		Name: file.Name,
 	}
+	mode := file.Mode
+	if mode == 0 {
+		mode = 0755
+	}
 	if fi, err := methods.GetFileStat(dst); err == nil {
-		if fi.Mode() == 0755 {
+		if fi.Mode() == mode {
 			return fileResult, nil
 		}
-		return fileResult, methods.Chmod(dst, 0755)
+		if params.Format != keyWordAnsible {
+			fmt.Printf("chmod %s %s\n", mode.String(), dst)
+		}
+		return fileResult, methods.Chmod(dst, mode)
 	}
 
 	u, err := pkg.GetURL()
@@ -180,10 +187,10 @@ func installFile(pkgName, dst string, pkg *domain.Package, file *domain.File, pa
 				}
 				fileResult.Changed = true
 			}
-			if err == nil && fi.Mode() == 0755 {
+			if err == nil && fi.Mode() == mode {
 				continue
 			}
-			if err := methods.Chmod(dst, 0755); err != nil {
+			if err := methods.Chmod(dst, mode); err != nil {
 				return fileResult, err
 			}
 			fileResult.Changed = true
