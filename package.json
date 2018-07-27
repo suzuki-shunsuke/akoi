@@ -5,7 +5,8 @@
     "precommit": "bash script/test.sh",
     "test": "bash script/test.sh",
     "fmt": "bash script/fmt.sh",
-    "c": "bash script/coverage.sh"
+    "c": "bash script/coverage.sh",
+    "tag": "bash script/tag.sh"
   },
   "devDependencies": {
     "@commitlint/cli": "^6.1.3",

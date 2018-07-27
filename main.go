@@ -6,12 +6,13 @@ import (
 	"github.com/urfave/cli"
 
 	"github.com/suzuki-shunsuke/akoi/command"
+	"github.com/suzuki-shunsuke/akoi/domain"
 )
 
 func main() {
 	app := cli.NewApp()
 	app.Name = "akoi"
-	app.Version = "0.3.1"
+	app.Version = domain.Version
 	app.Author = "suzuki-shunsuke https://github.com/suzuki-shunsuke"
 	app.Usage = "binary version control system"
 	app.Commands = []cli.Command{
