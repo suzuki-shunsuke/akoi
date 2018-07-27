@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/url"
 	"path/filepath"
-	"text/template"
 
 	"github.com/suzuki-shunsuke/akoi/domain"
 	"github.com/suzuki-shunsuke/akoi/util"
@@ -25,18 +24,12 @@ func Install(params *domain.InstallParams, methods *domain.InstallMethods) (*dom
 	if err != nil {
 		return result, err
 	}
-	binPathTpl, err := cfg.GetBinPathTpl()
-	if err != nil {
-		return result, err
-	}
-	linkPathTpl, err := cfg.GetLinkPathTpl()
-	if err != nil {
+	if err := cfg.Setup(); err != nil {
 		return result, err
 	}
 	for pkgName, pkg := range cfg.Packages {
 		// TODO goroutine
-		pkgResult, err := installPackage(
-			pkgName, &pkg, params, methods, binPathTpl, linkPathTpl)
+		pkgResult, err := installPackage(pkgName, &pkg, params, methods)
 		if pkgResult == nil {
 			pkgResult = &domain.PackageResult{}
 		}
@@ -55,39 +48,31 @@ func Install(params *domain.InstallParams, methods *domain.InstallMethods) (*dom
 	return result, nil
 }
 
-func createLink(pkgName, dst string, pkg *domain.Package, file *domain.File, params *domain.InstallParams, methods *domain.InstallMethods, linkPathTpl *template.Template) (*domain.FileResult, error) {
+func createLink(pkgName, dst string, pkg *domain.Package, file *domain.File, params *domain.InstallParams, methods *domain.InstallMethods) (*domain.FileResult, error) {
 	fileResult := &domain.FileResult{}
-	lnPath, err := util.RenderTpl(
-		linkPathTpl, &domain.TemplateParams{
-			Name: file.Name, Version: pkg.Version,
-		})
-	if err != nil {
-		return fileResult, err
-	}
-
-	if _, err := methods.GetFileLstat(lnPath); err != nil {
-		if _, err := methods.GetFileStat(lnPath); err == nil {
+	if _, err := methods.GetFileLstat(file.Link); err != nil {
+		if _, err := methods.GetFileStat(file.Link); err == nil {
 			// TODO force remove option
-			return fileResult, fmt.Errorf("%s has already existed and is not a symbolic link", lnPath)
+			return fileResult, fmt.Errorf("%s has already existed and is not a symbolic link", file.Link)
 		}
-		p, err := filepath.Rel(filepath.Dir(lnPath), dst)
+		p, err := filepath.Rel(filepath.Dir(file.Link), dst)
 		if err != nil {
 			return fileResult, err
 		}
 		if params.Format != keyWordAnsible {
-			fmt.Printf("create link %s -> %s\n", lnPath, p)
+			fmt.Printf("create link %s -> %s\n", file.Link, p)
 		}
-		if err := methods.MkLink(p, lnPath); err != nil {
+		if err := methods.MkLink(p, file.Link); err != nil {
 			return fileResult, err
 		}
 		fileResult.Changed = true
 		return fileResult, nil
 	}
-	lnDest, err := methods.ReadLink(lnPath)
+	lnDest, err := methods.ReadLink(file.Link)
 	if err != nil {
 		return fileResult, err
 	}
-	p, err := filepath.Rel(filepath.Dir(lnPath), dst)
+	p, err := filepath.Rel(filepath.Dir(file.Link), dst)
 	if err != nil {
 		return fileResult, err
 	}
@@ -95,22 +80,22 @@ func createLink(pkgName, dst string, pkg *domain.Package, file *domain.File, par
 		return fileResult, nil
 	}
 	if params.Format != keyWordAnsible {
-		fmt.Printf("remove link %s -> %s\n", lnPath, lnDest)
+		fmt.Printf("remove link %s -> %s\n", file.Link, lnDest)
 	}
-	if err := methods.RemoveLink(lnPath); err != nil {
+	if err := methods.RemoveLink(file.Link); err != nil {
 		return fileResult, err
 	}
 	fileResult.Changed = true
 	if params.Format != keyWordAnsible {
-		fmt.Printf("create link %s -> %s\n", lnPath, p)
+		fmt.Printf("create link %s -> %s\n", file.Link, p)
 	}
-	if err := methods.MkLink(p, lnPath); err != nil {
+	if err := methods.MkLink(p, file.Link); err != nil {
 		return fileResult, err
 	}
 	return fileResult, nil
 }
 
-func installFile(pkgName, dst string, pkg *domain.Package, file *domain.File, params *domain.InstallParams, methods *domain.InstallMethods, binPathTpl *template.Template) (*domain.FileResult, error) {
+func installFile(pkgName, dst string, pkg *domain.Package, file *domain.File, params *domain.InstallParams, methods *domain.InstallMethods) (*domain.FileResult, error) {
 	fileResult := &domain.FileResult{
 		Name: file.Name,
 	}
@@ -128,10 +113,7 @@ func installFile(pkgName, dst string, pkg *domain.Package, file *domain.File, pa
 		return fileResult, methods.Chmod(dst, mode)
 	}
 
-	u, err := pkg.GetURL()
-	if err != nil {
-		return fileResult, err
-	}
+	u := pkg.GetURL()
 	if params.Format != keyWordAnsible {
 		fmt.Printf("downloading %s: %s\n", pkgName, u)
 	}
@@ -162,16 +144,9 @@ func installFile(pkgName, dst string, pkg *domain.Package, file *domain.File, pa
 			return fileResult, err
 		}
 		for _, f := range pkg.Files {
-			dst, err := util.RenderTpl(
-				binPathTpl, &domain.TemplateParams{
-					Name: f.Name, Version: pkg.Version,
-				})
+			fi, err := methods.GetFileStat(f.Bin)
 			if err != nil {
-				return fileResult, err
-			}
-			fi, err := methods.GetFileStat(dst)
-			if err != nil {
-				dir := filepath.Dir(dst)
+				dir := filepath.Dir(f.Bin)
 				if _, err := methods.GetFileStat(dir); err != nil {
 					if params.Format != keyWordAnsible {
 						fmt.Printf("create directory %s\n", dir)
@@ -201,21 +176,14 @@ func installFile(pkgName, dst string, pkg *domain.Package, file *domain.File, pa
 	return fileResult, nil
 }
 
-func installPackage(pkgName string, pkg *domain.Package, params *domain.InstallParams, methods *domain.InstallMethods, binPathTpl, linkPathTpl *template.Template) (*domain.PackageResult, error) {
+func installPackage(pkgName string, pkg *domain.Package, params *domain.InstallParams, methods *domain.InstallMethods) (*domain.PackageResult, error) {
 	pkgResult := &domain.PackageResult{
 		Files:   []domain.FileResult{},
 		Version: pkg.Version,
 	}
 	for _, file := range pkg.Files {
-		dst, err := util.RenderTpl(
-			binPathTpl, &domain.TemplateParams{
-				Name: file.Name, Version: pkg.Version,
-			})
-		if err != nil {
-			return pkgResult, err
-		}
 		fileResult, err := installFile(
-			pkgName, dst, pkg, &file, params, methods, binPathTpl)
+			pkgName, file.Bin, pkg, &file, params, methods)
 		if fileResult == nil {
 			fileResult = &domain.FileResult{}
 		}
@@ -230,7 +198,7 @@ func installPackage(pkgName string, pkg *domain.Package, params *domain.InstallP
 			return pkgResult, err
 		}
 		fr, err := createLink(
-			pkgName, dst, pkg, &file, params, methods, linkPathTpl)
+			pkgName, file.Bin, pkg, &file, params, methods)
 		if fr == nil {
 			fr = &domain.FileResult{}
 		}

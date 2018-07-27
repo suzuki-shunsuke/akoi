@@ -16,4 +16,8 @@ func TestNewInstallMethods(t *testing.T) {
 	if methods == nil {
 		t.Fatal("methods is nil")
 	}
+	methods = NewInstallMethods(true)
+	if methods == nil {
+		t.Fatal("methods is nil")
+	}
 }
