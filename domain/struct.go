@@ -65,6 +65,7 @@ type (
 
 	// Package represents a package configuration.
 	Package struct {
+		Name    string `yaml:"-" validate:"required"`
 		url     string
 		URL     string `yaml:"url" validate:"required"`
 		Version string `yaml:"version" validate:"required"`
@@ -98,6 +99,7 @@ func (cfg *Config) Setup() error {
 	cfg.LinkPathTpl = tpl
 
 	for pkgName, pkg := range cfg.Packages {
+		pkg.Name = pkgName
 		tpl, err := template.New("pkg_url").Parse(pkg.URL)
 		if err != nil {
 			return err
