@@ -26,5 +26,7 @@ package domain
 const Version = "$TAG"
 EOS
 
+git add domain/version.go
+git commit -m "build: update version to $TAG"
 echo "git tag $TAG"
 git tag $TAG
