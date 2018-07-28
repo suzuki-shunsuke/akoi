@@ -30,6 +30,7 @@ type (
 	Result struct {
 		Msg      string                   `json:"msg"`
 		Changed  bool                     `json:"changed"`
+		Failed   bool                     `json:"failed"`
 		Packages map[string]PackageResult `json:"packages"`
 	}
 )
@@ -44,6 +45,6 @@ func (result *Result) String(params *InstallParams) string {
 		}
 		return string(b)
 	default:
-		return result.Msg
+		return ""
 	}
 }

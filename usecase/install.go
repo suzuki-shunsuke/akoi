@@ -72,18 +72,24 @@ func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
 }
 
 // Install intalls binraries.
-func Install(params *domain.InstallParams, methods *domain.InstallMethods) (*domain.Result, error) {
+func Install(params *domain.InstallParams, methods *domain.InstallMethods) *domain.Result {
 	result := &domain.Result{
 		Packages: map[string]domain.PackageResult{}}
 	if err := util.ValidateStruct(methods); err != nil {
-		return result, err
+		result.Msg = err.Error()
+		result.Failed = true
+		return result
 	}
 	cfg, err := methods.ReadConfigFile(params.ConfigFilePath)
 	if err != nil {
-		return result, err
+		result.Msg = err.Error()
+		result.Failed = true
+		return result
 	}
 	if err := setupConfig(cfg, methods); err != nil {
-		return result, err
+		result.Msg = err.Error()
+		result.Failed = true
+		return result
 	}
 	for _, pkg := range cfg.Packages {
 		// TODO goroutine
@@ -96,33 +102,45 @@ func Install(params *domain.InstallParams, methods *domain.InstallMethods) (*dom
 			result.Changed = true
 		}
 		if err != nil {
+			result.Failed = true
 			if pkgResult.Error == "" {
 				pkgResult.Error = err.Error()
 			}
 			result.Packages[pkg.Name] = *pkgResult
-			return result, err
 		}
 	}
-	return result, nil
+	return result
 }
 
 func createLink(dst string, pkg *domain.Package, file *domain.File, params *domain.InstallParams, methods *domain.InstallMethods) (*domain.FileResult, error) {
 	fileResult := &domain.FileResult{}
 	linkRelPath, err := filepath.Rel(filepath.Dir(file.Link), dst)
 	if err != nil {
+		if params.Format != keyWordAnsible {
+			fmt.Fprintln(os.Stderr, err)
+		}
 		return fileResult, err
 	}
 	if fi, err := methods.GetFileLstat(file.Link); err == nil {
 		switch mode := fi.Mode(); {
 		case mode.IsDir():
+			if params.Format != keyWordAnsible {
+				fmt.Fprintf(os.Stderr, "%s has already existed and is a directory\n", file.Link)
+			}
 			return fileResult, fmt.Errorf("%s has already existed and is a directory", file.Link)
 		case mode&os.ModeNamedPipe != 0:
+			if params.Format != keyWordAnsible {
+				fmt.Fprintf(os.Stderr, "%s has already existed and is a named pipe\n", file.Link)
+			}
 			return fileResult, fmt.Errorf("%s has already existed and is a named pipe", file.Link)
 		case mode.IsRegular():
 			if params.Format != keyWordAnsible {
 				fmt.Printf("remove %s\n", file.Link)
 			}
 			if err := methods.RemoveFile(file.Link); err != nil {
+				if params.Format != keyWordAnsible {
+					fmt.Fprintln(os.Stderr, err)
+				}
 				return fileResult, err
 			}
 			fileResult.Changed = true
@@ -130,6 +148,9 @@ func createLink(dst string, pkg *domain.Package, file *domain.File, params *doma
 				fmt.Printf("create link %s -> %s\n", file.Link, linkRelPath)
 			}
 			if err := methods.MkLink(linkRelPath, file.Link); err != nil {
+				if params.Format != keyWordAnsible {
+					fmt.Fprintln(os.Stderr, err)
+				}
 				return fileResult, err
 			}
 			fileResult.Changed = true
@@ -137,6 +158,9 @@ func createLink(dst string, pkg *domain.Package, file *domain.File, params *doma
 		case mode&os.ModeSymlink != 0:
 			lnDest, err := methods.ReadLink(file.Link)
 			if err != nil {
+				if params.Format != keyWordAnsible {
+					fmt.Fprintln(os.Stderr, err)
+				}
 				return fileResult, err
 			}
 			if linkRelPath == lnDest {
@@ -146,6 +170,9 @@ func createLink(dst string, pkg *domain.Package, file *domain.File, params *doma
 				fmt.Printf("remove link %s -> %s\n", file.Link, lnDest)
 			}
 			if err := methods.RemoveLink(file.Link); err != nil {
+				if params.Format != keyWordAnsible {
+					fmt.Fprintln(os.Stderr, err)
+				}
 				return fileResult, err
 			}
 			fileResult.Changed = true
@@ -153,6 +180,9 @@ func createLink(dst string, pkg *domain.Package, file *domain.File, params *doma
 				fmt.Printf("create link %s -> %s\n", file.Link, linkRelPath)
 			}
 			if err := methods.MkLink(linkRelPath, file.Link); err != nil {
+				if params.Format != keyWordAnsible {
+					fmt.Fprintln(os.Stderr, err)
+				}
 				return fileResult, err
 			}
 			return fileResult, nil
@@ -164,6 +194,9 @@ func createLink(dst string, pkg *domain.Package, file *domain.File, params *doma
 		fmt.Printf("create link %s -> %s\n", file.Link, linkRelPath)
 	}
 	if err := methods.MkLink(linkRelPath, file.Link); err != nil {
+		if params.Format != keyWordAnsible {
+			fmt.Fprintln(os.Stderr, err)
+		}
 		return fileResult, err
 	}
 	fileResult.Changed = true
@@ -185,7 +218,11 @@ func installFile(dst string, pkg *domain.Package, file *domain.File, params *dom
 		if params.Format != keyWordAnsible {
 			fmt.Printf("chmod %s %s\n", mode.String(), dst)
 		}
-		return fileResult, methods.Chmod(dst, mode)
+		err := methods.Chmod(dst, mode)
+		if err != nil && params.Format != keyWordAnsible {
+			fmt.Fprintln(os.Stderr, err)
+		}
+		return fileResult, err
 	}
 
 	ustr := pkg.URL.String()
@@ -194,15 +231,24 @@ func installFile(dst string, pkg *domain.Package, file *domain.File, params *dom
 	}
 	resp, err := methods.Download(ustr)
 	if err != nil {
+		if params.Format != keyWordAnsible {
+			fmt.Fprintln(os.Stderr, err)
+		}
 		return fileResult, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
+		if params.Format != keyWordAnsible {
+			fmt.Fprintf(os.Stderr, "failed to download %s from %s: %d\n", pkg.Name, ustr, resp.StatusCode)
+		}
 		return fileResult, fmt.Errorf(
 			"failed to download %s from %s: %d", pkg.Name, ustr, resp.StatusCode)
 	}
 	tmpDir, err := methods.TempDir()
 	if err != nil {
+		if params.Format != keyWordAnsible {
+			fmt.Fprintln(os.Stderr, err)
+		}
 		return fileResult, err
 	}
 	defer methods.RemoveAll(tmpDir)
@@ -213,6 +259,9 @@ func installFile(dst string, pkg *domain.Package, file *domain.File, params *dom
 			fmt.Printf("unarchive %s\n", pkg.Name)
 		}
 		if err := arc.Read(resp.Body, tmpDir); err != nil {
+			if params.Format != keyWordAnsible {
+				fmt.Fprintln(os.Stderr, err)
+			}
 			return fileResult, err
 		}
 		for _, f := range pkg.Files {
@@ -224,6 +273,9 @@ func installFile(dst string, pkg *domain.Package, file *domain.File, params *dom
 						fmt.Printf("create directory %s\n", dir)
 					}
 					if err := methods.MkdirAll(dir); err != nil {
+						if params.Format != keyWordAnsible {
+							fmt.Fprintln(os.Stderr, err)
+						}
 						return fileResult, err
 					}
 					fileResult.Changed = true
@@ -232,6 +284,9 @@ func installFile(dst string, pkg *domain.Package, file *domain.File, params *dom
 					fmt.Printf("install %s\n", dst)
 				}
 				if err := methods.CopyFile(filepath.Join(tmpDir, f.Archive), dst); err != nil {
+					if params.Format != keyWordAnsible {
+						fmt.Fprintln(os.Stderr, err)
+					}
 					return fileResult, err
 				}
 				fileResult.Changed = true
@@ -240,6 +295,9 @@ func installFile(dst string, pkg *domain.Package, file *domain.File, params *dom
 				continue
 			}
 			if err := methods.Chmod(dst, mode); err != nil {
+				if params.Format != keyWordAnsible {
+					fmt.Fprintln(os.Stderr, err)
+				}
 				return fileResult, err
 			}
 			fileResult.Changed = true

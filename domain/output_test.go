@@ -5,8 +5,8 @@ import (
 )
 
 func TestResultString(t *testing.T) {
-	exp := "foo"
-	result := &Result{Msg: exp}
+	exp := ""
+	result := &Result{Msg: "foo"}
 	params := &InstallParams{}
 	act := result.String(params)
 	if act != exp {
