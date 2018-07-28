@@ -64,12 +64,13 @@ type (
 
 	// Package represents a package configuration.
 	Package struct {
-		Name     string   `yaml:"-" validate:"required"`
-		URL      *url.URL `yaml:"-"`
-		Archiver Archiver `yaml:"-" validate:"required"`
-		RawURL   string   `yaml:"url" validate:"required"`
-		Version  string   `yaml:"version" validate:"required"`
-		Files    []File   `yaml:"files"`
+		ArchiveType string   `yaml:"archive_type"`
+		Name        string   `yaml:"-" validate:"required"`
+		RawURL      string   `yaml:"url" validate:"required"`
+		Version     string   `yaml:"version" validate:"required"`
+		Archiver    Archiver `yaml:"-" validate:"required"`
+		Files       []File   `yaml:"files"`
+		URL         *url.URL `yaml:"-"`
 	}
 
 	// TemplateParams is template parameters.

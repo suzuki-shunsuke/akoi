@@ -43,7 +43,7 @@ func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
 			return err
 		}
 		pkg.URL = u2
-		pkg.Archiver = methods.GetArchiver(u2.Path)
+		pkg.Archiver = methods.GetArchiver(u2.Path, pkg.ArchiveType)
 		for i, file := range pkg.Files {
 			dst, err := util.RenderTpl(
 				cfg.BinPathTpl, &domain.TemplateParams{

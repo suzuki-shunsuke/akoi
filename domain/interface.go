@@ -17,6 +17,8 @@ type (
 	Download func(url string) (*http.Response, error)
 	// ExistFile is an interface to check file existence.
 	ExistFile func(string) bool
+	// GetArchiver returns an archiver for a given file
+	GetArchiver func(fpath, ftype string) Archiver
 	// GetFileStat returns a FileInfo.
 	GetFileStat func(string) (os.FileInfo, error)
 	// MkdirAll is an interface to create directories.
@@ -35,8 +37,7 @@ type (
 	TempDir func() (string, error)
 	// WriteFile is an interface to write test to file.
 	WriteFile func(dest string, data []byte) error
-	// GetArchiver returns an archiver for a given file
-	GetArchiver func(string) Archiver
+
 	// Archiver is an interface to read an archive file.
 	Archiver interface {
 		Read(input io.Reader, destination string) error
