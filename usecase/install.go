@@ -124,9 +124,9 @@ func Install(params *domain.InstallParams, methods *domain.InstallMethods) *doma
 	return result
 }
 
-func createLink(dst string, pkg *domain.Package, file *domain.File, params *domain.InstallParams, methods *domain.InstallMethods) (*domain.FileResult, error) {
+func createLink(pkg *domain.Package, file *domain.File, params *domain.InstallParams, methods *domain.InstallMethods) (*domain.FileResult, error) {
 	fileResult := &domain.FileResult{}
-	linkRelPath, err := filepath.Rel(filepath.Dir(file.Link), dst)
+	linkRelPath, err := filepath.Rel(filepath.Dir(file.Link), file.Bin)
 	if err != nil {
 		if params.Format != keyWordAnsible {
 			fmt.Fprintln(os.Stderr, err)
@@ -215,7 +215,8 @@ func createLink(dst string, pkg *domain.Package, file *domain.File, params *doma
 	return fileResult, nil
 }
 
-func installFile(dst string, pkg *domain.Package, file *domain.File, params *domain.InstallParams, methods *domain.InstallMethods) (*domain.FileResult, error) {
+func installFile(pkg *domain.Package, file *domain.File, params *domain.InstallParams, methods *domain.InstallMethods) (*domain.FileResult, error) {
+	dst := file.Bin
 	fileResult := &domain.FileResult{
 		Name: file.Name,
 	}
@@ -325,7 +326,7 @@ func installPackage(pkg *domain.Package, params *domain.InstallParams, methods *
 		Name:    pkg.Name,
 	}
 	for _, file := range pkg.Files {
-		fileResult, err := installFile(file.Bin, pkg, &file, params, methods)
+		fileResult, err := installFile(pkg, &file, params, methods)
 		if fileResult == nil {
 			fileResult = &domain.FileResult{}
 		}
@@ -339,7 +340,7 @@ func installPackage(pkg *domain.Package, params *domain.InstallParams, methods *
 			pkgResult.Files = append(pkgResult.Files, *fileResult)
 			continue
 		}
-		fr, err := createLink(file.Bin, pkg, &file, params, methods)
+		fr, err := createLink(pkg, &file, params, methods)
 		if fr == nil {
 			fr = &domain.FileResult{}
 		}

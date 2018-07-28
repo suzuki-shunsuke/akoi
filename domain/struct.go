@@ -42,7 +42,6 @@ type (
 		Chmod          Chmod          `validate:"required"`
 		CopyFile       CopyFile       `validate:"required"`
 		Download       Download       `validate:"required"`
-		Exist          ExistFile      `validate:"required"`
 		GetArchiver    GetArchiver    `validate:"required"`
 		GetFileStat    GetFileStat    `validate:"required"`
 		GetFileLstat   GetFileStat    `validate:"required"`

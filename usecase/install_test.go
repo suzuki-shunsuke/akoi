@@ -19,7 +19,6 @@ func TestInstall(t *testing.T) {
 				StatusCode: 200,
 				Body:       testutil.NewFakeIOReadCloser("hello"),
 			}, nil),
-		Exist:       testutil.NewFakeExistFile(true),
 		GetArchiver: testutil.NewFakeGetArchiver(nil),
 		GetFileStat: testutil.NewFakeGetFileStat(
 			testutil.NewFakeFileInfo("foo", 0666), nil),
