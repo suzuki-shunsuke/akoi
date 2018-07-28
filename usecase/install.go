@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"path/filepath"
+	"text/template"
 
 	"github.com/suzuki-shunsuke/akoi/domain"
 	"github.com/suzuki-shunsuke/akoi/util"
@@ -12,6 +13,62 @@ import (
 const (
 	keyWordAnsible = "ansible"
 )
+
+// setupConfig compiles and renders templates of domain.Config .
+func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
+	tpl, err := template.New("bin_path").Parse(cfg.BinPath)
+	if err != nil {
+		return err
+	}
+	cfg.BinPathTpl = tpl
+
+	tpl, err = template.New("link_path").Parse(cfg.LinkPath)
+	if err != nil {
+		return err
+	}
+	cfg.LinkPathTpl = tpl
+
+	for pkgName, pkg := range cfg.Packages {
+		pkg.Name = pkgName
+		tpl, err := template.New("pkg_url").Parse(pkg.RawURL)
+		if err != nil {
+			return err
+		}
+		u, err := util.RenderTpl(tpl, pkg)
+		if err != nil {
+			return err
+		}
+		u2, err := url.Parse(u)
+		if err != nil {
+			return err
+		}
+		pkg.URL = u2
+		pkg.Archiver = methods.GetArchiver(u2.Path)
+		for i, file := range pkg.Files {
+			dst, err := util.RenderTpl(
+				cfg.BinPathTpl, &domain.TemplateParams{
+					Name: file.Name, Version: pkg.Version,
+				})
+			if err != nil {
+				return err
+			}
+			file.Bin = dst
+
+			lnPath, err := util.RenderTpl(
+				cfg.LinkPathTpl, &domain.TemplateParams{
+					Name: file.Name, Version: pkg.Version,
+				})
+			if err != nil {
+				return err
+			}
+			file.Link = lnPath
+			pkg.Files[i] = file
+		}
+		cfg.Packages[pkgName] = pkg
+	}
+
+	return nil
+}
 
 // Install intalls binraries.
 func Install(params *domain.InstallParams, methods *domain.InstallMethods) (*domain.Result, error) {
@@ -24,7 +81,7 @@ func Install(params *domain.InstallParams, methods *domain.InstallMethods) (*dom
 	if err != nil {
 		return result, err
 	}
-	if err := cfg.Setup(); err != nil {
+	if err := setupConfig(cfg, methods); err != nil {
 		return result, err
 	}
 	for _, pkg := range cfg.Packages {
@@ -113,28 +170,25 @@ func installFile(dst string, pkg *domain.Package, file *domain.File, params *dom
 		return fileResult, methods.Chmod(dst, mode)
 	}
 
-	u := pkg.GetURL()
+	ustr := pkg.URL.String()
 	if params.Format != keyWordAnsible {
-		fmt.Printf("downloading %s: %s\n", pkg.Name, u)
+		fmt.Printf("downloading %s: %s\n", pkg.Name, ustr)
 	}
-	resp, err := methods.Download(u)
+	resp, err := methods.Download(ustr)
 	if err != nil {
 		return fileResult, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
-		return fileResult, fmt.Errorf("failed to download %s from %s: %d", pkg.Name, u, resp.StatusCode)
+		return fileResult, fmt.Errorf(
+			"failed to download %s from %s: %d", pkg.Name, ustr, resp.StatusCode)
 	}
 	tmpDir, err := methods.TempDir()
 	if err != nil {
 		return fileResult, err
 	}
 	defer methods.RemoveAll(tmpDir)
-	u2, err := url.Parse(u)
-	if err != nil {
-		return fileResult, err
-	}
-	arc := methods.GetArchiver(u2.Path)
+	arc := pkg.Archiver
 	// TODO support not archived file
 	if arc != nil {
 		if params.Format != keyWordAnsible {
