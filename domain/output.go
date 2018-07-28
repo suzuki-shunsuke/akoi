@@ -19,11 +19,12 @@ type (
 	// PackageResult represents a result of package installation.
 	PackageResult struct {
 		Error   string       `json:"error"`
-		Changed bool         `json:"changed"`
+		Name    string       `json:"-"`
 		State   string       `json:"state"`
-		Files   []FileResult `json:"files"`
 		Version string       `json:"version"`
 		URL     string       `json:"url"`
+		Changed bool         `json:"changed"`
+		Files   []FileResult `json:"files"`
 	}
 
 	// Result represents a result of packages's installation.
