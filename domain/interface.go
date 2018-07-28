@@ -29,10 +29,8 @@ type (
 	ReadConfigFile func(string) (*Config, error)
 	// ReadLink gets a symbolic's destination path.
 	ReadLink func(string) (string, error)
-	// RemoveAll is an interface of os.RemoveAll .
-	RemoveAll func(string) error
-	// RemoveLink removes a symbolic link.
-	RemoveLink func(string) error
+	// RemoveFile is an interface of os.Remove .
+	RemoveFile func(string) error
 	// TempDir creates a temporary directory.
 	TempDir func() (string, error)
 	// WriteFile is an interface to write test to file.

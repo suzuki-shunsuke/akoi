@@ -10,6 +10,29 @@ import (
 	"github.com/suzuki-shunsuke/akoi/usecase"
 )
 
+// InstallCommand is the sub command "install".
+var InstallCommand = cli.Command{
+	Name:   "install",
+	Usage:  "intall binaries",
+	Action: Install,
+	Flags: []cli.Flag{
+		cli.StringFlag{
+			Name:  "config, c",
+			Usage: "configuration file path",
+			Value: "/etc/akoi/akoi.yml",
+		},
+		cli.StringFlag{
+			Name:  "format, f",
+			Usage: "output format",
+			Value: "human",
+		},
+		cli.BoolFlag{
+			Name:  "dry-run, n",
+			Usage: "dry run",
+		},
+	},
+}
+
 // Install is the sub command "install".
 func Install(c *cli.Context) error {
 	params := &domain.InstallParams{
