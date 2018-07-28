@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"sync"
 	"text/template"
 
 	"github.com/suzuki-shunsuke/akoi/domain"
@@ -91,22 +92,33 @@ func Install(params *domain.InstallParams, methods *domain.InstallMethods) *doma
 		result.Failed = true
 		return result
 	}
+	numOfPkgs := len(cfg.Packages)
+	if numOfPkgs == 0 {
+		return result
+	}
+	var wg sync.WaitGroup
+	pkgResultChan := make(chan domain.PackageResult, numOfPkgs)
 	for _, pkg := range cfg.Packages {
 		// TODO goroutine
-		pkgResult, err := installPackage(&pkg, params, methods)
-		if pkgResult == nil {
-			pkgResult = &domain.PackageResult{}
-		}
-		result.Packages[pkg.Name] = *pkgResult
+		wg.Add(1)
+		go func(pkg domain.Package) {
+			defer wg.Done()
+			pkgResult := installPackage(&pkg, params, methods)
+			if pkgResult == nil {
+				pkgResult = &domain.PackageResult{Name: pkg.Name}
+			}
+			pkgResultChan <- *pkgResult
+		}(pkg)
+	}
+	wg.Wait()
+	close(pkgResultChan)
+	for pkgResult := range pkgResultChan {
+		result.Packages[pkgResult.Name] = pkgResult
 		if pkgResult.Changed {
 			result.Changed = true
 		}
-		if err != nil {
+		if pkgResult.Error != "" {
 			result.Failed = true
-			if pkgResult.Error == "" {
-				pkgResult.Error = err.Error()
-			}
-			result.Packages[pkg.Name] = *pkgResult
 		}
 	}
 	return result
@@ -306,10 +318,11 @@ func installFile(dst string, pkg *domain.Package, file *domain.File, params *dom
 	return fileResult, nil
 }
 
-func installPackage(pkg *domain.Package, params *domain.InstallParams, methods *domain.InstallMethods) (*domain.PackageResult, error) {
+func installPackage(pkg *domain.Package, params *domain.InstallParams, methods *domain.InstallMethods) *domain.PackageResult {
 	pkgResult := &domain.PackageResult{
 		Files:   []domain.FileResult{},
 		Version: pkg.Version,
+		Name:    pkg.Name,
 	}
 	for _, file := range pkg.Files {
 		fileResult, err := installFile(file.Bin, pkg, &file, params, methods)
@@ -324,7 +337,7 @@ func installPackage(pkg *domain.Package, params *domain.InstallParams, methods *
 				fileResult.Error = err.Error()
 			}
 			pkgResult.Files = append(pkgResult.Files, *fileResult)
-			return pkgResult, err
+			continue
 		}
 		fr, err := createLink(file.Bin, pkg, &file, params, methods)
 		if fr == nil {
@@ -338,10 +351,8 @@ func installPackage(pkg *domain.Package, params *domain.InstallParams, methods *
 				fileResult.Error = err.Error()
 			}
 			pkgResult.Files = append(pkgResult.Files, *fileResult)
-			return pkgResult, err
 		}
 		pkgResult.Files = append(pkgResult.Files, *fileResult)
-		continue
 	}
-	return pkgResult, nil
+	return pkgResult
 }
