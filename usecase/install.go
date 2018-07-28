@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"path/filepath"
+	"text/template"
 
 	"github.com/suzuki-shunsuke/akoi/domain"
 	"github.com/suzuki-shunsuke/akoi/util"
@@ -12,6 +13,62 @@ import (
 const (
 	keyWordAnsible = "ansible"
 )
+
+// setupConfig compiles and renders templates of domain.Config .
+func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
+	tpl, err := template.New("bin_path").Parse(cfg.BinPath)
+	if err != nil {
+		return err
+	}
+	cfg.BinPathTpl = tpl
+
+	tpl, err = template.New("link_path").Parse(cfg.LinkPath)
+	if err != nil {
+		return err
+	}
+	cfg.LinkPathTpl = tpl
+
+	for pkgName, pkg := range cfg.Packages {
+		pkg.Name = pkgName
+		tpl, err := template.New("pkg_url").Parse(pkg.RawURL)
+		if err != nil {
+			return err
+		}
+		u, err := util.RenderTpl(tpl, pkg)
+		if err != nil {
+			return err
+		}
+		u2, err := url.Parse(u)
+		if err != nil {
+			return err
+		}
+		pkg.URL = u2
+		pkg.Archiver = methods.GetArchiver(u2.Path, pkg.ArchiveType)
+		for i, file := range pkg.Files {
+			dst, err := util.RenderTpl(
+				cfg.BinPathTpl, &domain.TemplateParams{
+					Name: file.Name, Version: pkg.Version,
+				})
+			if err != nil {
+				return err
+			}
+			file.Bin = dst
+
+			lnPath, err := util.RenderTpl(
+				cfg.LinkPathTpl, &domain.TemplateParams{
+					Name: file.Name, Version: pkg.Version,
+				})
+			if err != nil {
+				return err
+			}
+			file.Link = lnPath
+			pkg.Files[i] = file
+		}
+		cfg.Packages[pkgName] = pkg
+	}
+
+	return nil
+}
 
 // Install intalls binraries.
 func Install(params *domain.InstallParams, methods *domain.InstallMethods) (*domain.Result, error) {
@@ -24,16 +81,16 @@ func Install(params *domain.InstallParams, methods *domain.InstallMethods) (*dom
 	if err != nil {
 		return result, err
 	}
-	if err := cfg.Setup(); err != nil {
+	if err := setupConfig(cfg, methods); err != nil {
 		return result, err
 	}
-	for pkgName, pkg := range cfg.Packages {
+	for _, pkg := range cfg.Packages {
 		// TODO goroutine
-		pkgResult, err := installPackage(pkgName, &pkg, params, methods)
+		pkgResult, err := installPackage(&pkg, params, methods)
 		if pkgResult == nil {
 			pkgResult = &domain.PackageResult{}
 		}
-		result.Packages[pkgName] = *pkgResult
+		result.Packages[pkg.Name] = *pkgResult
 		if pkgResult.Changed {
 			result.Changed = true
 		}
@@ -41,14 +98,14 @@ func Install(params *domain.InstallParams, methods *domain.InstallMethods) (*dom
 			if pkgResult.Error == "" {
 				pkgResult.Error = err.Error()
 			}
-			result.Packages[pkgName] = *pkgResult
+			result.Packages[pkg.Name] = *pkgResult
 			return result, err
 		}
 	}
 	return result, nil
 }
 
-func createLink(pkgName, dst string, pkg *domain.Package, file *domain.File, params *domain.InstallParams, methods *domain.InstallMethods) (*domain.FileResult, error) {
+func createLink(dst string, pkg *domain.Package, file *domain.File, params *domain.InstallParams, methods *domain.InstallMethods) (*domain.FileResult, error) {
 	fileResult := &domain.FileResult{}
 	if _, err := methods.GetFileLstat(file.Link); err != nil {
 		if _, err := methods.GetFileStat(file.Link); err == nil {
@@ -95,7 +152,7 @@ func createLink(pkgName, dst string, pkg *domain.Package, file *domain.File, par
 	return fileResult, nil
 }
 
-func installFile(pkgName, dst string, pkg *domain.Package, file *domain.File, params *domain.InstallParams, methods *domain.InstallMethods) (*domain.FileResult, error) {
+func installFile(dst string, pkg *domain.Package, file *domain.File, params *domain.InstallParams, methods *domain.InstallMethods) (*domain.FileResult, error) {
 	fileResult := &domain.FileResult{
 		Name: file.Name,
 	}
@@ -113,32 +170,29 @@ func installFile(pkgName, dst string, pkg *domain.Package, file *domain.File, pa
 		return fileResult, methods.Chmod(dst, mode)
 	}
 
-	u := pkg.GetURL()
+	ustr := pkg.URL.String()
 	if params.Format != keyWordAnsible {
-		fmt.Printf("downloading %s: %s\n", pkgName, u)
+		fmt.Printf("downloading %s: %s\n", pkg.Name, ustr)
 	}
-	resp, err := methods.Download(u)
+	resp, err := methods.Download(ustr)
 	if err != nil {
 		return fileResult, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
-		return fileResult, fmt.Errorf("failed to download %s from %s: %d", pkgName, u, resp.StatusCode)
+		return fileResult, fmt.Errorf(
+			"failed to download %s from %s: %d", pkg.Name, ustr, resp.StatusCode)
 	}
 	tmpDir, err := methods.TempDir()
 	if err != nil {
 		return fileResult, err
 	}
 	defer methods.RemoveAll(tmpDir)
-	u2, err := url.Parse(u)
-	if err != nil {
-		return fileResult, err
-	}
-	arc := methods.GetArchiver(u2.Path)
+	arc := pkg.Archiver
 	// TODO support not archived file
 	if arc != nil {
 		if params.Format != keyWordAnsible {
-			fmt.Printf("unarchive %s\n", pkgName)
+			fmt.Printf("unarchive %s\n", pkg.Name)
 		}
 		if err := arc.Read(resp.Body, tmpDir); err != nil {
 			return fileResult, err
@@ -176,14 +230,13 @@ func installFile(pkgName, dst string, pkg *domain.Package, file *domain.File, pa
 	return fileResult, nil
 }
 
-func installPackage(pkgName string, pkg *domain.Package, params *domain.InstallParams, methods *domain.InstallMethods) (*domain.PackageResult, error) {
+func installPackage(pkg *domain.Package, params *domain.InstallParams, methods *domain.InstallMethods) (*domain.PackageResult, error) {
 	pkgResult := &domain.PackageResult{
 		Files:   []domain.FileResult{},
 		Version: pkg.Version,
 	}
 	for _, file := range pkg.Files {
-		fileResult, err := installFile(
-			pkgName, file.Bin, pkg, &file, params, methods)
+		fileResult, err := installFile(file.Bin, pkg, &file, params, methods)
 		if fileResult == nil {
 			fileResult = &domain.FileResult{}
 		}
@@ -197,8 +250,7 @@ func installPackage(pkgName string, pkg *domain.Package, params *domain.InstallP
 			pkgResult.Files = append(pkgResult.Files, *fileResult)
 			return pkgResult, err
 		}
-		fr, err := createLink(
-			pkgName, file.Bin, pkg, &file, params, methods)
+		fr, err := createLink(file.Bin, pkg, &file, params, methods)
 		if fr == nil {
 			fr = &domain.FileResult{}
 		}

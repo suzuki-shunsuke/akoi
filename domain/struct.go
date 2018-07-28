@@ -1,10 +1,9 @@
 package domain
 
 import (
+	"net/url"
 	"os"
 	"text/template"
-
-	"github.com/suzuki-shunsuke/akoi/util"
 )
 
 type (
@@ -65,10 +64,13 @@ type (
 
 	// Package represents a package configuration.
 	Package struct {
-		url     string
-		URL     string `yaml:"url" validate:"required"`
-		Version string `yaml:"version" validate:"required"`
-		Files   []File `yaml:"files"`
+		ArchiveType string   `yaml:"archive_type"`
+		Name        string   `yaml:"-" validate:"required"`
+		RawURL      string   `yaml:"url" validate:"required"`
+		Version     string   `yaml:"version" validate:"required"`
+		Archiver    Archiver `yaml:"-" validate:"required"`
+		Files       []File   `yaml:"files"`
+		URL         *url.URL `yaml:"-"`
 	}
 
 	// TemplateParams is template parameters.
@@ -77,58 +79,3 @@ type (
 		Version string
 	}
 )
-
-// GetURL returns a download URL.
-func (pkg *Package) GetURL() string {
-	return pkg.url
-}
-
-// Setup compiles and renders templates.
-func (cfg *Config) Setup() error {
-	tpl, err := template.New("bin_path").Parse(cfg.BinPath)
-	if err != nil {
-		return err
-	}
-	cfg.BinPathTpl = tpl
-
-	tpl, err = template.New("link_path").Parse(cfg.LinkPath)
-	if err != nil {
-		return err
-	}
-	cfg.LinkPathTpl = tpl
-
-	for pkgName, pkg := range cfg.Packages {
-		tpl, err := template.New("pkg_url").Parse(pkg.URL)
-		if err != nil {
-			return err
-		}
-		u, err := util.RenderTpl(tpl, pkg)
-		if err != nil {
-			return err
-		}
-		pkg.url = u
-		for i, file := range pkg.Files {
-			dst, err := util.RenderTpl(
-				cfg.BinPathTpl, &TemplateParams{
-					Name: file.Name, Version: pkg.Version,
-				})
-			if err != nil {
-				return err
-			}
-			file.Bin = dst
-
-			lnPath, err := util.RenderTpl(
-				cfg.LinkPathTpl, &TemplateParams{
-					Name: file.Name, Version: pkg.Version,
-				})
-			if err != nil {
-				return err
-			}
-			file.Link = lnPath
-			pkg.Files[i] = file
-		}
-		cfg.Packages[pkgName] = pkg
-	}
-
-	return nil
-}

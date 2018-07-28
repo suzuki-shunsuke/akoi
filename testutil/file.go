@@ -36,6 +36,13 @@ func NewFakeExistFile(result bool) domain.ExistFile {
 	}
 }
 
+// NewFakeGetArchiver is a fake of domain.GetArchiver .
+func NewFakeGetArchiver(err error) domain.GetArchiver {
+	return func(fpath, ftype string) domain.Archiver {
+		return &FakeArchiver{err: err}
+	}
+}
+
 // NewFakeGetFileStat is a fake of domain.GetFileStat .
 func NewFakeGetFileStat(fi os.FileInfo, err error) domain.GetFileStat {
 	return func(string) (os.FileInfo, error) {
@@ -96,13 +103,6 @@ func NewFakeTempDir(dst string, err error) domain.TempDir {
 func NewFakeWrite(e error) domain.WriteFile {
 	return func(dest string, data []byte) error {
 		return e
-	}
-}
-
-// NewFakeGetArchiver is a fake of domain.GetArchiver .
-func NewFakeGetArchiver(err error) domain.GetArchiver {
-	return func(path string) domain.Archiver {
-		return &FakeArchiver{err: err}
 	}
 }
 

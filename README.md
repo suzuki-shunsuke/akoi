@@ -129,7 +129,7 @@ Check whether akoi is installed.
 
 ```
 $ akoi -v
-akoi version 0.1.0
+akoi version 0.3.1
 ```
 
 ## Usage
@@ -156,12 +156,18 @@ packages:
     url: "https://releases.hashicorp.com/consul/{{.Version}}/consul_{{.Version}}_darwin_amd64.zip"
     # package version
     version: 1.2.1
+    # archive file's type. This is optional and by default this is decided by url's path.
+    # The value should be included in archiver.SupportedFormat
+    # https://github.com/mholt/archiver
+    achive_type: Zip
     # files included in the downloaded file
     files:
     - name: consul
       # when unarchive the file to the temporary directory,
       # the relative path from the directory to the file.
       archive: consul
+      # file's mode. This is optional and default value is 0755.
+      mode: 0644
 ```
 
 ## Tips

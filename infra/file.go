@@ -63,6 +63,13 @@ func WriteFile(dst string, data []byte) error {
 }
 
 // GetArchiver converts archiver.Archiver into domain.Archiver .
-func GetArchiver(fpath string) domain.Archiver {
-	return archiver.MatchingFormat(fpath)
+func GetArchiver(fpath, ftype string) domain.Archiver {
+	if ftype == "" {
+		return archiver.MatchingFormat(fpath)
+	}
+	arc, ok := archiver.SupportedFormats[ftype]
+	if ok {
+		return arc
+	}
+	return nil
 }
