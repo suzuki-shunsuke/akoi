@@ -8,7 +8,7 @@
 [![GitHub tag](https://img.shields.io/github/tag/suzuki-shunsuke/akoi.svg)](https://github.com/suzuki-shunsuke/akoi/releases)
 [![License](http://img.shields.io/badge/license-mit-blue.svg?style=flat-square)](https://raw.githubusercontent.com/suzuki-shunsuke/akoi/master/LICENSE)
 
-binary version controll system
+binary version control system
 
 * [Overview](#overview)
 * [Getting Started](#getting-started)
@@ -21,7 +21,7 @@ binary version controll system
 
 ## Overview
 
-`akoi` is a binary version controll system.
+`akoi` is a binary version control system.
 `akoi` installs binaries according to the configuration file.
 
 `akoi`'s task is simple.
