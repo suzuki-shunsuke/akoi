@@ -41,19 +41,16 @@ func Install(c *cli.Context) error {
 		Format:         c.String("format"),
 		DryRun:         c.Bool("dry-run"),
 	}
-	result, err := usecase.Install(params, registry.NewInstallMethods(params.DryRun))
+	result := usecase.Install(params, registry.NewInstallMethods(params.DryRun))
 	if result == nil {
 		result = &domain.Result{}
 	}
-	if err == nil {
+	if !result.Failed {
 		s := result.String(params)
 		if s != "" {
 			fmt.Println(s)
 		}
 		return nil
-	}
-	if result.Msg == "" {
-		result.Msg = err.Error()
 	}
 	return cli.NewExitError(result.String(params), 1)
 }
