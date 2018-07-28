@@ -36,8 +36,8 @@ func NewInstallMethods(dryRun bool) *domain.InstallMethods {
 			MkLink:         testutil.NewFakeMkLink(nil),
 			ReadConfigFile: infra.ReadConfigFile,
 			ReadLink:       os.Readlink,
-			RemoveAll:      testutil.NewFakeRemoveAll(nil),
-			RemoveLink:     testutil.NewFakeRemoveLink(nil),
+			RemoveAll:      testutil.NewFakeRemoveFile(nil),
+			RemoveLink:     testutil.NewFakeRemoveFile(nil),
 			RemoveFile:     testutil.NewFakeRemoveFile(nil),
 			TempDir:        testutil.NewFakeTempDir("/tmp/tempdir", nil),
 		}

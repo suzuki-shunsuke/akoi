@@ -78,20 +78,6 @@ func NewFakeReadLink(dest string, err error) domain.ReadLink {
 	}
 }
 
-// NewFakeRemoveAll is a fake of domain.RemoveFile .
-func NewFakeRemoveAll(e error) domain.RemoveFile {
-	return func(dest string) error {
-		return e
-	}
-}
-
-// NewFakeRemoveLink is a fake of domain.RemoveFile .
-func NewFakeRemoveLink(e error) domain.RemoveFile {
-	return func(dest string) error {
-		return e
-	}
-}
-
 // NewFakeRemoveFile is a fake of domain.RemoveFile .
 func NewFakeRemoveFile(e error) domain.RemoveFile {
 	return func(dest string) error {
