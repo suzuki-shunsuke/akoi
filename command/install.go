@@ -17,9 +17,10 @@ var InstallCommand = cli.Command{
 	Action: Install,
 	Flags: []cli.Flag{
 		cli.StringFlag{
-			Name:  "config, c",
-			Usage: "configuration file path",
-			Value: "/etc/akoi/akoi.yml",
+			Name:   "config, c",
+			Usage:  "configuration file path",
+			Value:  "/etc/akoi/akoi.yml",
+			EnvVar: "AKOI_CONFIG_PATH",
 		},
 		cli.StringFlag{
 			Name:  "format, f",

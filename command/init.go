@@ -15,9 +15,10 @@ var InitCommand = cli.Command{
 	Action: Init,
 	Flags: []cli.Flag{
 		cli.StringFlag{
-			Name:  "dest, d",
-			Usage: "created configuration file path",
-			Value: "/etc/akoi/akoi.yml",
+			Name:   "dest, d",
+			Usage:  "created configuration file path",
+			Value:  "/etc/akoi/akoi.yml",
+			EnvVar: "AKOI_CONFIG_PATH",
 		},
 	},
 }
