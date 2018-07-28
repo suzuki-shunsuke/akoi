@@ -11,6 +11,7 @@
 binary version control system
 
 * [Overview](#overview)
+* [Features](#features)
 * [Getting Started](#getting-started)
 * [Install](#install)
 * [Usage](#usage)
@@ -39,6 +40,13 @@ For example,
 /usr/local/bin/consul-1.2.1
 /usr/local/bin/consul -> consul-1.2.1
 ```
+
+## Features
+
+* parallel installation
+* declarative and idempotence
+* [small dependencies and easy to install (written in Go)](#install)
+* [work good with ansible's shell module](#use-akoi-at-ansible)
 
 ## Getting Started
 
