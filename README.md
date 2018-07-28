@@ -17,6 +17,7 @@ binary version control system
 * [Configuration](#configuration)
 * [Tips](#tips)
   * [Use akoi at ansible](#use-akoi-at-ansible)
+* [Release Notes](https://github.com/suzuki-shunsuke/akoi/releases)
 * [License](#license)
 
 ## Overview
@@ -125,6 +126,8 @@ If you want to build yourself, run the following command.
 $ go get -u github.com/suzuki-shunsuke/akoi
 ```
 
+If you want to install `akoi` with ansible, please consider to use the ansible role [suzuki-shunsuke.akoi](https://galaxy.ansible.com/suzuki-shunsuke/akoi).
+
 Check whether akoi is installed.
 
 ```
@@ -169,6 +172,16 @@ packages:
       # file's mode. This is optional and default value is 0755.
       mode: 0644
 ```
+
+## Environment variables
+
+### AKOI_CONFIG_PATH
+
+Configuration file path. The precedence is
+
+1. command line option
+2. AKOI_CONFIG_PATH
+3. /etc/akoi/akoi.yml
 
 ## Tips
 
