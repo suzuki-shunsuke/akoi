@@ -3,6 +3,7 @@ package usecase
 import (
 	"fmt"
 	"net/url"
+	"os"
 	"path/filepath"
 	"text/template"
 
@@ -107,48 +108,65 @@ func Install(params *domain.InstallParams, methods *domain.InstallMethods) (*dom
 
 func createLink(dst string, pkg *domain.Package, file *domain.File, params *domain.InstallParams, methods *domain.InstallMethods) (*domain.FileResult, error) {
 	fileResult := &domain.FileResult{}
-	if _, err := methods.GetFileLstat(file.Link); err != nil {
-		if _, err := methods.GetFileStat(file.Link); err == nil {
-			// TODO force remove option
-			return fileResult, fmt.Errorf("%s has already existed and is not a symbolic link", file.Link)
-		}
-		p, err := filepath.Rel(filepath.Dir(file.Link), dst)
-		if err != nil {
-			return fileResult, err
-		}
-		if params.Format != keyWordAnsible {
-			fmt.Printf("create link %s -> %s\n", file.Link, p)
-		}
-		if err := methods.MkLink(p, file.Link); err != nil {
-			return fileResult, err
-		}
-		fileResult.Changed = true
-		return fileResult, nil
-	}
-	lnDest, err := methods.ReadLink(file.Link)
+	linkRelPath, err := filepath.Rel(filepath.Dir(file.Link), dst)
 	if err != nil {
 		return fileResult, err
 	}
-	p, err := filepath.Rel(filepath.Dir(file.Link), dst)
-	if err != nil {
-		return fileResult, err
-	}
-	if p == lnDest {
-		return fileResult, nil
+	if fi, err := methods.GetFileLstat(file.Link); err == nil {
+		switch mode := fi.Mode(); {
+		case mode.IsDir():
+			return fileResult, fmt.Errorf("%s has already existed and is a directory", file.Link)
+		case mode&os.ModeNamedPipe != 0:
+			return fileResult, fmt.Errorf("%s has already existed and is a named pipe", file.Link)
+		case mode.IsRegular():
+			if params.Format != keyWordAnsible {
+				fmt.Printf("remove %s\n", file.Link)
+			}
+			if err := methods.RemoveFile(file.Link); err != nil {
+				return fileResult, err
+			}
+			fileResult.Changed = true
+			if params.Format != keyWordAnsible {
+				fmt.Printf("create link %s -> %s\n", file.Link, linkRelPath)
+			}
+			if err := methods.MkLink(linkRelPath, file.Link); err != nil {
+				return fileResult, err
+			}
+			fileResult.Changed = true
+			return fileResult, nil
+		case mode&os.ModeSymlink != 0:
+			lnDest, err := methods.ReadLink(file.Link)
+			if err != nil {
+				return fileResult, err
+			}
+			if linkRelPath == lnDest {
+				return fileResult, nil
+			}
+			if params.Format != keyWordAnsible {
+				fmt.Printf("remove link %s -> %s\n", file.Link, lnDest)
+			}
+			if err := methods.RemoveLink(file.Link); err != nil {
+				return fileResult, err
+			}
+			fileResult.Changed = true
+			if params.Format != keyWordAnsible {
+				fmt.Printf("create link %s -> %s\n", file.Link, linkRelPath)
+			}
+			if err := methods.MkLink(linkRelPath, file.Link); err != nil {
+				return fileResult, err
+			}
+			return fileResult, nil
+		default:
+			return fileResult, fmt.Errorf("unexpected file mode %s: %s", file.Link, mode.String())
+		}
 	}
 	if params.Format != keyWordAnsible {
-		fmt.Printf("remove link %s -> %s\n", file.Link, lnDest)
+		fmt.Printf("create link %s -> %s\n", file.Link, linkRelPath)
 	}
-	if err := methods.RemoveLink(file.Link); err != nil {
+	if err := methods.MkLink(linkRelPath, file.Link); err != nil {
 		return fileResult, err
 	}
 	fileResult.Changed = true
-	if params.Format != keyWordAnsible {
-		fmt.Printf("create link %s -> %s\n", file.Link, p)
-	}
-	if err := methods.MkLink(p, file.Link); err != nil {
-		return fileResult, err
-	}
 	return fileResult, nil
 }
 

@@ -46,6 +46,7 @@ func TestInstall(t *testing.T) {
 			}, nil),
 		ReadLink:   testutil.NewFakeReadLink("/usr/local/bin/consul", nil),
 		RemoveAll:  testutil.NewFakeRemoveAll(nil),
+		RemoveFile: testutil.NewFakeRemoveFile(nil),
 		RemoveLink: testutil.NewFakeRemoveLink(nil),
 		TempDir:    testutil.NewFakeTempDir("/tmp/foo", nil),
 	}

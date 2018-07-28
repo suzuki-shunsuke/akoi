@@ -50,8 +50,9 @@ type (
 		MkLink         MkLink         `validate:"required"`
 		ReadConfigFile ReadConfigFile `validate:"required"`
 		ReadLink       ReadLink       `validate:"required"`
-		RemoveAll      RemoveAll      `validate:"required"`
-		RemoveLink     RemoveLink     `validate:"required"`
+		RemoveAll      RemoveFile     `validate:"required"`
+		RemoveFile     RemoveFile     `validate:"required"`
+		RemoveLink     RemoveFile     `validate:"required"`
 		TempDir        TempDir        `validate:"required"`
 	}
 
