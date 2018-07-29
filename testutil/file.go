@@ -22,13 +22,6 @@ func NewFakeCopy(written int64, err error) domain.Copy {
 	}
 }
 
-// NewFakeCopyFile is a fake of domain.CopyFile .
-func NewFakeCopyFile(err error) domain.CopyFile {
-	return func(src, dest string) error {
-		return err
-	}
-}
-
 // NewFakeDownload is a fake of domain.Download .
 func NewFakeDownload(resp *http.Response, err error) domain.Download {
 	return func(string) (*http.Response, error) {
@@ -68,6 +61,13 @@ func NewFakeMkdirAll(e error) domain.MkdirAll {
 func NewFakeMkLink(e error) domain.MkLink {
 	return func(src, dest string) error {
 		return e
+	}
+}
+
+// NewFakeOpen is a fake of domain.Open .
+func NewFakeOpen(f *os.File, e error) domain.Open {
+	return func(name string) (*os.File, error) {
+		return f, e
 	}
 }
 

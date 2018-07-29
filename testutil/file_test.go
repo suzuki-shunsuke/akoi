@@ -15,13 +15,6 @@ func TestNewFakeChmod(t *testing.T) {
 	}
 }
 
-func TestNewFakeCopyFile(t *testing.T) {
-	f := NewFakeCopyFile(nil)
-	if err := f("src", "dest"); err != nil {
-		t.Fatal(err)
-	}
-}
-
 func TestNewFakeDownload(t *testing.T) {
 	f := NewFakeDownload(nil, nil)
 	if _, err := f("http://example.com"); err != nil {

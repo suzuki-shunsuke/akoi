@@ -70,6 +70,13 @@ func installFile(pkg *domain.Package, file *domain.File, params *domain.InstallP
 	if pkg.ArchiveType != "unarchived" {
 		arc := pkg.Archiver
 		if arc == nil {
+			if params.Format != keyWordAnsible {
+				t := ustr
+				if pkg.ArchiveType != "" {
+					t = pkg.ArchiveType
+				}
+				fmt.Fprintf(os.Stderr, "failed to unarchive file: unsupported archive type: %s\n", t)
+			}
 			return fileResult, fmt.Errorf("failed to unarchive file: unsupported archive type")
 		}
 		// Unarchive
@@ -107,22 +114,30 @@ func installFile(pkg *domain.Package, file *domain.File, params *domain.InstallP
 			if params.Format != keyWordAnsible {
 				fmt.Printf("install %s\n", dst)
 			}
+			writer, err := methods.OpenFile(dst, os.O_RDWR|os.O_CREATE, mode)
+			if err != nil {
+				if params.Format != keyWordAnsible {
+					fmt.Fprintf(os.Stderr, "failed to install %s: %s\n", dst, err)
+				}
+				return fileResult, err
+			}
+			defer writer.Close()
 			if pkg.ArchiveType != "unarchived" {
-				if err := methods.CopyFile(filepath.Join(tmpDir, f.Archive), dst); err != nil {
+				src, err := methods.Open(filepath.Join(tmpDir, f.Archive))
+				if err != nil {
+					if params.Format != keyWordAnsible {
+						fmt.Fprintln(os.Stderr, err)
+					}
+					return fileResult, err
+				}
+				defer src.Close()
+				if _, err := methods.Copy(writer, src); err != nil {
 					if params.Format != keyWordAnsible {
 						fmt.Fprintln(os.Stderr, err)
 					}
 					return fileResult, err
 				}
 			} else {
-				writer, err := methods.OpenFile(dst, os.O_RDWR|os.O_CREATE, mode)
-				if err != nil {
-					if params.Format != keyWordAnsible {
-						fmt.Fprintf(os.Stderr, "failed to install %s: %s\n", dst, err)
-					}
-					return fileResult, err
-				}
-				defer writer.Close()
 				if _, err := methods.Copy(writer, resp.Body); err != nil {
 					if params.Format != keyWordAnsible {
 						fmt.Fprintln(os.Stderr, err)
@@ -131,8 +146,8 @@ func installFile(pkg *domain.Package, file *domain.File, params *domain.InstallP
 				}
 			}
 			fileResult.Changed = true
+			continue
 		}
-
 		// Change file mode
 		if err == nil && fi.Mode() == mode {
 			continue

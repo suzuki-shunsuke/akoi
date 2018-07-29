@@ -12,9 +12,8 @@ import (
 
 func TestInstall(t *testing.T) {
 	methods := &domain.InstallMethods{
-		Chmod:    testutil.NewFakeChmod(nil),
-		Copy:     testutil.NewFakeCopy(10, nil),
-		CopyFile: testutil.NewFakeCopyFile(nil),
+		Chmod: testutil.NewFakeChmod(nil),
+		Copy:  testutil.NewFakeCopy(10, nil),
 		Download: testutil.NewFakeDownload(
 			&http.Response{
 				StatusCode: 200,
@@ -27,6 +26,7 @@ func TestInstall(t *testing.T) {
 			testutil.NewFakeFileInfo("foo", 0666), nil),
 		MkdirAll: testutil.NewFakeMkdirAll(nil),
 		MkLink:   testutil.NewFakeMkLink(nil),
+		Open:     testutil.NewFakeOpen(&os.File{}, nil),
 		OpenFile: testutil.NewFakeOpenFile(&os.File{}, nil),
 		ReadConfigFile: testutil.NewFakeReadConfigFile(
 			&domain.Config{

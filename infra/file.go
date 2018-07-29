@@ -1,7 +1,6 @@
 package infra
 
 import (
-	"io"
 	"io/ioutil"
 	"os"
 
@@ -11,20 +10,6 @@ import (
 
 	"github.com/suzuki-shunsuke/akoi/domain"
 )
-
-// CopyFile copies a file.
-func CopyFile(src, dest string) error {
-	f, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	w, err := os.Create(dest)
-	if err != nil {
-		return err
-	}
-	_, err = io.Copy(w, f)
-	return err
-}
 
 // ExistFile is an implementation of domain.ExistFile .
 func ExistFile(dst string) bool {

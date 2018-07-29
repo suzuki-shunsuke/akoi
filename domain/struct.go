@@ -41,13 +41,13 @@ type (
 	InstallMethods struct {
 		Chmod          Chmod          `validate:"required"`
 		Copy           Copy           `validate:"required"`
-		CopyFile       CopyFile       `validate:"required"`
 		Download       Download       `validate:"required"`
 		GetArchiver    GetArchiver    `validate:"required"`
 		GetFileStat    GetFileStat    `validate:"required"`
 		GetFileLstat   GetFileStat    `validate:"required"`
 		MkdirAll       MkdirAll       `validate:"required"`
 		MkLink         MkLink         `validate:"required"`
+		Open           Open           `validate:"required"`
 		OpenFile       OpenFile       `validate:"required"`
 		ReadConfigFile ReadConfigFile `validate:"required"`
 		ReadLink       ReadLink       `validate:"required"`
