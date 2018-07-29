@@ -48,6 +48,12 @@ For example,
 * [small dependencies and easy to install (written in Go)](#install)
 * [work good with ansible's shell module](#use-akoi-at-ansible)
 
+## Demo
+
+<p align="center">
+  <img src="https://rawgit.com/suzuki-shunsuke/artifact/master/akoi/demo.gif">
+</p>
+
 ## Getting Started
 
 [Install akoi](#install).
