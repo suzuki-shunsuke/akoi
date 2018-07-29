@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/suzuki-shunsuke/akoi/domain"
-	"github.com/suzuki-shunsuke/akoi/registry"
 	"github.com/suzuki-shunsuke/akoi/testutil"
 )
 
@@ -57,36 +56,5 @@ func TestInstall(t *testing.T) {
 	methods.ReadConfigFile = testutil.NewFakeReadConfigFile(nil, fmt.Errorf("failed to read config"))
 	if result := Install(params, methods); !result.Failed {
 		t.Fatal("it should be failed to read config")
-	}
-}
-
-func Test_createLink(t *testing.T) {
-}
-
-func Test_installFile(t *testing.T) {
-}
-
-func Test_installPackage(t *testing.T) {
-}
-
-func Test_setupConfig(t *testing.T) {
-	cfg := &domain.Config{
-		BinPath:  "/usr/local/bin/{{.Name}}-{{.Version}}",
-		LinkPath: "/usr/local/bin/{{.Name}}",
-		Packages: map[string]domain.Package{
-			"consul": {
-				RawURL:  "https://releases.hashicorp.com/consul/{{.Version}}/consul_{{.Version}}_darwin_amd64.zip",
-				Version: "1.2.1",
-				Files: []domain.File{
-					{
-						Name:    "consul",
-						Archive: "consul",
-					},
-				},
-			},
-		},
-	}
-	if err := setupConfig(cfg, registry.NewInstallMethods(true)); err != nil {
-		t.Fatal(err)
 	}
 }
