@@ -15,6 +15,13 @@ func NewFakeChmod(err error) domain.Chmod {
 	}
 }
 
+// NewFakeCopy is a fake of domain.Copy .
+func NewFakeCopy(written int64, err error) domain.Copy {
+	return func(dst io.Writer, src io.Reader) (int64, error) {
+		return written, err
+	}
+}
+
 // NewFakeCopyFile is a fake of domain.CopyFile .
 func NewFakeCopyFile(err error) domain.CopyFile {
 	return func(src, dest string) error {
@@ -61,6 +68,13 @@ func NewFakeMkdirAll(e error) domain.MkdirAll {
 func NewFakeMkLink(e error) domain.MkLink {
 	return func(src, dest string) error {
 		return e
+	}
+}
+
+// NewFakeOpenFile is a fake of domain.OpenFile .
+func NewFakeOpenFile(f *os.File, e error) domain.OpenFile {
+	return func(name string, flag int, perm os.FileMode) (*os.File, error) {
+		return f, e
 	}
 }
 

@@ -14,4 +14,10 @@ link_path: /usr/local/bin/{{.Name}}
 #     files:
 #     - name: consul
 #       archive: consul
+#   jq:
+#     url: https://github.com/stedolan/jq/releases/download/jq-{{.Version}}/jq-osx-amd64
+#     version: 1.5
+#     archive_type: unarchived
+#     files:
+#     - name: jq
 `

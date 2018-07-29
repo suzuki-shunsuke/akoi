@@ -3,6 +3,7 @@ package usecase
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"testing"
 
 	"github.com/suzuki-shunsuke/akoi/domain"
@@ -12,6 +13,7 @@ import (
 func TestInstall(t *testing.T) {
 	methods := &domain.InstallMethods{
 		Chmod:    testutil.NewFakeChmod(nil),
+		Copy:     testutil.NewFakeCopy(10, nil),
 		CopyFile: testutil.NewFakeCopyFile(nil),
 		Download: testutil.NewFakeDownload(
 			&http.Response{
@@ -25,6 +27,7 @@ func TestInstall(t *testing.T) {
 			testutil.NewFakeFileInfo("foo", 0666), nil),
 		MkdirAll: testutil.NewFakeMkdirAll(nil),
 		MkLink:   testutil.NewFakeMkLink(nil),
+		OpenFile: testutil.NewFakeOpenFile(&os.File{}, nil),
 		ReadConfigFile: testutil.NewFakeReadConfigFile(
 			&domain.Config{
 				BinPath:  "/usr/local/bin/{{.Name}}-{{.Version}}",

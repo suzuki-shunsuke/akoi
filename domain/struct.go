@@ -40,6 +40,7 @@ type (
 	// InstallMethods is functions which are used at usecase.Install .
 	InstallMethods struct {
 		Chmod          Chmod          `validate:"required"`
+		Copy           Copy           `validate:"required"`
 		CopyFile       CopyFile       `validate:"required"`
 		Download       Download       `validate:"required"`
 		GetArchiver    GetArchiver    `validate:"required"`
@@ -47,6 +48,7 @@ type (
 		GetFileLstat   GetFileStat    `validate:"required"`
 		MkdirAll       MkdirAll       `validate:"required"`
 		MkLink         MkLink         `validate:"required"`
+		OpenFile       OpenFile       `validate:"required"`
 		ReadConfigFile ReadConfigFile `validate:"required"`
 		ReadLink       ReadLink       `validate:"required"`
 		RemoveAll      RemoveFile     `validate:"required"`

@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"io"
 	"net/http"
 	"os"
 
@@ -23,6 +24,7 @@ func NewInstallMethods(dryRun bool) *domain.InstallMethods {
 	if dryRun {
 		return &domain.InstallMethods{
 			Chmod:    testutil.NewFakeChmod(nil),
+			Copy:     testutil.NewFakeCopy(10, nil),
 			CopyFile: testutil.NewFakeCopyFile(nil),
 			Download: testutil.NewFakeDownload(
 				&http.Response{
@@ -34,6 +36,7 @@ func NewInstallMethods(dryRun bool) *domain.InstallMethods {
 			GetFileLstat:   os.Lstat,
 			MkdirAll:       testutil.NewFakeMkdirAll(nil),
 			MkLink:         testutil.NewFakeMkLink(nil),
+			OpenFile:       testutil.NewFakeOpenFile(&os.File{}, nil),
 			ReadConfigFile: infra.ReadConfigFile,
 			ReadLink:       os.Readlink,
 			RemoveAll:      testutil.NewFakeRemoveFile(nil),
@@ -44,6 +47,7 @@ func NewInstallMethods(dryRun bool) *domain.InstallMethods {
 	}
 	return &domain.InstallMethods{
 		Chmod:          os.Chmod,
+		Copy:           io.Copy,
 		CopyFile:       infra.CopyFile,
 		Download:       http.Get,
 		GetArchiver:    infra.GetArchiver,
@@ -51,6 +55,7 @@ func NewInstallMethods(dryRun bool) *domain.InstallMethods {
 		GetFileLstat:   os.Lstat,
 		MkdirAll:       infra.MkdirAll,
 		MkLink:         os.Symlink,
+		OpenFile:       os.OpenFile,
 		ReadConfigFile: infra.ReadConfigFile,
 		ReadLink:       os.Readlink,
 		RemoveAll:      os.RemoveAll,

@@ -17,6 +17,8 @@ func installFile(pkg *domain.Package, file *domain.File, params *domain.InstallP
 	if mode == 0 {
 		mode = 0755
 	}
+
+	// Check file
 	if fi, err := methods.GetFileStat(dst); err == nil {
 		if fi.Mode() == mode {
 			return fileResult, nil
@@ -24,13 +26,17 @@ func installFile(pkg *domain.Package, file *domain.File, params *domain.InstallP
 		if params.Format != keyWordAnsible {
 			fmt.Printf("chmod %s %s\n", mode.String(), dst)
 		}
-		err := methods.Chmod(dst, mode)
-		if err != nil && params.Format != keyWordAnsible {
-			fmt.Fprintln(os.Stderr, err)
+		if err := methods.Chmod(dst, mode); err != nil {
+			if params.Format != keyWordAnsible {
+				fmt.Fprintln(os.Stderr, err)
+			}
+			return fileResult, err
 		}
+		fileResult.Changed = true
 		return fileResult, err
 	}
 
+	// Download
 	ustr := pkg.URL.String()
 	if params.Format != keyWordAnsible {
 		fmt.Printf("downloading %s: %s\n", pkg.Name, ustr)
@@ -50,6 +56,8 @@ func installFile(pkg *domain.Package, file *domain.File, params *domain.InstallP
 		return fileResult, fmt.Errorf(
 			"failed to download %s from %s: %d", pkg.Name, ustr, resp.StatusCode)
 	}
+
+	// Create temporary directory
 	tmpDir, err := methods.TempDir()
 	if err != nil {
 		if params.Format != keyWordAnsible {
@@ -58,9 +66,13 @@ func installFile(pkg *domain.Package, file *domain.File, params *domain.InstallP
 		return fileResult, err
 	}
 	defer methods.RemoveAll(tmpDir)
-	arc := pkg.Archiver
-	// TODO support not archived file
-	if arc != nil {
+
+	if pkg.ArchiveType != "unarchived" {
+		arc := pkg.Archiver
+		if arc == nil {
+			return fileResult, fmt.Errorf("failed to unarchive file: unsupported archive type")
+		}
+		// Unarchive
 		if params.Format != keyWordAnsible {
 			fmt.Printf("unarchive %s\n", pkg.Name)
 		}
@@ -70,26 +82,19 @@ func installFile(pkg *domain.Package, file *domain.File, params *domain.InstallP
 			}
 			return fileResult, err
 		}
-		for _, f := range pkg.Files {
-			fi, err := methods.GetFileStat(f.Bin)
-			if err != nil {
-				dir := filepath.Dir(f.Bin)
-				if _, err := methods.GetFileStat(dir); err != nil {
-					if params.Format != keyWordAnsible {
-						fmt.Printf("create directory %s\n", dir)
-					}
-					if err := methods.MkdirAll(dir); err != nil {
-						if params.Format != keyWordAnsible {
-							fmt.Fprintln(os.Stderr, err)
-						}
-						return fileResult, err
-					}
-					fileResult.Changed = true
-				}
+	}
+
+	for _, f := range pkg.Files {
+		// Check file
+		fi, err := methods.GetFileStat(f.Bin)
+		if err != nil {
+			// Create parent directory
+			dir := filepath.Dir(f.Bin)
+			if _, err := methods.GetFileStat(dir); err != nil {
 				if params.Format != keyWordAnsible {
-					fmt.Printf("install %s\n", dst)
+					fmt.Printf("create directory %s\n", dir)
 				}
-				if err := methods.CopyFile(filepath.Join(tmpDir, f.Archive), dst); err != nil {
+				if err := methods.MkdirAll(dir); err != nil {
 					if params.Format != keyWordAnsible {
 						fmt.Fprintln(os.Stderr, err)
 					}
@@ -97,17 +102,48 @@ func installFile(pkg *domain.Package, file *domain.File, params *domain.InstallP
 				}
 				fileResult.Changed = true
 			}
-			if err == nil && fi.Mode() == mode {
-				continue
+
+			// Install
+			if params.Format != keyWordAnsible {
+				fmt.Printf("install %s\n", dst)
 			}
-			if err := methods.Chmod(dst, mode); err != nil {
-				if params.Format != keyWordAnsible {
-					fmt.Fprintln(os.Stderr, err)
+			if pkg.ArchiveType != "unarchived" {
+				if err := methods.CopyFile(filepath.Join(tmpDir, f.Archive), dst); err != nil {
+					if params.Format != keyWordAnsible {
+						fmt.Fprintln(os.Stderr, err)
+					}
+					return fileResult, err
 				}
-				return fileResult, err
+			} else {
+				writer, err := methods.OpenFile(dst, os.O_RDWR|os.O_CREATE, mode)
+				if err != nil {
+					if params.Format != keyWordAnsible {
+						fmt.Fprintf(os.Stderr, "failed to install %s: %s\n", dst, err)
+					}
+					return fileResult, err
+				}
+				defer writer.Close()
+				if _, err := methods.Copy(writer, resp.Body); err != nil {
+					if params.Format != keyWordAnsible {
+						fmt.Fprintln(os.Stderr, err)
+					}
+					return fileResult, err
+				}
 			}
 			fileResult.Changed = true
 		}
+
+		// Change file mode
+		if err == nil && fi.Mode() == mode {
+			continue
+		}
+		if err := methods.Chmod(dst, mode); err != nil {
+			if params.Format != keyWordAnsible {
+				fmt.Fprintln(os.Stderr, err)
+			}
+			return fileResult, err
+		}
+		fileResult.Changed = true
 	}
 	return fileResult, nil
 }
