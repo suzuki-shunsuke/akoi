@@ -40,9 +40,6 @@ func TestMkdirAll(t *testing.T) {
 	}
 }
 
-func TestCopyFile(t *testing.T) {
-}
-
 func TestMkLink(t *testing.T) {
 }
 

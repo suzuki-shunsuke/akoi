@@ -176,6 +176,7 @@ packages:
     # archive file's type. This is optional and by default this is decided by url's path.
     # The value should be included in archiver.SupportedFormat
     # https://github.com/mholt/archiver
+    # If downloaded file is not archived, set archive_type to "unarchived".
     achive_type: Zip
     # files included in the downloaded file
     files:
