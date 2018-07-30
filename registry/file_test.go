@@ -18,7 +18,7 @@ func TestNewInstallMethods(t *testing.T) {
 	if methods == nil {
 		t.Fatal("methods is nil")
 	}
-	methods = NewInstallMethods(&domain.InstallParams{DryRun: true})
+	methods = NewInstallMethods(&domain.InstallParams{DryRun: false})
 	if methods == nil {
 		t.Fatal("methods is nil")
 	}
