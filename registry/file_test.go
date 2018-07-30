@@ -2,6 +2,8 @@ package registry
 
 import (
 	"testing"
+
+	"github.com/suzuki-shunsuke/akoi/domain"
 )
 
 func TestNewInitMethods(t *testing.T) {
@@ -12,11 +14,11 @@ func TestNewInitMethods(t *testing.T) {
 }
 
 func TestNewInstallMethods(t *testing.T) {
-	methods := NewInstallMethods(false)
+	methods := NewInstallMethods(&domain.InstallParams{DryRun: true})
 	if methods == nil {
 		t.Fatal("methods is nil")
 	}
-	methods = NewInstallMethods(true)
+	methods = NewInstallMethods(&domain.InstallParams{DryRun: false})
 	if methods == nil {
 		t.Fatal("methods is nil")
 	}

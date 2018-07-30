@@ -24,7 +24,10 @@ func Test_setupConfig(t *testing.T) {
 			},
 		},
 	}
-	if err := setupConfig(cfg, registry.NewInstallMethods(true)); err != nil {
+	params := domain.InstallParams{
+		DryRun: true,
+	}
+	if err := setupConfig(cfg, registry.NewInstallMethods(&params)); err != nil {
 		t.Fatal(err)
 	}
 }

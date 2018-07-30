@@ -15,6 +15,10 @@ type (
 	Download func(url string) (*http.Response, error)
 	// ExistFile is an interface to check file existence.
 	ExistFile func(string) bool
+	// Fprintf is an interface of fmt.Fprintf .
+	Fprintf func(w io.Writer, format string, a ...interface{}) (n int, err error)
+	// Fprintln is an interface of fmt.Fprintln .
+	Fprintln func(w io.Writer, a ...interface{}) (n int, err error)
 	// GetArchiver returns an archiver for a given file
 	GetArchiver func(fpath, ftype string) Archiver
 	// GetFileStat returns a FileInfo.
@@ -27,6 +31,10 @@ type (
 	Open func(name string) (*os.File, error)
 	// OpenFile opens a file.
 	OpenFile func(name string, flag int, perm os.FileMode) (*os.File, error)
+	// Printf is an interface of fmt.Printf .
+	Printf func(format string, a ...interface{}) (n int, err error)
+	// Println is an interface of fmt.Println .
+	Println func(a ...interface{}) (n int, err error)
 	// ReadConfigFile reads a configuration file.
 	ReadConfigFile func(string) (*Config, error)
 	// ReadLink gets a symbolic's destination path.

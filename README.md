@@ -16,6 +16,8 @@ binary version control system
 * [Install](#install)
 * [Usage](#usage)
 * [Configuration](#configuration)
+* [Output Format](#output-format)
+  * [ansible](#ansible)
 * [Tips](#tips)
   * [Use akoi at ansible](#use-akoi-at-ansible)
 * [Release Notes](https://github.com/suzuki-shunsuke/akoi/releases)
@@ -197,6 +199,44 @@ Configuration file path. The precedence is
 1. command line option
 2. AKOI_CONFIG_PATH
 3. /etc/akoi/akoi.yml
+
+## Output Format
+
+### ansible
+
+*Note that this specification is unstable.*
+
+```json
+{
+  "msg": "",
+  "changed": true,
+  "failed": false,
+  "packages": {
+    "consul": {
+      "name": "consul",
+      "changed": true,
+      "failed": false,
+      "error": "",
+      "version": "1.2.1",
+      "url": "https://releases.hashicorp.com/consul/1.2.1/consul_1.2.1_darwin_amd64.zip",
+      "files": {
+        "consul": {
+          "name": "consul",
+          "error": "",
+          "changed": true,
+          "migrated": false,
+          "installed": true,
+          "mode_changed": false,
+          "file_removed": false,
+          "dir_created": false,
+          "link": "consul",
+          "entity": "consul"
+        }
+      }
+    }
+  }
+}
+```
 
 ## Tips
 

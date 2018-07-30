@@ -2,15 +2,29 @@ package testutil
 
 import (
 	"fmt"
+	"os"
 	"testing"
+
+	"github.com/suzuki-shunsuke/akoi/domain"
 )
 
 func TestFakeArchiverRead(t *testing.T) {
+	arc := &FakeArchiver{err: nil}
+	if err := arc.Read(nil, "foo"); err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestNewFakeChmod(t *testing.T) {
 	f := NewFakeChmod(nil)
 	if err := f("", 0755); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestNewFakeCopy(t *testing.T) {
+	f := NewFakeCopy(10, nil)
+	if _, err := f(nil, nil); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -42,6 +56,11 @@ func TestNewFakeGetArchiver(t *testing.T) {
 }
 
 func TestNewFakeGetFileStat(t *testing.T) {
+	fi := NewFakeFileInfo("foo.tar.gz", 0755)
+	f := NewFakeGetFileStat(fi, nil)
+	if _, err := f("foo.tar.gz"); err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestNewFakeMkdirAll(t *testing.T) {
@@ -62,7 +81,28 @@ func TestNewFakeMkLink(t *testing.T) {
 	}
 }
 
+func TestNewFakeOpen(t *testing.T) {
+	file := os.File{}
+	f := NewFakeOpen(&file, nil)
+	if _, err := f("src"); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestNewFakeOpenFile(t *testing.T) {
+	file := os.File{}
+	f := NewFakeOpenFile(&file, nil)
+	if _, err := f("src", 0, 0755); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestNewFakeReadConfigFile(t *testing.T) {
+	cfg := domain.Config{}
+	f := NewFakeReadConfigFile(&cfg, nil)
+	if _, err := f("src"); err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestNewFakeReadLink(t *testing.T) {

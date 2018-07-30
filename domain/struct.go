@@ -23,6 +23,21 @@ type (
 		Bin     string      `yaml:"-"`
 		Link    string      `yaml:"-"`
 		Mode    os.FileMode `yaml:"mode"`
+		Result  *FileResult `yaml:"-"`
+	}
+
+	// FileResult represents a result of file installation.
+	FileResult struct {
+		Error       string `json:"error"`
+		FileRemoved bool   `json:"file_removed"`
+		Changed     bool   `json:"changed"`
+		Migrated    bool   `json:"migrated"`
+		ModeChanged bool   `json:"mode_changed"`
+		Installed   bool   `json:"installed"`
+		DirCreated  bool   `json:"dir_created"`
+		Name        string `json:"name"`
+		Link        string `json:"link"`
+		Entity      string `json:"entity"`
 	}
 
 	// InitMethods is functions which are used at usecase.Init .
@@ -42,6 +57,8 @@ type (
 		Chmod          Chmod          `validate:"required"`
 		Copy           Copy           `validate:"required"`
 		Download       Download       `validate:"required"`
+		Fprintf        Fprintf        `validate:"required"`
+		Fprintln       Fprintln       `validate:"required"`
 		GetArchiver    GetArchiver    `validate:"required"`
 		GetFileStat    GetFileStat    `validate:"required"`
 		GetFileLstat   GetFileStat    `validate:"required"`
@@ -49,6 +66,8 @@ type (
 		MkLink         MkLink         `validate:"required"`
 		Open           Open           `validate:"required"`
 		OpenFile       OpenFile       `validate:"required"`
+		Printf         Printf         `validate:"required"`
+		Println        Println        `validate:"required"`
 		ReadConfigFile ReadConfigFile `validate:"required"`
 		ReadLink       ReadLink       `validate:"required"`
 		RemoveAll      RemoveFile     `validate:"required"`
@@ -66,13 +85,33 @@ type (
 
 	// Package represents a package configuration.
 	Package struct {
-		ArchiveType string   `yaml:"archive_type"`
-		Name        string   `yaml:"-" validate:"required"`
-		RawURL      string   `yaml:"url" validate:"required"`
-		Version     string   `yaml:"version" validate:"required"`
-		Archiver    Archiver `yaml:"-" validate:"required"`
-		Files       []File   `yaml:"files"`
-		URL         *url.URL `yaml:"-"`
+		ArchiveType string         `yaml:"archive_type"`
+		Name        string         `yaml:"-" validate:"required"`
+		RawURL      string         `yaml:"url" validate:"required"`
+		Version     string         `yaml:"version" validate:"required"`
+		Archiver    Archiver       `yaml:"-" validate:"required"`
+		Files       []File         `yaml:"files"`
+		URL         *url.URL       `yaml:"-"`
+		Result      *PackageResult `yaml:"-"`
+	}
+
+	// PackageResult represents a result of package installation.
+	PackageResult struct {
+		Error   string                `json:"error"`
+		Name    string                `json:"-"`
+		Version string                `json:"version"`
+		URL     string                `json:"url"`
+		Changed bool                  `json:"changed"`
+		Failed  bool                  `json:"failed"`
+		Files   map[string]FileResult `json:"files"`
+	}
+
+	// Result represents a result of packages's installation.
+	Result struct {
+		Msg      string                   `json:"msg"`
+		Changed  bool                     `json:"changed"`
+		Failed   bool                     `json:"failed"`
+		Packages map[string]PackageResult `json:"packages"`
 	}
 
 	// TemplateParams is template parameters.
@@ -81,3 +120,8 @@ type (
 		Version string
 	}
 )
+
+// Archived returns whether the package is archived.
+func (pkg *Package) Archived() bool {
+	return pkg.ArchiveType != "unarchived"
+}

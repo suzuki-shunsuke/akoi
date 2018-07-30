@@ -20,8 +20,9 @@ func NewInitMethods() *domain.InitMethods {
 }
 
 // NewInstallMethods returns a domain.InstallMethods .
-func NewInstallMethods(dryRun bool) *domain.InstallMethods {
-	if dryRun {
+func NewInstallMethods(params *domain.InstallParams) *domain.InstallMethods {
+	flag := params.Format != "ansible"
+	if params.DryRun {
 		return &domain.InstallMethods{
 			Chmod: testutil.NewFakeChmod(nil),
 			Copy:  testutil.NewFakeCopy(10, nil),
@@ -30,6 +31,8 @@ func NewInstallMethods(dryRun bool) *domain.InstallMethods {
 					StatusCode: 200,
 					Body:       testutil.NewFakeIOReadCloser("hello"),
 				}, nil),
+			Fprintf:        infra.NewFprintf(flag),
+			Fprintln:       infra.NewFprintln(flag),
 			GetArchiver:    testutil.NewFakeGetArchiver(nil),
 			GetFileStat:    os.Stat,
 			GetFileLstat:   os.Lstat,
@@ -37,6 +40,8 @@ func NewInstallMethods(dryRun bool) *domain.InstallMethods {
 			MkLink:         testutil.NewFakeMkLink(nil),
 			Open:           testutil.NewFakeOpen(&os.File{}, nil),
 			OpenFile:       testutil.NewFakeOpenFile(&os.File{}, nil),
+			Printf:         infra.NewPrintf(flag),
+			Println:        infra.NewPrintln(flag),
 			ReadConfigFile: infra.ReadConfigFile,
 			ReadLink:       os.Readlink,
 			RemoveAll:      testutil.NewFakeRemoveFile(nil),
@@ -49,6 +54,8 @@ func NewInstallMethods(dryRun bool) *domain.InstallMethods {
 		Chmod:          os.Chmod,
 		Copy:           io.Copy,
 		Download:       http.Get,
+		Fprintf:        infra.NewFprintf(flag),
+		Fprintln:       infra.NewFprintln(flag),
 		GetArchiver:    infra.GetArchiver,
 		GetFileStat:    os.Stat,
 		GetFileLstat:   os.Lstat,
@@ -56,6 +63,8 @@ func NewInstallMethods(dryRun bool) *domain.InstallMethods {
 		MkLink:         os.Symlink,
 		Open:           os.Open,
 		OpenFile:       os.OpenFile,
+		Printf:         infra.NewPrintf(flag),
+		Println:        infra.NewPrintln(flag),
 		ReadConfigFile: infra.ReadConfigFile,
 		ReadLink:       os.Readlink,
 		RemoveAll:      os.RemoveAll,

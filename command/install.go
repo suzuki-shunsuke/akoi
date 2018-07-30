@@ -41,7 +41,7 @@ func Install(c *cli.Context) error {
 		Format:         c.String("format"),
 		DryRun:         c.Bool("dry-run"),
 	}
-	result := usecase.Install(params, registry.NewInstallMethods(params.DryRun))
+	result := usecase.Install(params, registry.NewInstallMethods(params))
 	if result == nil {
 		result = &domain.Result{}
 	}
