@@ -42,9 +42,20 @@ func Install(params *domain.InstallParams, methods *domain.InstallMethods) *doma
 		wg.Add(1)
 		go func(pkg domain.Package) {
 			defer wg.Done()
-			pkgResult := installPackage(&pkg, params, methods)
+			installPackage(&pkg, params, methods)
+			pkgResult := pkg.Result
 			if pkgResult == nil {
 				pkgResult = &domain.PackageResult{Name: pkg.Name}
+			}
+			for _, file := range pkg.Files {
+				fileResult := file.Result
+				if fileResult.Changed {
+					pkgResult.Changed = true
+				}
+				if fileResult.Error != "" {
+					pkgResult.Failed = true
+				}
+				pkgResult.Files[file.Name] = *fileResult
 			}
 			pkgResultChan <- *pkgResult
 		}(pkg)
@@ -56,7 +67,7 @@ func Install(params *domain.InstallParams, methods *domain.InstallMethods) *doma
 		if pkgResult.Changed {
 			result.Changed = true
 		}
-		if pkgResult.Error != "" {
+		if pkgResult.Failed {
 			result.Failed = true
 		}
 	}

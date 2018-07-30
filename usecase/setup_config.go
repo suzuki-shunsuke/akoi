@@ -23,6 +23,12 @@ func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
 	cfg.LinkPathTpl = tpl
 
 	for pkgName, pkg := range cfg.Packages {
+		if pkg.Result == nil {
+			pkg.Result = &domain.PackageResult{
+				Name:  pkgName,
+				Files: map[string]domain.FileResult{},
+			}
+		}
 		pkg.Name = pkgName
 		tpl, err := template.New("pkg_url").Parse(pkg.RawURL)
 		if err != nil {
@@ -39,6 +45,12 @@ func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
 		pkg.URL = u2
 		pkg.Archiver = methods.GetArchiver(u2.Path, pkg.ArchiveType)
 		for i, file := range pkg.Files {
+			if file.Result == nil {
+				file.Result = &domain.FileResult{}
+			}
+			if file.Mode == 0 {
+				file.Mode = 0755
+			}
 			dst, err := util.RenderTpl(
 				cfg.BinPathTpl, &domain.TemplateParams{
 					Name: file.Name, Version: pkg.Version,

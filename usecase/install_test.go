@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/suzuki-shunsuke/akoi/domain"
+	"github.com/suzuki-shunsuke/akoi/infra"
 	"github.com/suzuki-shunsuke/akoi/testutil"
 )
 
@@ -19,6 +20,8 @@ func TestInstall(t *testing.T) {
 				StatusCode: 200,
 				Body:       testutil.NewFakeIOReadCloser("hello"),
 			}, nil),
+		Fprintf:     infra.NewFprintf(true),
+		Fprintln:    infra.NewFprintln(true),
 		GetArchiver: testutil.NewFakeGetArchiver(nil),
 		GetFileStat: testutil.NewFakeGetFileStat(
 			testutil.NewFakeFileInfo("foo", 0666), nil),
@@ -28,6 +31,8 @@ func TestInstall(t *testing.T) {
 		MkLink:   testutil.NewFakeMkLink(nil),
 		Open:     testutil.NewFakeOpen(&os.File{}, nil),
 		OpenFile: testutil.NewFakeOpenFile(&os.File{}, nil),
+		Printf:   infra.NewPrintf(true),
+		Println:  infra.NewPrintln(true),
 		ReadConfigFile: testutil.NewFakeReadConfigFile(
 			&domain.Config{
 				BinPath:  "/usr/local/bin/{{.Name}}-{{.Version}}",
