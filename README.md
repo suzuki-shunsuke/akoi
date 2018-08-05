@@ -180,6 +180,10 @@ packages:
     # https://github.com/mholt/archiver
     # If downloaded file is not archived, set archive_type to "unarchived".
     achive_type: Zip
+    # binary install path
+    bin_path: dummy/{{.Name}}-{{.Version}}
+    # the symbolic link to the binary
+    link_path: dummy/{{.Name}}
     # files included in the downloaded file
     files:
     - name: consul
@@ -188,6 +192,10 @@ packages:
       archive: consul
       # file's mode. This is optional and default value is 0755.
       mode: 0644
+      # binary install path
+      bin_path: dummy/{{.Name}}-{{.Version}}
+      # the symbolic link to the binary
+      link_path: dummy/{{.Name}}
 ```
 
 ## Environment variables

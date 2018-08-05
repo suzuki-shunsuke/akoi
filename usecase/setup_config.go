@@ -10,13 +10,13 @@ import (
 
 // setupConfig compiles and renders templates of domain.Config .
 func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
-	tpl, err := template.New("bin_path").Parse(cfg.BinPath)
+	tpl, err := template.New("cfg_bin_path").Parse(cfg.BinPath)
 	if err != nil {
 		return err
 	}
 	cfg.BinPathTpl = tpl
 
-	tpl, err = template.New("link_path").Parse(cfg.LinkPath)
+	tpl, err = template.New("cfg_link_path").Parse(cfg.LinkPath)
 	if err != nil {
 		return err
 	}
@@ -29,6 +29,29 @@ func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
 				Files: map[string]domain.FileResult{},
 			}
 		}
+
+		if pkg.LinkPath == "" {
+			pkg.LinkPath = cfg.LinkPath
+			pkg.LinkPathTpl = cfg.LinkPathTpl
+		} else {
+			tpl, err := template.New("pkg_link_path").Parse(pkg.LinkPath)
+			if err != nil {
+				return err
+			}
+			pkg.LinkPathTpl = tpl
+		}
+
+		if pkg.BinPath == "" {
+			pkg.BinPath = cfg.BinPath
+			pkg.BinPathTpl = cfg.BinPathTpl
+		} else {
+			tpl, err := template.New("pkg_bin_path").Parse(pkg.BinPath)
+			if err != nil {
+				return err
+			}
+			pkg.BinPathTpl = tpl
+		}
+
 		pkg.Name = pkgName
 		tpl, err := template.New("pkg_url").Parse(pkg.RawURL)
 		if err != nil {
@@ -51,8 +74,31 @@ func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
 			if file.Mode == 0 {
 				file.Mode = 0755
 			}
+
+			if file.LinkPath == "" {
+				file.LinkPath = pkg.LinkPath
+				file.LinkPathTpl = pkg.LinkPathTpl
+			} else {
+				tpl, err := template.New("file_link_path").Parse(file.LinkPath)
+				if err != nil {
+					return err
+				}
+				file.LinkPathTpl = tpl
+			}
+
+			if file.BinPath == "" {
+				file.BinPath = pkg.BinPath
+				file.BinPathTpl = pkg.BinPathTpl
+			} else {
+				tpl, err := template.New("file_bin_path").Parse(file.BinPath)
+				if err != nil {
+					return err
+				}
+				file.BinPathTpl = tpl
+			}
+
 			dst, err := util.RenderTpl(
-				cfg.BinPathTpl, &domain.TemplateParams{
+				file.BinPathTpl, &domain.TemplateParams{
 					Name: file.Name, Version: pkg.Version,
 				})
 			if err != nil {
@@ -61,7 +107,7 @@ func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
 			file.Bin = dst
 
 			lnPath, err := util.RenderTpl(
-				cfg.LinkPathTpl, &domain.TemplateParams{
+				file.LinkPathTpl, &domain.TemplateParams{
 					Name: file.Name, Version: pkg.Version,
 				})
 			if err != nil {
