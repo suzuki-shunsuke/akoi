@@ -9,8 +9,8 @@ import (
 type (
 	// Config represents application's configuration.
 	Config struct {
-		BinPathTpl  *template.Template
-		LinkPathTpl *template.Template
+		BinPathTpl  *template.Template `yaml:"-"`
+		LinkPathTpl *template.Template `yaml:"-"`
 		BinPath     string             `yaml:"bin_path"`
 		LinkPath    string             `yaml:"link_path"`
 		Packages    map[string]Package `yaml:"packages"`
@@ -18,12 +18,16 @@ type (
 
 	// File represents a file configuration.
 	File struct {
-		Name    string      `yaml:"name"`
-		Archive string      `yaml:"archive"`
-		Bin     string      `yaml:"-"`
-		Link    string      `yaml:"-"`
-		Mode    os.FileMode `yaml:"mode"`
-		Result  *FileResult `yaml:"-"`
+		Name        string             `yaml:"name"`
+		Archive     string             `yaml:"archive"`
+		Bin         string             `yaml:"-"`
+		Link        string             `yaml:"-"`
+		BinPath     string             `yaml:"bin_path"`
+		LinkPath    string             `yaml:"link_path"`
+		BinPathTpl  *template.Template `yaml:"-"`
+		LinkPathTpl *template.Template `yaml:"-"`
+		Mode        os.FileMode        `yaml:"mode"`
+		Result      *FileResult        `yaml:"-"`
 	}
 
 	// FileResult represents a result of file installation.
@@ -85,14 +89,18 @@ type (
 
 	// Package represents a package configuration.
 	Package struct {
-		ArchiveType string         `yaml:"archive_type"`
-		Name        string         `yaml:"-" validate:"required"`
-		RawURL      string         `yaml:"url" validate:"required"`
-		Version     string         `yaml:"version" validate:"required"`
-		Archiver    Archiver       `yaml:"-" validate:"required"`
-		Files       []File         `yaml:"files"`
-		URL         *url.URL       `yaml:"-"`
-		Result      *PackageResult `yaml:"-"`
+		ArchiveType string             `yaml:"archive_type"`
+		Name        string             `yaml:"-" validate:"required"`
+		RawURL      string             `yaml:"url" validate:"required"`
+		Version     string             `yaml:"version" validate:"required"`
+		BinPath     string             `yaml:"bin_path"`
+		LinkPath    string             `yaml:"link_path"`
+		BinPathTpl  *template.Template `yaml:"-"`
+		LinkPathTpl *template.Template `yaml:"-"`
+		Archiver    Archiver           `yaml:"-" validate:"required"`
+		Files       []File             `yaml:"files"`
+		URL         *url.URL           `yaml:"-"`
+		Result      *PackageResult     `yaml:"-"`
 	}
 
 	// PackageResult represents a result of package installation.
