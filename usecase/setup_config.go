@@ -11,18 +11,16 @@ import (
 )
 
 // setupConfig compiles and renders templates of domain.Config .
-func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
-	tpl, err := template.New("cfg_bin_dir").Parse(cfg.BinDir)
+func setupConfig(cfg *domain.Config, methods *domain.SetupConfigMethods) error {
+	cfgBinDirTpl, err := template.New("cfg_bin_dir").Parse(cfg.BinDirTplStr)
 	if err != nil {
 		return err
 	}
-	cfg.BinDirTpl = tpl
 
-	tpl, err = template.New("cfg_link_dir").Parse(cfg.LinkDir)
+	cfgLinkDirTpl, err := template.New("cfg_link_dir").Parse(cfg.LinkDirTplStr)
 	if err != nil {
 		return err
 	}
-	cfg.LinkDirTpl = tpl
 
 	if cfg.BinSeparator == "" {
 		cfg.BinSeparator = "-"
@@ -36,22 +34,20 @@ func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
 			}
 		}
 
-		if pkg.LinkDir == "" {
-			pkg.LinkDir = cfg.LinkDir
-			pkg.LinkDirTpl = cfg.LinkDirTpl
+		if pkg.LinkDirTplStr == "" {
+			pkg.LinkDirTpl = cfgLinkDirTpl
 		} else {
-			tpl, err := template.New("pkg_link_dir").Parse(pkg.LinkDir)
+			tpl, err := template.New("pkg_link_dir").Parse(pkg.LinkDirTplStr)
 			if err != nil {
 				return err
 			}
 			pkg.LinkDirTpl = tpl
 		}
 
-		if pkg.BinDir == "" {
-			pkg.BinDir = cfg.BinDir
-			pkg.BinDirTpl = cfg.BinDirTpl
+		if pkg.BinDirTplStr == "" {
+			pkg.BinDirTpl = cfgBinDirTpl
 		} else {
-			tpl, err := template.New("pkg_bin_dir").Parse(pkg.BinDir)
+			tpl, err := template.New("pkg_bin_dir").Parse(pkg.BinDirTplStr)
 			if err != nil {
 				return err
 			}
@@ -73,6 +69,7 @@ func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
 		}
 		pkg.URL = u2
 		pkg.Archiver = methods.GetArchiver(u2.Path, pkg.ArchiveType)
+		// TODO validate archiver
 		if pkg.BinSeparator == "" {
 			pkg.BinSeparator = cfg.BinSeparator
 		}
@@ -84,22 +81,20 @@ func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
 				file.Mode = 0755
 			}
 
-			if file.LinkDir == "" {
-				file.LinkDir = pkg.LinkDir
+			if file.LinkDirTplStr == "" {
 				file.LinkDirTpl = pkg.LinkDirTpl
 			} else {
-				tpl, err := template.New("file_link_dir").Parse(file.LinkDir)
+				tpl, err := template.New("file_link_dir").Parse(file.LinkDirTplStr)
 				if err != nil {
 					return err
 				}
 				file.LinkDirTpl = tpl
 			}
 
-			if file.BinDir == "" {
-				file.BinDir = pkg.BinDir
+			if file.BinDirTplStr == "" {
 				file.BinDirTpl = pkg.BinDirTpl
 			} else {
-				tpl, err := template.New("file_bin_dir").Parse(file.BinDir)
+				tpl, err := template.New("file_bin_dir").Parse(file.BinDirTplStr)
 				if err != nil {
 					return err
 				}
@@ -110,7 +105,7 @@ func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
 				file.BinSeparator = pkg.BinSeparator
 			}
 
-			dst, err := util.RenderTpl(
+			file.BinDir, err = util.RenderTpl(
 				file.BinDirTpl, &domain.TemplateParams{
 					Name: file.Name, Version: pkg.Version,
 				})
@@ -118,7 +113,7 @@ func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
 				return err
 			}
 			file.Bin = filepath.Join(
-				dst, fmt.Sprintf("%s%s%s", file.Name, file.BinSeparator, pkg.Version))
+				file.BinDir, fmt.Sprintf("%s%s%s", file.Name, file.BinSeparator, pkg.Version))
 
 			lnPath, err := util.RenderTpl(
 				file.LinkDirTpl, &domain.TemplateParams{
@@ -127,7 +122,6 @@ func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
 			if err != nil {
 				return err
 			}
-			file.Link = fmt.Sprintf("%s%s", lnPath, file.Name)
 			file.Link = filepath.Join(lnPath, file.Name)
 			pkg.Files[i] = file
 		}

@@ -9,27 +9,26 @@ import (
 type (
 	// Config represents application's configuration.
 	Config struct {
-		BinDir       string             `yaml:"bin_dir"`
-		BinSeparator string             `yaml:"bin_separator"`
-		LinkDir      string             `yaml:"link_dir"`
-		BinDirTpl    *template.Template `yaml:"-"`
-		LinkDirTpl   *template.Template `yaml:"-"`
-		Packages     map[string]Package `yaml:"packages"`
+		BinDirTplStr  string             `yaml:"bin_dir"`
+		BinSeparator  string             `yaml:"bin_separator"`
+		LinkDirTplStr string             `yaml:"link_dir"`
+		Packages      map[string]Package `yaml:"packages"`
 	}
 
 	// File represents a file configuration.
 	File struct {
-		Archive      string             `yaml:"archive"`
-		Bin          string             `yaml:"-"`
-		BinDir       string             `yaml:"bin_dir"`
-		BinSeparator string             `yaml:"bin_separator"`
-		Link         string             `yaml:"-"`
-		LinkDir      string             `yaml:"link_dir"`
-		Name         string             `yaml:"name"`
-		BinDirTpl    *template.Template `yaml:"-"`
-		LinkDirTpl   *template.Template `yaml:"-"`
-		Mode         os.FileMode        `yaml:"mode"`
-		Result       *FileResult        `yaml:"-"`
+		Archive       string             `yaml:"archive"`
+		Bin           string             `yaml:"-"`
+		BinDir        string             `yaml:"-"`
+		BinDirTplStr  string             `yaml:"bin_dir"`
+		BinSeparator  string             `yaml:"bin_separator"`
+		Link          string             `yaml:"-"`
+		LinkDirTplStr string             `yaml:"link_dir"`
+		Name          string             `yaml:"name"`
+		BinDirTpl     *template.Template `yaml:"-"`
+		LinkDirTpl    *template.Template `yaml:"-"`
+		Mode          os.FileMode        `yaml:"mode"`
+		Result        *FileResult        `yaml:"-"`
 	}
 
 	// FileResult represents a result of file installation.
@@ -90,21 +89,38 @@ type (
 		DryRun         bool
 	}
 
+	// ListMethods is functions which are used at usecase.List .
+	ListMethods struct {
+		Fprintf        Fprintf        `validate:"required"`
+		Fprintln       Fprintln       `validate:"required"`
+		GetArchiver    GetArchiver    `validate:"required"`
+		Glob           Glob           `validate:"required"`
+		Printf         Printf         `validate:"required"`
+		Println        Println        `validate:"required"`
+		ReadConfigFile ReadConfigFile `validate:"required"`
+	}
+
+	// ListParams is parameters of usecase.List .
+	ListParams struct {
+		ConfigFilePath string
+		Format         string
+	}
+
 	// Package represents a package configuration.
 	Package struct {
-		ArchiveType  string             `yaml:"archive_type"`
-		BinDir       string             `yaml:"bin_dir"`
-		BinSeparator string             `yaml:"bin_separator"`
-		LinkDir      string             `yaml:"link_dir"`
-		Name         string             `yaml:"-" validate:"required"`
-		RawURL       string             `yaml:"url" validate:"required"`
-		Version      string             `yaml:"version" validate:"required"`
-		BinDirTpl    *template.Template `yaml:"-"`
-		LinkDirTpl   *template.Template `yaml:"-"`
-		Archiver     Archiver           `yaml:"-" validate:"required"`
-		Files        []File             `yaml:"files"`
-		URL          *url.URL           `yaml:"-"`
-		Result       *PackageResult     `yaml:"-"`
+		ArchiveType   string             `yaml:"archive_type"`
+		BinDirTplStr  string             `yaml:"bin_dir"`
+		BinSeparator  string             `yaml:"bin_separator"`
+		LinkDirTplStr string             `yaml:"link_dir"`
+		Name          string             `yaml:"-" validate:"required"`
+		RawURL        string             `yaml:"url" validate:"required"`
+		Version       string             `yaml:"version" validate:"required"`
+		BinDirTpl     *template.Template `yaml:"-"`
+		LinkDirTpl    *template.Template `yaml:"-"`
+		Archiver      Archiver           `yaml:"-" validate:"required"`
+		Files         []File             `yaml:"files"`
+		URL           *url.URL           `yaml:"-"`
+		Result        *PackageResult     `yaml:"-"`
 	}
 
 	// PackageResult represents a result of package installation.
@@ -124,6 +140,11 @@ type (
 		Changed  bool                     `json:"changed"`
 		Failed   bool                     `json:"failed"`
 		Packages map[string]PackageResult `json:"packages"`
+	}
+
+	// SetupConfigMethods is functions which are used at usecase.setupConfig .
+	SetupConfigMethods struct {
+		GetArchiver GetArchiver `validate:"required"`
 	}
 
 	// TemplateParams is template parameters.

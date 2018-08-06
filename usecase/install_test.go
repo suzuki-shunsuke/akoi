@@ -37,8 +37,8 @@ func TestInstall(t *testing.T) {
 		Println:  infra.NewPrintln(true),
 		ReadConfigFile: testutil.NewFakeReadConfigFile(
 			&domain.Config{
-				BinDir:  "/usr/local/bin",
-				LinkDir: "/usr/local/bin",
+				BinDirTplStr:  "/usr/local/bin",
+				LinkDirTplStr: "/usr/local/bin",
 				Packages: map[string]domain.Package{
 					"consul": {
 						RawURL:  "https://releases.hashicorp.com/consul/{{.Version}}/consul_{{.Version}}_darwin_amd64.zip",

@@ -23,6 +23,8 @@ type (
 	GetArchiver func(fpath, ftype string) Archiver
 	// GetFileStat returns a FileInfo.
 	GetFileStat func(string) (os.FileInfo, error)
+	// Glob returns the names of all files matching pattern or nil if there is no matching file.
+	Glob func(string) ([]string, error)
 	// MkdirAll is an interface to create directories.
 	MkdirAll func(string) error
 	// MkLink creates a symbolic link.

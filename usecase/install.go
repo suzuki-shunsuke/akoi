@@ -12,7 +12,7 @@ const (
 	keyWordAnsible = "ansible"
 )
 
-// Install intalls binraries.
+// Install installs binraries.
 func Install(params *domain.InstallParams, methods *domain.InstallMethods) *domain.Result {
 	result := &domain.Result{
 		Packages: map[string]domain.PackageResult{}}
@@ -31,7 +31,9 @@ func Install(params *domain.InstallParams, methods *domain.InstallMethods) *doma
 		result.Failed = true
 		return result
 	}
-	if err := setupConfig(cfg, methods); err != nil {
+	if err := setupConfig(cfg, &domain.SetupConfigMethods{
+		GetArchiver: methods.GetArchiver,
+	}); err != nil {
 		methods.Fprintln(os.Stderr, err)
 		result.Msg = err.Error()
 		result.Failed = true
@@ -44,7 +46,6 @@ func Install(params *domain.InstallParams, methods *domain.InstallMethods) *doma
 	var wg sync.WaitGroup
 	pkgResultChan := make(chan domain.PackageResult, numOfPkgs)
 	for _, pkg := range cfg.Packages {
-		// TODO goroutine
 		wg.Add(1)
 		go func(pkg domain.Package) {
 			defer wg.Done()

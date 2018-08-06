@@ -13,7 +13,7 @@ import (
 // InstallCommand is the sub command "install".
 var InstallCommand = cli.Command{
 	Name:   "install",
-	Usage:  "intall binaries",
+	Usage:  "install binaries",
 	Action: Install,
 	Flags: []cli.Flag{
 		cli.StringFlag{

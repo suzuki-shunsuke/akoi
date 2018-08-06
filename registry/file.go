@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"github.com/suzuki-shunsuke/akoi/domain"
 	"github.com/suzuki-shunsuke/akoi/infra"
@@ -74,5 +75,19 @@ func NewInstallMethods(params *domain.InstallParams) *domain.InstallMethods {
 		RemoveLink:     os.Remove,
 		RemoveFile:     os.Remove,
 		TempDir:        infra.TempDir,
+	}
+}
+
+// NewListMethods returns a domain.ListMethods .
+func NewListMethods(params *domain.ListParams) *domain.ListMethods {
+	flag := params.Format != "ansible"
+	return &domain.ListMethods{
+		Fprintf:        infra.NewFprintf(flag),
+		Fprintln:       infra.NewFprintln(flag),
+		GetArchiver:    infra.GetArchiver,
+		Glob:           filepath.Glob,
+		Printf:         infra.NewPrintf(flag),
+		Println:        infra.NewPrintln(flag),
+		ReadConfigFile: infra.ReadConfigFile,
 	}
 }
