@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"os"
 	"sync"
 
 	"github.com/suzuki-shunsuke/akoi/domain"
@@ -16,17 +17,22 @@ func Install(params *domain.InstallParams, methods *domain.InstallMethods) *doma
 	result := &domain.Result{
 		Packages: map[string]domain.PackageResult{}}
 	if err := util.ValidateStruct(methods); err != nil {
+		if methods.Fprintln != nil {
+			methods.Fprintln(os.Stderr, err)
+		}
 		result.Msg = err.Error()
 		result.Failed = true
 		return result
 	}
 	cfg, err := methods.ReadConfigFile(params.ConfigFilePath)
 	if err != nil {
+		methods.Fprintln(os.Stderr, err)
 		result.Msg = err.Error()
 		result.Failed = true
 		return result
 	}
 	if err := setupConfig(cfg, methods); err != nil {
+		methods.Fprintln(os.Stderr, err)
 		result.Msg = err.Error()
 		result.Failed = true
 		return result

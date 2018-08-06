@@ -127,6 +127,20 @@ func installPackage(pkg *domain.Package, params *domain.InstallParams, methods *
 				}
 				fileResult.Installed = true
 			} else {
+				if pkg.ArchiveType == "Gzip" {
+					reader, err := methods.NewGzipReader(resp.Body)
+					if err != nil {
+						methods.Fprintln(os.Stderr, err)
+						fileResult.Error = err.Error()
+						continue
+					}
+					defer reader.Close()
+					if _, err := methods.Copy(writer, reader); err != nil {
+						methods.Fprintln(os.Stderr, err)
+						fileResult.Error = err.Error()
+						continue
+					}
+				}
 				if _, err := methods.Copy(writer, resp.Body); err != nil {
 					methods.Fprintln(os.Stderr, err)
 					fileResult.Error = err.Error()

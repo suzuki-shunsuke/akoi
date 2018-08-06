@@ -27,6 +27,8 @@ type (
 	MkdirAll func(string) error
 	// MkLink creates a symbolic link.
 	MkLink func(src, dst string) error
+	// NewGzipReader creates a reader for gzip.
+	NewGzipReader func(io.Reader) (io.ReadCloser, error)
 	// Open opens a file.
 	Open func(name string) (*os.File, error)
 	// OpenFile opens a file.
