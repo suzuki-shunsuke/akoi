@@ -68,6 +68,7 @@ type (
 		GetFileLstat   GetFileStat    `validate:"required"`
 		MkdirAll       MkdirAll       `validate:"required"`
 		MkLink         MkLink         `validate:"required"`
+		NewGzipReader  NewGzipReader  `validate:"required"`
 		Open           Open           `validate:"required"`
 		OpenFile       OpenFile       `validate:"required"`
 		Printf         Printf         `validate:"required"`
@@ -131,5 +132,5 @@ type (
 
 // Archived returns whether the package is archived.
 func (pkg *Package) Archived() bool {
-	return pkg.ArchiveType != "unarchived"
+	return pkg.ArchiveType != "unarchived" && pkg.ArchiveType != "Gzip"
 }

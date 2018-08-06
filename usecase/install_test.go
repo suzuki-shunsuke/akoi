@@ -29,6 +29,8 @@ func TestInstall(t *testing.T) {
 			testutil.NewFakeFileInfo("foo", 0666), nil),
 		MkdirAll: testutil.NewFakeMkdirAll(nil),
 		MkLink:   testutil.NewFakeMkLink(nil),
+		NewGzipReader: testutil.NewFakeNewGzipReader(
+			testutil.NewFakeIOReadCloser("hello"), nil),
 		Open:     testutil.NewFakeOpen(&os.File{}, nil),
 		OpenFile: testutil.NewFakeOpenFile(&os.File{}, nil),
 		Printf:   infra.NewPrintf(true),

@@ -176,9 +176,10 @@ packages:
     # package version
     version: 1.2.1
     # archive file's type. This is optional and by default this is decided by url's path.
-    # The value should be included in archiver.SupportedFormat
+    # akoi uses mholt/archiver and the value included in archiver.SupportedFormat is supported.
     # https://github.com/mholt/archiver
     # If downloaded file is not archived, set archive_type to "unarchived".
+    # And the file type is compressed but not archived (not ".tar.gz"), set archive_type to "Gzip".
     achive_type: Zip
     # binary install path
     bin_path: dummy/{{.Name}}-{{.Version}}

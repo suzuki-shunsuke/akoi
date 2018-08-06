@@ -1,6 +1,8 @@
 package infra
 
 import (
+	"compress/gzip"
+	"io"
 	"io/ioutil"
 	"os"
 
@@ -15,6 +17,23 @@ import (
 func ExistFile(dst string) bool {
 	_, err := os.Stat(dst)
 	return err == nil
+}
+
+// GetArchiver converts archiver.Archiver into domain.Archiver .
+func GetArchiver(fpath, ftype string) domain.Archiver {
+	if ftype == "" {
+		return archiver.MatchingFormat(fpath)
+	}
+	arc, ok := archiver.SupportedFormats[ftype]
+	if ok {
+		return arc
+	}
+	return nil
+}
+
+// NewGzipReader converts gzip.NewReader into domain.NewGzipReader .
+func NewGzipReader(reader io.Reader) (io.ReadCloser, error) {
+	return gzip.NewReader(reader)
 }
 
 // MkdirAll is an implementation of domain.MkdirAll .
@@ -45,16 +64,4 @@ func TempDir() (string, error) {
 // WriteFile is an implementation of domain.WriteFile .
 func WriteFile(dst string, data []byte) error {
 	return ioutil.WriteFile(dst, data, 0644)
-}
-
-// GetArchiver converts archiver.Archiver into domain.Archiver .
-func GetArchiver(fpath, ftype string) domain.Archiver {
-	if ftype == "" {
-		return archiver.MatchingFormat(fpath)
-	}
-	arc, ok := archiver.SupportedFormats[ftype]
-	if ok {
-		return arc
-	}
-	return nil
 }

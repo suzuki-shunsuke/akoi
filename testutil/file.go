@@ -64,6 +64,13 @@ func NewFakeMkLink(e error) domain.MkLink {
 	}
 }
 
+// NewFakeNewGzipReader is a fake of domain.NewGzipReader .
+func NewFakeNewGzipReader(reader io.ReadCloser, err error) domain.NewGzipReader {
+	return func(r io.Reader) (io.ReadCloser, error) {
+		return reader, err
+	}
+}
+
 // NewFakeOpen is a fake of domain.Open .
 func NewFakeOpen(f *os.File, e error) domain.Open {
 	return func(name string) (*os.File, error) {
