@@ -1,7 +1,9 @@
 package usecase
 
 import (
+	"fmt"
 	"net/url"
+	"path/filepath"
 	"text/template"
 
 	"github.com/suzuki-shunsuke/akoi/domain"
@@ -10,17 +12,21 @@ import (
 
 // setupConfig compiles and renders templates of domain.Config .
 func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
-	tpl, err := template.New("cfg_bin_path").Parse(cfg.BinPath)
+	tpl, err := template.New("cfg_bin_dir").Parse(cfg.BinDir)
 	if err != nil {
 		return err
 	}
-	cfg.BinPathTpl = tpl
+	cfg.BinDirTpl = tpl
 
-	tpl, err = template.New("cfg_link_path").Parse(cfg.LinkPath)
+	tpl, err = template.New("cfg_link_dir").Parse(cfg.LinkDir)
 	if err != nil {
 		return err
 	}
-	cfg.LinkPathTpl = tpl
+	cfg.LinkDirTpl = tpl
+
+	if cfg.BinSeparator == "" {
+		cfg.BinSeparator = "-"
+	}
 
 	for pkgName, pkg := range cfg.Packages {
 		if pkg.Result == nil {
@@ -30,26 +36,26 @@ func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
 			}
 		}
 
-		if pkg.LinkPath == "" {
-			pkg.LinkPath = cfg.LinkPath
-			pkg.LinkPathTpl = cfg.LinkPathTpl
+		if pkg.LinkDir == "" {
+			pkg.LinkDir = cfg.LinkDir
+			pkg.LinkDirTpl = cfg.LinkDirTpl
 		} else {
-			tpl, err := template.New("pkg_link_path").Parse(pkg.LinkPath)
+			tpl, err := template.New("pkg_link_dir").Parse(pkg.LinkDir)
 			if err != nil {
 				return err
 			}
-			pkg.LinkPathTpl = tpl
+			pkg.LinkDirTpl = tpl
 		}
 
-		if pkg.BinPath == "" {
-			pkg.BinPath = cfg.BinPath
-			pkg.BinPathTpl = cfg.BinPathTpl
+		if pkg.BinDir == "" {
+			pkg.BinDir = cfg.BinDir
+			pkg.BinDirTpl = cfg.BinDirTpl
 		} else {
-			tpl, err := template.New("pkg_bin_path").Parse(pkg.BinPath)
+			tpl, err := template.New("pkg_bin_dir").Parse(pkg.BinDir)
 			if err != nil {
 				return err
 			}
-			pkg.BinPathTpl = tpl
+			pkg.BinDirTpl = tpl
 		}
 
 		pkg.Name = pkgName
@@ -67,6 +73,9 @@ func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
 		}
 		pkg.URL = u2
 		pkg.Archiver = methods.GetArchiver(u2.Path, pkg.ArchiveType)
+		if pkg.BinSeparator == "" {
+			pkg.BinSeparator = cfg.BinSeparator
+		}
 		for i, file := range pkg.Files {
 			if file.Result == nil {
 				file.Result = &domain.FileResult{}
@@ -75,45 +84,51 @@ func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
 				file.Mode = 0755
 			}
 
-			if file.LinkPath == "" {
-				file.LinkPath = pkg.LinkPath
-				file.LinkPathTpl = pkg.LinkPathTpl
+			if file.LinkDir == "" {
+				file.LinkDir = pkg.LinkDir
+				file.LinkDirTpl = pkg.LinkDirTpl
 			} else {
-				tpl, err := template.New("file_link_path").Parse(file.LinkPath)
+				tpl, err := template.New("file_link_dir").Parse(file.LinkDir)
 				if err != nil {
 					return err
 				}
-				file.LinkPathTpl = tpl
+				file.LinkDirTpl = tpl
 			}
 
-			if file.BinPath == "" {
-				file.BinPath = pkg.BinPath
-				file.BinPathTpl = pkg.BinPathTpl
+			if file.BinDir == "" {
+				file.BinDir = pkg.BinDir
+				file.BinDirTpl = pkg.BinDirTpl
 			} else {
-				tpl, err := template.New("file_bin_path").Parse(file.BinPath)
+				tpl, err := template.New("file_bin_dir").Parse(file.BinDir)
 				if err != nil {
 					return err
 				}
-				file.BinPathTpl = tpl
+				file.BinDirTpl = tpl
+			}
+
+			if file.BinSeparator == "" {
+				file.BinSeparator = pkg.BinSeparator
 			}
 
 			dst, err := util.RenderTpl(
-				file.BinPathTpl, &domain.TemplateParams{
+				file.BinDirTpl, &domain.TemplateParams{
 					Name: file.Name, Version: pkg.Version,
 				})
 			if err != nil {
 				return err
 			}
-			file.Bin = dst
+			file.Bin = filepath.Join(
+				dst, fmt.Sprintf("%s%s%s", file.Name, file.BinSeparator, pkg.Version))
 
 			lnPath, err := util.RenderTpl(
-				file.LinkPathTpl, &domain.TemplateParams{
+				file.LinkDirTpl, &domain.TemplateParams{
 					Name: file.Name, Version: pkg.Version,
 				})
 			if err != nil {
 				return err
 			}
-			file.Link = lnPath
+			file.Link = fmt.Sprintf("%s%s", lnPath, file.Name)
+			file.Link = filepath.Join(lnPath, file.Name)
 			pkg.Files[i] = file
 		}
 		cfg.Packages[pkgName] = pkg

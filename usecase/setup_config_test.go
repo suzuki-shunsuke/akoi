@@ -9,8 +9,8 @@ import (
 
 func Test_setupConfig(t *testing.T) {
 	cfg := &domain.Config{
-		BinPath:  "/usr/local/bin/{{.Name}}-{{.Version}}",
-		LinkPath: "/usr/local/bin/{{.Name}}",
+		BinDir:  "/usr/local/bin",
+		LinkDir: "/usr/local/bin",
 		Packages: map[string]domain.Package{
 			"consul": {
 				RawURL:  "https://releases.hashicorp.com/consul/{{.Version}}/consul_{{.Version}}_darwin_amd64.zip",

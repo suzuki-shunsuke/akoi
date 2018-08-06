@@ -9,46 +9,48 @@ import (
 type (
 	// Config represents application's configuration.
 	Config struct {
-		BinPathTpl  *template.Template `yaml:"-"`
-		LinkPathTpl *template.Template `yaml:"-"`
-		BinPath     string             `yaml:"bin_path"`
-		LinkPath    string             `yaml:"link_path"`
-		Packages    map[string]Package `yaml:"packages"`
+		BinDir       string             `yaml:"bin_dir"`
+		BinSeparator string             `yaml:"bin_separator"`
+		LinkDir      string             `yaml:"link_dir"`
+		BinDirTpl    *template.Template `yaml:"-"`
+		LinkDirTpl   *template.Template `yaml:"-"`
+		Packages     map[string]Package `yaml:"packages"`
 	}
 
 	// File represents a file configuration.
 	File struct {
-		Name        string             `yaml:"name"`
-		Archive     string             `yaml:"archive"`
-		Bin         string             `yaml:"-"`
-		Link        string             `yaml:"-"`
-		BinPath     string             `yaml:"bin_path"`
-		LinkPath    string             `yaml:"link_path"`
-		BinPathTpl  *template.Template `yaml:"-"`
-		LinkPathTpl *template.Template `yaml:"-"`
-		Mode        os.FileMode        `yaml:"mode"`
-		Result      *FileResult        `yaml:"-"`
+		Archive      string             `yaml:"archive"`
+		Bin          string             `yaml:"-"`
+		BinDir       string             `yaml:"bin_dir"`
+		BinSeparator string             `yaml:"bin_separator"`
+		Link         string             `yaml:"-"`
+		LinkDir      string             `yaml:"link_dir"`
+		Name         string             `yaml:"name"`
+		BinDirTpl    *template.Template `yaml:"-"`
+		LinkDirTpl   *template.Template `yaml:"-"`
+		Mode         os.FileMode        `yaml:"mode"`
+		Result       *FileResult        `yaml:"-"`
 	}
 
 	// FileResult represents a result of file installation.
 	FileResult struct {
+		Entity      string `json:"entity"`
 		Error       string `json:"error"`
-		FileRemoved bool   `json:"file_removed"`
+		Link        string `json:"link"`
+		Name        string `json:"name"`
 		Changed     bool   `json:"changed"`
+		DirCreated  bool   `json:"dir_created"`
+		FileRemoved bool   `json:"file_removed"`
+		Installed   bool   `json:"installed"`
 		Migrated    bool   `json:"migrated"`
 		ModeChanged bool   `json:"mode_changed"`
-		Installed   bool   `json:"installed"`
-		DirCreated  bool   `json:"dir_created"`
-		Name        string `json:"name"`
-		Link        string `json:"link"`
-		Entity      string `json:"entity"`
 	}
 
 	// InitMethods is functions which are used at usecase.Init .
 	InitMethods struct {
-		Write    WriteFile `validate:"required"`
 		Exist    ExistFile `validate:"required"`
 		MkdirAll MkdirAll  `validate:"required"`
+		Write    WriteFile `validate:"required"`
 	}
 
 	// InitParams is parameters of usecase.Init .
@@ -90,26 +92,27 @@ type (
 
 	// Package represents a package configuration.
 	Package struct {
-		ArchiveType string             `yaml:"archive_type"`
-		Name        string             `yaml:"-" validate:"required"`
-		RawURL      string             `yaml:"url" validate:"required"`
-		Version     string             `yaml:"version" validate:"required"`
-		BinPath     string             `yaml:"bin_path"`
-		LinkPath    string             `yaml:"link_path"`
-		BinPathTpl  *template.Template `yaml:"-"`
-		LinkPathTpl *template.Template `yaml:"-"`
-		Archiver    Archiver           `yaml:"-" validate:"required"`
-		Files       []File             `yaml:"files"`
-		URL         *url.URL           `yaml:"-"`
-		Result      *PackageResult     `yaml:"-"`
+		ArchiveType  string             `yaml:"archive_type"`
+		BinDir       string             `yaml:"bin_dir"`
+		BinSeparator string             `yaml:"bin_separator"`
+		LinkDir      string             `yaml:"link_dir"`
+		Name         string             `yaml:"-" validate:"required"`
+		RawURL       string             `yaml:"url" validate:"required"`
+		Version      string             `yaml:"version" validate:"required"`
+		BinDirTpl    *template.Template `yaml:"-"`
+		LinkDirTpl   *template.Template `yaml:"-"`
+		Archiver     Archiver           `yaml:"-" validate:"required"`
+		Files        []File             `yaml:"files"`
+		URL          *url.URL           `yaml:"-"`
+		Result       *PackageResult     `yaml:"-"`
 	}
 
 	// PackageResult represents a result of package installation.
 	PackageResult struct {
 		Error   string                `json:"error"`
 		Name    string                `json:"-"`
-		Version string                `json:"version"`
 		URL     string                `json:"url"`
+		Version string                `json:"version"`
 		Changed bool                  `json:"changed"`
 		Failed  bool                  `json:"failed"`
 		Files   map[string]FileResult `json:"files"`
