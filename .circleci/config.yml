@@ -3,12 +3,12 @@ version: 2
 jobs:
   build:
     docker:
-    - image: suzukishunsuke/go-ci:0.1.0-0
+    - image: suzukishunsuke/go-ci:0.4.1
     working_directory: /go/src/github.com/suzuki-shunsuke/akoi
     steps:
     - checkout
     - run: npm i
-    - run: dep ensure
+    - run: dep-dl
     - run: bash script/commitlint-circleci.sh
     - run: gometalinter ./...
     - run: bash script/codecov-test.sh
