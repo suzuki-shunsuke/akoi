@@ -164,6 +164,7 @@ $ akoi help [init|install]
 
 ```yaml
 ---
+# bin_path and link_path must be absolute.
 # binary install path
 bin_path: dummy/{{.Name}}-{{.Version}}
 # the symbolic link to the binary
