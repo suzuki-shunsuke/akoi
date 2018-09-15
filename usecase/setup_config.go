@@ -1,7 +1,9 @@
 package usecase
 
 import (
+	"fmt"
 	"net/url"
+	"path/filepath"
 	"text/template"
 
 	"github.com/suzuki-shunsuke/akoi/domain"
@@ -10,6 +12,9 @@ import (
 
 // setupConfig compiles and renders templates of domain.Config .
 func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
+	cfg.BinPath = methods.ExpandEnv(cfg.BinPath)
+	cfg.LinkPath = methods.ExpandEnv(cfg.LinkPath)
+
 	tpl, err := template.New("cfg_bin_path").Parse(cfg.BinPath)
 	if err != nil {
 		return err
@@ -34,6 +39,7 @@ func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
 			pkg.LinkPath = cfg.LinkPath
 			pkg.LinkPathTpl = cfg.LinkPathTpl
 		} else {
+			pkg.LinkPath = methods.ExpandEnv(pkg.LinkPath)
 			tpl, err := template.New("pkg_link_path").Parse(pkg.LinkPath)
 			if err != nil {
 				return err
@@ -45,6 +51,7 @@ func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
 			pkg.BinPath = cfg.BinPath
 			pkg.BinPathTpl = cfg.BinPathTpl
 		} else {
+			pkg.BinPath = methods.ExpandEnv(pkg.BinPath)
 			tpl, err := template.New("pkg_bin_path").Parse(pkg.BinPath)
 			if err != nil {
 				return err
@@ -79,6 +86,7 @@ func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
 				file.LinkPath = pkg.LinkPath
 				file.LinkPathTpl = pkg.LinkPathTpl
 			} else {
+				file.LinkPath = methods.ExpandEnv(file.LinkPath)
 				tpl, err := template.New("file_link_path").Parse(file.LinkPath)
 				if err != nil {
 					return err
@@ -90,6 +98,7 @@ func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
 				file.BinPath = pkg.BinPath
 				file.BinPathTpl = pkg.BinPathTpl
 			} else {
+				file.BinPath = methods.ExpandEnv(file.BinPath)
 				tpl, err := template.New("file_bin_path").Parse(file.BinPath)
 				if err != nil {
 					return err
@@ -104,6 +113,9 @@ func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
 			if err != nil {
 				return err
 			}
+			if !filepath.IsAbs(dst) {
+				return fmt.Errorf("installed path must be absolute: %s %s %s", pkg.Name, file.Name, dst)
+			}
 			file.Bin = dst
 
 			lnPath, err := util.RenderTpl(
@@ -112,6 +124,9 @@ func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
 				})
 			if err != nil {
 				return err
+			}
+			if !filepath.IsAbs(lnPath) {
+				return fmt.Errorf("link path must be absolute: %s %s %s", pkg.Name, file.Name, lnPath)
 			}
 			file.Link = lnPath
 			pkg.Files[i] = file

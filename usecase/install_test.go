@@ -20,6 +20,7 @@ func TestInstall(t *testing.T) {
 				StatusCode: 200,
 				Body:       testutil.NewFakeIOReadCloser("hello"),
 			}, nil),
+		ExpandEnv:   os.ExpandEnv,
 		Fprintf:     infra.NewFprintf(true),
 		Fprintln:    infra.NewFprintln(true),
 		GetArchiver: testutil.NewFakeGetArchiver(nil),

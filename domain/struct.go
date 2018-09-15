@@ -61,6 +61,7 @@ type (
 		Chmod          Chmod          `validate:"required"`
 		Copy           Copy           `validate:"required"`
 		Download       Download       `validate:"required"`
+		ExpandEnv      ExpandEnv      `validate:"required"`
 		Fprintf        Fprintf        `validate:"required"`
 		Fprintln       Fprintln       `validate:"required"`
 		GetArchiver    GetArchiver    `validate:"required"`

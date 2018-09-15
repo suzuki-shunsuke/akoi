@@ -15,6 +15,8 @@ type (
 	Download func(url string) (*http.Response, error)
 	// ExistFile is an interface to check file existence.
 	ExistFile func(string) bool
+	// ExpandEnv is an interface of os.ExpandEnv .
+	ExpandEnv func(string) string
 	// Fprintf is an interface of fmt.Fprintf .
 	Fprintf func(w io.Writer, format string, a ...interface{}) (n int, err error)
 	// Fprintln is an interface of fmt.Fprintln .
