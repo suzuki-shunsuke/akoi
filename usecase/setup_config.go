@@ -1,7 +1,9 @@
 package usecase
 
 import (
+	"fmt"
 	"net/url"
+	"path/filepath"
 	"text/template"
 
 	"github.com/suzuki-shunsuke/akoi/domain"
@@ -111,6 +113,9 @@ func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
 			if err != nil {
 				return err
 			}
+			if !filepath.IsAbs(dst) {
+				return fmt.Errorf("installed path must be absolute: %s %s %s", pkg.Name, file.Name, dst)
+			}
 			file.Bin = dst
 
 			lnPath, err := util.RenderTpl(
@@ -119,6 +124,9 @@ func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
 				})
 			if err != nil {
 				return err
+			}
+			if !filepath.IsAbs(lnPath) {
+				return fmt.Errorf("link path must be absolute: %s %s %s", pkg.Name, file.Name, lnPath)
 			}
 			file.Link = lnPath
 			pkg.Files[i] = file

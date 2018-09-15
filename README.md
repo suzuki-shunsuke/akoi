@@ -73,8 +73,8 @@ In this section, install [consul](https://www.consul.io/) as example.
 ---
 # akoi - binary version control system
 # https://github.com/suzuki-shunsuke/akoi
-bin_path: dummy/{{.Name}}-{{.Version}}
-link_path: dummy/{{.Name}}
+bin_path: /tmp/bin/{{.Name}}-{{.Version}}
+link_path: /tmp/bin/{{.Name}}
 packages:
   consul:
     url: "https://releases.hashicorp.com/consul/{{.Version}}/consul_{{.Version}}_darwin_amd64.zip"
@@ -90,17 +90,17 @@ Run the `akoi install` command to install binaries.
 $ akoi install -c akoi.yml
 downloading consul: https://releases.hashicorp.com/consul/1.2.1/consul_1.2.1_darwin_amd64.zip
 unarchive consul
-create directory dummy
-install dummy/consul-1.2.1
-create link dummy/consul -> consul-1.2.1
+create directory /tmp/bin
+install /tmp/bin/consul-1.2.1
+create link /tmp/bin/consul -> /tmp/bin/consul-1.2.1
 ```
 
-Binaries are installed at the `dummy` directory.
+Binaries are installed at the `bin` directory.
 
-Check dummy directory.
+Check bin directory.
 
 ```
-$ ls dummy
+$ ls /tmp/bin
 consul -> consul-1.2.1
 consul-1.2.1
 ```
@@ -111,9 +111,9 @@ Edit `akoi.yml` to change the consul version to 1.2.0 and run `akoi install` aga
 $ akoi install -c akoi.yml
 downloading consul: https://releases.hashicorp.com/consul/1.2.0/consul_1.2.0_darwin_amd64.zip
 unarchive consul
-install dummy/consul-1.2.0
-remove link dummy/consul -> consul-1.2.1
-create link dummy/consul -> consul-1.2.0
+install /tmp/bin/consul-1.2.0
+remove link /tmp/bin/consul -> /tmp/bin/consul-1.2.1
+create link /tmp/bin/consul -> /tmp/bin/consul-1.2.0
 ```
 
 Run `akoi install` again. `akoi` does nothing. `akoi` doesn't download files wastefully.
@@ -128,8 +128,8 @@ The consul 1.2.1 has already been installed so `akoi` doesn't download the archi
 
 ```
 $ akoi install -c akoi.yml
-remove link dummy/consul -> consul-1.2.0
-create link dummy/consul -> consul-1.2.1
+remove link /tmp/bin/consul -> /tmp/bin/consul-1.2.0
+create link /tmp/bin/consul -> /tmp/bin/consul-1.2.1
 ```
 
 ## Install
@@ -166,9 +166,9 @@ $ akoi help [init|install]
 ---
 # bin_path and link_path must be absolute.
 # binary install path
-bin_path: dummy/{{.Name}}-{{.Version}}
+bin_path: $HOME/bin/{{.Name}}-{{.Version}}
 # the symbolic link to the binary
-link_path: dummy/{{.Name}}
+link_path: $HOME/bin/{{.Name}}
 packages:
   consul: # package name
     # akoi downloads a file from this url and unarchive it according to the base file name.
@@ -183,9 +183,9 @@ packages:
     # And the file type is compressed but not archived (not ".tar.gz"), set archive_type to "Gzip".
     achive_type: Zip
     # binary install path
-    bin_path: dummy/{{.Name}}-{{.Version}}
+    bin_path: /usr/local/bin/{{.Name}}-{{.Version}}
     # the symbolic link to the binary
-    link_path: dummy/{{.Name}}
+    link_path: /usr/local/bin/{{.Name}}
     # files included in the downloaded file
     files:
     - name: consul
@@ -195,9 +195,9 @@ packages:
       # file's mode. This is optional and default value is 0755.
       mode: 0644
       # binary install path
-      bin_path: dummy/{{.Name}}-{{.Version}}
+      bin_path: /opt/bin/{{.Name}}-{{.Version}}
       # the symbolic link to the binary
-      link_path: dummy/{{.Name}}
+      link_path: /opt/bin/{{.Name}}
 ```
 
 ## Environment variables

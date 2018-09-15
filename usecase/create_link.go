@@ -3,18 +3,12 @@ package usecase
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/suzuki-shunsuke/akoi/domain"
 )
 
 func createLink(pkg *domain.Package, file *domain.File, params *domain.InstallParams, methods *domain.InstallMethods) error {
 	fileResult := file.Result
-	linkRelPath, err := filepath.Rel(filepath.Dir(file.Link), file.Bin)
-	if err != nil {
-		methods.Fprintln(os.Stderr, err)
-		return err
-	}
 	if fi, err := methods.GetFileLstat(file.Link); err == nil {
 		switch mode := fi.Mode(); {
 		case mode.IsDir():
@@ -31,8 +25,8 @@ func createLink(pkg *domain.Package, file *domain.File, params *domain.InstallPa
 			}
 			fileResult.Changed = true
 			fileResult.FileRemoved = true
-			methods.Printf("create link %s -> %s\n", file.Link, linkRelPath)
-			if err := methods.MkLink(linkRelPath, file.Link); err != nil {
+			methods.Printf("create link %s -> %s\n", file.Link, file.Bin)
+			if err := methods.MkLink(file.Bin, file.Link); err != nil {
 				methods.Fprintln(os.Stderr, err)
 				return err
 			}
@@ -45,7 +39,7 @@ func createLink(pkg *domain.Package, file *domain.File, params *domain.InstallPa
 				methods.Fprintln(os.Stderr, err)
 				return err
 			}
-			if linkRelPath == lnDest {
+			if file.Bin == lnDest {
 				return nil
 			}
 			methods.Printf("remove link %s -> %s\n", file.Link, lnDest)
@@ -54,8 +48,8 @@ func createLink(pkg *domain.Package, file *domain.File, params *domain.InstallPa
 				return err
 			}
 			fileResult.Changed = true
-			methods.Printf("create link %s -> %s\n", file.Link, linkRelPath)
-			if err := methods.MkLink(linkRelPath, file.Link); err != nil {
+			methods.Printf("create link %s -> %s\n", file.Link, file.Bin)
+			if err := methods.MkLink(file.Bin, file.Link); err != nil {
 				methods.Fprintln(os.Stderr, err)
 				return err
 			}
@@ -65,8 +59,8 @@ func createLink(pkg *domain.Package, file *domain.File, params *domain.InstallPa
 			return fmt.Errorf("unexpected file mode %s: %s", file.Link, mode.String())
 		}
 	}
-	methods.Printf("create link %s -> %s\n", file.Link, linkRelPath)
-	if err := methods.MkLink(linkRelPath, file.Link); err != nil {
+	methods.Printf("create link %s -> %s\n", file.Link, file.Bin)
+	if err := methods.MkLink(file.Bin, file.Link); err != nil {
 		methods.Fprintln(os.Stderr, err)
 		return err
 	}
