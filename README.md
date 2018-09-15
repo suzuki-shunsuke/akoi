@@ -292,6 +292,10 @@ tasks:
   changed_when: (result.stdout|from_json)["changed"]
 ```
 
+## Change Log
+
+Please see [Releases](https://github.com/suzuki-shunsuke/akoi/releases).
+
 ## License
 
 [MIT](LICENSE)
