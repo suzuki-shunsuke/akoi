@@ -1,5 +1,5 @@
 # Usage
-#   bash script/tag.sh 0.3.2
+#   bash script/tag.sh v0.3.2
 
 if [ $# -gt 1 ]; then
   echo "too many arguments" > /dev/stderr
@@ -13,17 +13,24 @@ if [ $# -lt 1 ]; then
   exit 1
 fi
 
+TAG=$1
+echo "TAG: $TAG"
+VERSION=${TAG#v}
+
+if [ "$TAG" = "$VERSION" ]; then
+  echo "TAG must start with 'v'"
+  exit 1
+fi
+
 echo "cd `dirname $0`/.."
 cd `dirname $0`/..
 
-TAG=$1
-echo "TAG: $TAG"
 echo "create domain/version.go"
 cat << EOS > domain/version.go
 package domain
 
 // Version is the akoi's version.
-const Version = "$TAG"
+const Version = "$VERSION"
 EOS
 
 git add domain/version.go
