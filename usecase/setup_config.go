@@ -118,6 +118,19 @@ func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
 			}
 			file.Bin = dst
 
+			arcPath := methods.ExpandEnv(file.Archive)
+			arcPathTpl, err := template.New("archive_path").Parse(arcPath)
+			if err != nil {
+				return err
+			}
+			file.Archive, err = util.RenderTpl(
+				arcPathTpl, &domain.TemplateParams{
+					Name: file.Name, Version: pkg.Version,
+				})
+			if err != nil {
+				return err
+			}
+
 			lnPath, err := util.RenderTpl(
 				file.LinkPathTpl, &domain.TemplateParams{
 					Name: file.Name, Version: pkg.Version,
