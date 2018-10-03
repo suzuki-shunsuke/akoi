@@ -3,8 +3,8 @@ package usecase
 import (
 	"testing"
 
-	"github.com/suzuki-shunsuke/akoi/domain"
-	"github.com/suzuki-shunsuke/akoi/registry"
+	"github.com/suzuki-shunsuke/akoi/internal/domain"
+	"github.com/suzuki-shunsuke/akoi/internal/registry"
 )
 
 func Test_setupConfig(t *testing.T) {

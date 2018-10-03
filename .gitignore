@@ -1,7 +1,8 @@
 vendor
+dist
 node_modules
 profile.out
-coverage
+.coverage
 akoi.yml
 dummy
 coverage.txt

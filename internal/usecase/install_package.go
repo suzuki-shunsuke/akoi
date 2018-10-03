@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/suzuki-shunsuke/akoi/domain"
+	"github.com/suzuki-shunsuke/akoi/internal/domain"
 )
 
 func getInstalledFiles(pkg *domain.Package, params *domain.InstallParams, methods *domain.InstallMethods) []domain.File {

@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/suzuki-shunsuke/akoi/domain"
-	"github.com/suzuki-shunsuke/akoi/infra"
-	"github.com/suzuki-shunsuke/akoi/testutil"
+	"github.com/suzuki-shunsuke/akoi/internal/domain"
+	"github.com/suzuki-shunsuke/akoi/internal/infra"
+	"github.com/suzuki-shunsuke/akoi/internal/testutil"
 )
 
 // NewInitMethods returns a domain.InitMethods .

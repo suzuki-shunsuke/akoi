@@ -3,7 +3,7 @@ package registry
 import (
 	"testing"
 
-	"github.com/suzuki-shunsuke/akoi/domain"
+	"github.com/suzuki-shunsuke/akoi/internal/domain"
 )
 
 func TestNewInitMethods(t *testing.T) {

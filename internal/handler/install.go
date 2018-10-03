@@ -1,13 +1,13 @@
-package command
+package handler
 
 import (
 	"fmt"
 
 	"github.com/urfave/cli"
 
-	"github.com/suzuki-shunsuke/akoi/domain"
-	"github.com/suzuki-shunsuke/akoi/registry"
-	"github.com/suzuki-shunsuke/akoi/usecase"
+	"github.com/suzuki-shunsuke/akoi/internal/domain"
+	"github.com/suzuki-shunsuke/akoi/internal/registry"
+	"github.com/suzuki-shunsuke/akoi/internal/usecase"
 )
 
 // InstallCommand is the sub command "install".

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/suzuki-shunsuke/akoi/domain"
+	"github.com/suzuki-shunsuke/akoi/internal/domain"
 )
 
 // NewFprintf returns a domain.Fprintf which prints if flag is true.
