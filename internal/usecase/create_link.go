@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/suzuki-shunsuke/akoi/domain"
+	"github.com/suzuki-shunsuke/akoi/internal/domain"
 )
 
 func createLink(pkg *domain.Package, file *domain.File, params *domain.InstallParams, methods *domain.InstallMethods) error {

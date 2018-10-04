@@ -1,5 +1,5 @@
 # Usage
-#   bash script/tag.sh v0.3.2
+#   bash scripts/tag.sh v0.3.2
 
 if [ $# -gt 1 ]; then
   echo "too many arguments" > /dev/stderr
@@ -25,15 +25,15 @@ fi
 echo "cd `dirname $0`/.."
 cd `dirname $0`/..
 
-echo "create domain/version.go"
-cat << EOS > domain/version.go
+echo "create internal/domain/version.go"
+cat << EOS > internal/domain/version.go
 package domain
 
 // Version is the akoi's version.
 const Version = "$VERSION"
 EOS
 
-git add domain/version.go
+git add internal/domain/version.go
 git commit -m "build: update version to $TAG"
 echo "git tag $TAG"
 git tag $TAG

@@ -10,7 +10,7 @@ import (
 
 	"github.com/mholt/archiver"
 
-	"github.com/suzuki-shunsuke/akoi/domain"
+	"github.com/suzuki-shunsuke/akoi/internal/domain"
 )
 
 // ExistFile is an implementation of domain.ExistFile .

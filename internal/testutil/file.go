@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/suzuki-shunsuke/akoi/domain"
+	"github.com/suzuki-shunsuke/akoi/internal/domain"
 )
 
 // NewFakeChmod is a fake of domain.Chmod .

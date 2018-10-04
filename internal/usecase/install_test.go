@@ -6,9 +6,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/suzuki-shunsuke/akoi/domain"
-	"github.com/suzuki-shunsuke/akoi/infra"
-	"github.com/suzuki-shunsuke/akoi/testutil"
+	"github.com/suzuki-shunsuke/akoi/internal/domain"
+	"github.com/suzuki-shunsuke/akoi/internal/infra"
+	"github.com/suzuki-shunsuke/akoi/internal/testutil"
 )
 
 func TestInstall(t *testing.T) {

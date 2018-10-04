@@ -1,11 +1,11 @@
-package command
+package handler
 
 import (
 	"github.com/urfave/cli"
 
-	"github.com/suzuki-shunsuke/akoi/domain"
-	"github.com/suzuki-shunsuke/akoi/registry"
-	"github.com/suzuki-shunsuke/akoi/usecase"
+	"github.com/suzuki-shunsuke/akoi/internal/domain"
+	"github.com/suzuki-shunsuke/akoi/internal/registry"
+	"github.com/suzuki-shunsuke/akoi/internal/usecase"
 )
 
 // InitCommand is the sub command "init".

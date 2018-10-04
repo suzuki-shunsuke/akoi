@@ -4,8 +4,8 @@ import (
 	"os"
 	"sync"
 
-	"github.com/suzuki-shunsuke/akoi/domain"
-	"github.com/suzuki-shunsuke/akoi/util"
+	"github.com/suzuki-shunsuke/akoi/internal/domain"
+	"github.com/suzuki-shunsuke/akoi/internal/util"
 )
 
 const (

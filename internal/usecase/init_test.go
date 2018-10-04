@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/suzuki-shunsuke/akoi/domain"
-	"github.com/suzuki-shunsuke/akoi/testutil"
+	"github.com/suzuki-shunsuke/akoi/internal/domain"
+	"github.com/suzuki-shunsuke/akoi/internal/testutil"
 )
 
 func TestInitConfigFile(t *testing.T) {

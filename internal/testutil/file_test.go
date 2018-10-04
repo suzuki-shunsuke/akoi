@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/suzuki-shunsuke/akoi/domain"
+	"github.com/suzuki-shunsuke/akoi/internal/domain"
 )
 
 func TestFakeArchiverRead(t *testing.T) {
