@@ -49,7 +49,10 @@ func getInstalledFiles(
 	return installedFiles
 }
 
-func installPackage(ctx context.Context, pkg *domain.Package, params *domain.InstallParams, methods domain.InstallMethods) {
+func installPackage(
+	ctx context.Context, pkg *domain.Package, params domain.InstallParams,
+	methods domain.InstallMethods,
+) {
 	installedFiles := getInstalledFiles(pkg.Files, methods)
 	if len(installedFiles) != 0 {
 		// Download

@@ -52,7 +52,7 @@ func Install(
 		wg.Add(1)
 		go func(pkg domain.Package) {
 			defer wg.Done()
-			installPackage(context.Background(), &pkg, &params, methods)
+			installPackage(context.Background(), &pkg, params, methods)
 			pkgResult := pkg.Result
 			if pkgResult == nil {
 				pkgResult = &domain.PackageResult{Name: pkg.Name}
