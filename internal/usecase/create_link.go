@@ -8,7 +8,7 @@ import (
 )
 
 func createLink(
-	file *domain.File, methods *domain.InstallMethods,
+	file *domain.File, methods domain.InstallMethods,
 ) error {
 	// check file existence and create a symlink.
 	fileResult := file.Result

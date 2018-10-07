@@ -11,7 +11,7 @@ import (
 )
 
 // setupConfig compiles and renders templates of domain.Config .
-func setupConfig(cfg *domain.Config, methods *domain.InstallMethods) error {
+func setupConfig(cfg *domain.Config, methods domain.InstallMethods) error {
 	cfg.BinPath = methods.ExpandEnv(cfg.BinPath)
 	cfg.LinkPath = methods.ExpandEnv(cfg.LinkPath)
 

@@ -14,7 +14,7 @@ const (
 )
 
 // Install intalls binraries.
-func Install(ctx context.Context, params *domain.InstallParams, methods *domain.InstallMethods) *domain.Result {
+func Install(ctx context.Context, params *domain.InstallParams, methods domain.InstallMethods) *domain.Result {
 	result := &domain.Result{
 		Packages: map[string]domain.PackageResult{}}
 	if err := util.ValidateStruct(methods); err != nil {

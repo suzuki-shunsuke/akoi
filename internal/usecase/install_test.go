@@ -13,7 +13,7 @@ import (
 )
 
 func TestInstall(t *testing.T) {
-	methods := &domain.InstallMethods{
+	methods := domain.InstallMethods{
 		Chmod: testutil.NewFakeChmod(nil),
 		Copy:  testutil.NewFakeCopy(10, nil),
 		Download: testutil.NewFakeDownload(

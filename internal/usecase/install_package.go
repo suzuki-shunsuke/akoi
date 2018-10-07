@@ -9,7 +9,7 @@ import (
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
 )
 
-func getInstalledFiles(pkg *domain.Package, params *domain.InstallParams, methods *domain.InstallMethods) []domain.File {
+func getInstalledFiles(pkg *domain.Package, params *domain.InstallParams, methods domain.InstallMethods) []domain.File {
 	installedFiles := []domain.File{}
 	for _, file := range pkg.Files {
 		dst := file.Bin
@@ -47,7 +47,7 @@ func getInstalledFiles(pkg *domain.Package, params *domain.InstallParams, method
 	return installedFiles
 }
 
-func installPackage(ctx context.Context, pkg *domain.Package, params *domain.InstallParams, methods *domain.InstallMethods) {
+func installPackage(ctx context.Context, pkg *domain.Package, params *domain.InstallParams, methods domain.InstallMethods) {
 	installedFiles := getInstalledFiles(pkg, params, methods)
 	if len(installedFiles) != 0 {
 		// Download
