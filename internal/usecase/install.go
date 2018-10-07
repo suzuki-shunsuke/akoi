@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"os"
 	"sync"
 
@@ -13,8 +14,11 @@ const (
 )
 
 // Install intalls binraries.
-func Install(params *domain.InstallParams, methods *domain.InstallMethods) *domain.Result {
-	result := &domain.Result{
+func Install(
+	ctx context.Context, params domain.InstallParams,
+	methods domain.InstallMethods,
+) domain.Result {
+	result := domain.Result{
 		Packages: map[string]domain.PackageResult{}}
 	if err := util.ValidateStruct(methods); err != nil {
 		if methods.Fprintln != nil {
@@ -31,7 +35,8 @@ func Install(params *domain.InstallParams, methods *domain.InstallMethods) *doma
 		result.Failed = true
 		return result
 	}
-	if err := setupConfig(cfg, methods); err != nil {
+	cfg, err = setupConfig(cfg, methods)
+	if err != nil {
 		methods.Fprintln(os.Stderr, err)
 		result.Msg = err.Error()
 		result.Failed = true
@@ -44,11 +49,12 @@ func Install(params *domain.InstallParams, methods *domain.InstallMethods) *doma
 	var wg sync.WaitGroup
 	pkgResultChan := make(chan domain.PackageResult, numOfPkgs)
 	for _, pkg := range cfg.Packages {
-		// TODO goroutine
 		wg.Add(1)
 		go func(pkg domain.Package) {
 			defer wg.Done()
-			installPackage(&pkg, params, methods)
+			c, cancel := context.WithCancel(ctx)
+			defer cancel()
+			pkg = installPackage(c, pkg, params, methods)
 			pkgResult := pkg.Result
 			if pkgResult == nil {
 				pkgResult = &domain.PackageResult{Name: pkg.Name}

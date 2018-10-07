@@ -1,7 +1,11 @@
 package handler
 
 import (
+	"context"
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/urfave/cli"
 
@@ -36,21 +40,36 @@ var InstallCommand = cli.Command{
 
 // Install is the sub command "install".
 func Install(c *cli.Context) error {
-	params := &domain.InstallParams{
+	params := domain.InstallParams{
 		ConfigFilePath: c.String("config"),
 		Format:         c.String("format"),
 		DryRun:         c.Bool("dry-run"),
 	}
-	result := usecase.Install(params, registry.NewInstallMethods(params))
-	if result == nil {
-		result = &domain.Result{}
-	}
-	if !result.Failed {
-		s := result.String(params)
-		if s != "" {
-			fmt.Println(s)
+
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(
+		signalChan, syscall.SIGHUP, syscall.SIGINT,
+		syscall.SIGTERM, syscall.SIGQUIT)
+	resultChan := make(chan domain.Result)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	go func() {
+		resultChan <- usecase.Install(
+			ctx, params, registry.NewInstallMethods(params))
+	}()
+	select {
+	case result := <-resultChan:
+		close(signalChan)
+		if !result.Failed {
+			s := result.String(params.Format)
+			if s != "" {
+				fmt.Println(s)
+			}
+			return nil
 		}
-		return nil
+		return cli.NewExitError(result.String(params.Format), 1)
+	case sig := <-signalChan:
+		close(resultChan)
+		return cli.NewExitError(sig.String(), 1)
 	}
-	return cli.NewExitError(result.String(params), 1)
 }

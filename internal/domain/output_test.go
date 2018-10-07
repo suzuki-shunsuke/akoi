@@ -7,13 +7,11 @@ import (
 func TestResultString(t *testing.T) {
 	exp := ""
 	result := &Result{Msg: "foo"}
-	params := &InstallParams{}
-	act := result.String(params)
+	act := result.String("")
 	if act != exp {
 		t.Fatalf(`result.String(params) = "%s", wanted "%s"`, act, exp)
 	}
-	params.Format = "ansible"
-	if result.String(params) == "" {
+	if result.String("ansible") == "" {
 		t.Fatal("result.String(params) is empty")
 	}
 }

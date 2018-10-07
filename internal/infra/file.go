@@ -2,8 +2,10 @@ package infra
 
 import (
 	"compress/gzip"
+	"context"
 	"io"
 	"io/ioutil"
+	"net/http"
 	"os"
 
 	"gopkg.in/yaml.v2"
@@ -12,6 +14,18 @@ import (
 
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
 )
+
+// Download is an implementation of domain.Download .
+func Download(ctx context.Context, uri string) (*http.Response, error) {
+	req, err := http.NewRequest("GET", uri, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req = req.WithContext(ctx)
+	client := http.DefaultClient
+	return client.Do(req)
+}
 
 // ExistFile is an implementation of domain.ExistFile .
 func ExistFile(dst string) bool {
@@ -42,18 +56,15 @@ func MkdirAll(dst string) error {
 }
 
 // ReadConfigFile reads a configuration from a file.
-func ReadConfigFile(dst string) (*domain.Config, error) {
+func ReadConfigFile(dst string) (domain.Config, error) {
+	cfg := domain.Config{}
 	f, err := os.Open(dst)
 	if err != nil {
-		return nil, err
+		return cfg, err
 	}
 	defer f.Close()
-	decoder := yaml.NewDecoder(f)
-	cfg := domain.Config{}
-	if err := decoder.Decode(&cfg); err != nil {
-		return nil, err
-	}
-	return &cfg, nil
+	err = yaml.NewDecoder(f).Decode(&cfg)
+	return cfg, err
 }
 
 // TempDir creates a temrapory directory.

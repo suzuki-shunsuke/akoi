@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"os"
@@ -12,7 +13,7 @@ import (
 )
 
 func TestInstall(t *testing.T) {
-	methods := &domain.InstallMethods{
+	methods := domain.InstallMethods{
 		Chmod: testutil.NewFakeChmod(nil),
 		Copy:  testutil.NewFakeCopy(10, nil),
 		Download: testutil.NewFakeDownload(
@@ -37,7 +38,7 @@ func TestInstall(t *testing.T) {
 		Printf:   infra.NewPrintf(true),
 		Println:  infra.NewPrintln(true),
 		ReadConfigFile: testutil.NewFakeReadConfigFile(
-			&domain.Config{
+			domain.Config{
 				BinPath:  "/usr/local/bin/{{.Name}}-{{.Version}}",
 				LinkPath: "/usr/local/bin/{{.Name}}",
 				Packages: map[string]domain.Package{
@@ -59,13 +60,14 @@ func TestInstall(t *testing.T) {
 		RemoveLink: testutil.NewFakeRemoveFile(nil),
 		TempDir:    testutil.NewFakeTempDir("/tmp/foo", nil),
 	}
-	params := &domain.InstallParams{
+	params := domain.InstallParams{
 		ConfigFilePath: "/etc/akoi/akoi.yml", Format: "ansible"}
-	if result := Install(params, methods); result.Failed {
-		t.Fatal(result.String(params))
+	if result := Install(context.Background(), params, methods); result.Failed {
+		t.Fatal(result.String("ansible"))
 	}
-	methods.ReadConfigFile = testutil.NewFakeReadConfigFile(nil, fmt.Errorf("failed to read config"))
-	if result := Install(params, methods); !result.Failed {
+	methods.ReadConfigFile = testutil.NewFakeReadConfigFile(
+		domain.Config{}, fmt.Errorf("failed to read config"))
+	if result := Install(context.Background(), params, methods); !result.Failed {
 		t.Fatal("it should be failed to read config")
 	}
 }

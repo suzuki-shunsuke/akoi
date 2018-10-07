@@ -8,7 +8,7 @@ import (
 )
 
 func Test_setupConfig(t *testing.T) {
-	cfg := &domain.Config{
+	cfg := domain.Config{
 		BinPath:  "/usr/local/bin/{{.Name}}-{{.Version}}",
 		LinkPath: "/usr/local/bin/{{.Name}}",
 		Packages: map[string]domain.Package{
@@ -27,7 +27,7 @@ func Test_setupConfig(t *testing.T) {
 	params := domain.InstallParams{
 		DryRun: true,
 	}
-	if err := setupConfig(cfg, registry.NewInstallMethods(&params)); err != nil {
+	if _, err := setupConfig(cfg, registry.NewInstallMethods(params)); err != nil {
 		t.Fatal(err)
 	}
 }

@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -8,9 +9,11 @@ import (
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
 )
 
-func getInstalledFiles(pkg *domain.Package, params *domain.InstallParams, methods *domain.InstallMethods) []domain.File {
+func getInstalledFiles(
+	files []domain.File, methods domain.InstallMethods,
+) []domain.File {
 	installedFiles := []domain.File{}
-	for _, file := range pkg.Files {
+	for _, file := range files {
 		dst := file.Bin
 		fileResult := file.Result
 		mode := file.Mode
@@ -46,24 +49,29 @@ func getInstalledFiles(pkg *domain.Package, params *domain.InstallParams, method
 	return installedFiles
 }
 
-func installPackage(pkg *domain.Package, params *domain.InstallParams, methods *domain.InstallMethods) {
-	installedFiles := getInstalledFiles(pkg, params, methods)
+func installPackage(
+	ctx context.Context, pkg domain.Package, params domain.InstallParams,
+	methods domain.InstallMethods,
+) domain.Package {
+	installedFiles := getInstalledFiles(pkg.Files, methods)
 	if len(installedFiles) != 0 {
 		// Download
 		ustr := pkg.URL.String()
 		methods.Printf("downloading %s: %s\n", pkg.Name, ustr)
-		resp, err := methods.Download(ustr)
+		c, cancel := context.WithCancel(ctx)
+		defer cancel()
+		resp, err := methods.Download(c, ustr)
 		if err != nil {
 			methods.Fprintln(os.Stderr, err)
 			pkg.Result.Error = err.Error()
-			return
+			return pkg
 		}
 		defer resp.Body.Close()
 		if resp.StatusCode != 200 {
 			methods.Fprintf(os.Stderr, "failed to download %s from %s: %d\n", pkg.Name, ustr, resp.StatusCode)
 			pkg.Result.Error = fmt.Sprintf(
 				"failed to download %s from %s: %d", pkg.Name, ustr, resp.StatusCode)
-			return
+			return pkg
 		}
 
 		tmpDir := ""
@@ -74,7 +82,7 @@ func installPackage(pkg *domain.Package, params *domain.InstallParams, methods *
 			if err != nil {
 				methods.Fprintln(os.Stderr, err)
 				pkg.Result.Error = err.Error()
-				return
+				return pkg
 			}
 			defer methods.RemoveAll(tmpDir)
 
@@ -88,14 +96,14 @@ func installPackage(pkg *domain.Package, params *domain.InstallParams, methods *
 					pkg.Result.Error = fmt.Sprintf("failed to unarchive file: unsupported archive type: %s\n", t)
 					methods.Fprintf(os.Stderr, "failed to unarchive file: unsupported archive type: %s\n", t)
 				}
-				return
+				return pkg
 			}
 			// Unarchive
 			methods.Printf("unarchive %s\n", pkg.Name)
 			if err := arc.Read(resp.Body, tmpDir); err != nil {
 				pkg.Result.Error = err.Error()
 				methods.Fprintln(os.Stderr, err)
-				return
+				return pkg
 			}
 		}
 
@@ -150,16 +158,17 @@ func installPackage(pkg *domain.Package, params *domain.InstallParams, methods *
 			}
 		}
 	}
-	for _, file := range pkg.Files {
-		fileResult := file.Result
-		if fileResult.Error != "" {
+	for i, file := range pkg.Files {
+		if file.Result.Error != "" {
 			continue
 		}
-
-		if err := createLink(pkg, &file, params, methods); err != nil {
-			if fileResult.Error == "" {
-				fileResult.Error = err.Error()
+		f, err := createLink(file, methods)
+		if err != nil {
+			if f.Result.Error == "" {
+				f.Result.Error = err.Error()
 			}
 		}
+		pkg.Files[i] = f
 	}
+	return pkg
 }

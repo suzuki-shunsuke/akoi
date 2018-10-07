@@ -20,10 +20,10 @@ func NewInitMethods() *domain.InitMethods {
 }
 
 // NewInstallMethods returns a domain.InstallMethods .
-func NewInstallMethods(params *domain.InstallParams) *domain.InstallMethods {
+func NewInstallMethods(params domain.InstallParams) domain.InstallMethods {
 	flag := params.Format != "ansible"
 	if params.DryRun {
-		return &domain.InstallMethods{
+		return domain.InstallMethods{
 			Chmod: testutil.NewFakeChmod(nil),
 			Copy:  testutil.NewFakeCopy(10, nil),
 			Download: testutil.NewFakeDownload(
@@ -53,10 +53,10 @@ func NewInstallMethods(params *domain.InstallParams) *domain.InstallMethods {
 			TempDir:        testutil.NewFakeTempDir("/tmp/tempdir", nil),
 		}
 	}
-	return &domain.InstallMethods{
+	return domain.InstallMethods{
 		Chmod:          os.Chmod,
 		Copy:           io.Copy,
-		Download:       http.Get,
+		Download:       infra.Download,
 		ExpandEnv:      os.ExpandEnv,
 		Fprintf:        infra.NewFprintf(flag),
 		Fprintln:       infra.NewFprintln(flag),

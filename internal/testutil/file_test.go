@@ -1,6 +1,7 @@
 package testutil
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"testing"
@@ -31,7 +32,7 @@ func TestNewFakeCopy(t *testing.T) {
 
 func TestNewFakeDownload(t *testing.T) {
 	f := NewFakeDownload(nil, nil)
-	if _, err := f("http://example.com"); err != nil {
+	if _, err := f(context.Background(), "http://example.com"); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -99,7 +100,7 @@ func TestNewFakeOpenFile(t *testing.T) {
 
 func TestNewFakeReadConfigFile(t *testing.T) {
 	cfg := domain.Config{}
-	f := NewFakeReadConfigFile(&cfg, nil)
+	f := NewFakeReadConfigFile(cfg, nil)
 	if _, err := f("src"); err != nil {
 		t.Fatal(err)
 	}

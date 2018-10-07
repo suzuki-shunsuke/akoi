@@ -1,6 +1,7 @@
 package testutil
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"os"
@@ -24,7 +25,7 @@ func NewFakeCopy(written int64, err error) domain.Copy {
 
 // NewFakeDownload is a fake of domain.Download .
 func NewFakeDownload(resp *http.Response, err error) domain.Download {
-	return func(string) (*http.Response, error) {
+	return func(context.Context, string) (*http.Response, error) {
 		return resp, err
 	}
 }
@@ -86,8 +87,8 @@ func NewFakeOpenFile(f *os.File, e error) domain.OpenFile {
 }
 
 // NewFakeReadConfigFile is a fake of domain.ReadConfigFile .
-func NewFakeReadConfigFile(cfg *domain.Config, err error) domain.ReadConfigFile {
-	return func(dest string) (*domain.Config, error) {
+func NewFakeReadConfigFile(cfg domain.Config, err error) domain.ReadConfigFile {
+	return func(dest string) (domain.Config, error) {
 		return cfg, err
 	}
 }

@@ -5,7 +5,7 @@ import (
 
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
 	"github.com/suzuki-shunsuke/akoi/internal/registry"
-	"github.com/suzuki-shunsuke/akoi/internal/usecase"
+	"github.com/suzuki-shunsuke/akoi/internal/usecase/initcmd"
 )
 
 // InitCommand is the sub command "init".
@@ -25,7 +25,7 @@ var InitCommand = cli.Command{
 
 // Init is the sub command "init".
 func Init(c *cli.Context) error {
-	err := usecase.InitConfigFile(
+	err := initcmd.InitConfigFile(
 		&domain.InitParams{
 			Dest: c.String("dest"),
 		},
