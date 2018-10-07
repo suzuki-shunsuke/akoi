@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"log"
 	"os"
 	"sync"
 
@@ -18,6 +19,8 @@ func Install(
 	ctx context.Context, params domain.InstallParams,
 	methods domain.InstallMethods,
 ) domain.Result {
+	log.SetOutput(methods.NewLoggerOutput())
+
 	result := domain.Result{
 		Packages: map[string]domain.PackageResult{}}
 	if err := util.ValidateStruct(methods); err != nil {

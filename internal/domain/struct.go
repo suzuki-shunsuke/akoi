@@ -58,28 +58,29 @@ type (
 
 	// InstallMethods is functions which are used at usecase.Install .
 	InstallMethods struct {
-		Chmod          Chmod          `validate:"required"`
-		Copy           Copy           `validate:"required"`
-		Download       Download       `validate:"required"`
-		ExpandEnv      ExpandEnv      `validate:"required"`
-		Fprintf        Fprintf        `validate:"required"`
-		Fprintln       Fprintln       `validate:"required"`
-		GetArchiver    GetArchiver    `validate:"required"`
-		GetFileStat    GetFileStat    `validate:"required"`
-		GetFileLstat   GetFileStat    `validate:"required"`
-		MkdirAll       MkdirAll       `validate:"required"`
-		MkLink         MkLink         `validate:"required"`
-		NewGzipReader  NewGzipReader  `validate:"required"`
-		Open           Open           `validate:"required"`
-		OpenFile       OpenFile       `validate:"required"`
-		Printf         Printf         `validate:"required"`
-		Println        Println        `validate:"required"`
-		ReadConfigFile ReadConfigFile `validate:"required"`
-		ReadLink       ReadLink       `validate:"required"`
-		RemoveAll      RemoveFile     `validate:"required"`
-		RemoveFile     RemoveFile     `validate:"required"`
-		RemoveLink     RemoveFile     `validate:"required"`
-		TempDir        TempDir        `validate:"required"`
+		Chmod           Chmod           `validate:"required"`
+		Copy            Copy            `validate:"required"`
+		Download        Download        `validate:"required"`
+		ExpandEnv       ExpandEnv       `validate:"required"`
+		Fprintf         Fprintf         `validate:"required"`
+		Fprintln        Fprintln        `validate:"required"`
+		GetArchiver     GetArchiver     `validate:"required"`
+		GetFileStat     GetFileStat     `validate:"required"`
+		GetFileLstat    GetFileStat     `validate:"required"`
+		MkdirAll        MkdirAll        `validate:"required"`
+		MkLink          MkLink          `validate:"required"`
+		NewGzipReader   NewGzipReader   `validate:"required"`
+		NewLoggerOutput NewLoggerOutput `validate:"required"`
+		Open            Open            `validate:"required"`
+		OpenFile        OpenFile        `validate:"required"`
+		Printf          Printf          `validate:"required"`
+		Println         Println         `validate:"required"`
+		ReadConfigFile  ReadConfigFile  `validate:"required"`
+		ReadLink        ReadLink        `validate:"required"`
+		RemoveAll       RemoveFile      `validate:"required"`
+		RemoveFile      RemoveFile      `validate:"required"`
+		RemoveLink      RemoveFile      `validate:"required"`
+		TempDir         TempDir         `validate:"required"`
 	}
 
 	// InstallParams is parameters of usecase.Install .

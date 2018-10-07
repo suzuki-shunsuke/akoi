@@ -3,7 +3,6 @@ package domain
 import (
 	"context"
 	"io"
-	"net/http"
 	"os"
 )
 
@@ -13,7 +12,7 @@ type (
 	// Copy is the interface of io.Copy .
 	Copy func(dst io.Writer, src io.Reader) (int64, error)
 	// Download downloads a file.
-	Download func(ctx context.Context, uri string) (*http.Response, error)
+	Download func(ctx context.Context, uri string) (io.ReadCloser, error)
 	// ExistFile is an interface to check file existence.
 	ExistFile func(string) bool
 	// ExpandEnv is an interface of os.ExpandEnv .
@@ -32,6 +31,8 @@ type (
 	MkLink func(src, dst string) error
 	// NewGzipReader creates a reader for gzip.
 	NewGzipReader func(io.Reader) (io.ReadCloser, error)
+	// NewLoggerOutput creates a writer for standard logger.
+	NewLoggerOutput func() io.Writer
 	// Open opens a file.
 	Open func(name string) (*os.File, error)
 	// OpenFile opens a file.

@@ -5,26 +5,23 @@ import (
 	"context"
 	"io"
 	"io/ioutil"
-	"net/http"
 	"os"
 
 	"gopkg.in/yaml.v2"
 
+	"github.com/joeybloggs/go-download"
 	"github.com/mholt/archiver"
 
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
 )
 
-// Download is an implementation of domain.Download .
-func Download(ctx context.Context, uri string) (*http.Response, error) {
-	req, err := http.NewRequest("GET", uri, nil)
-	if err != nil {
-		return nil, err
-	}
+type (
+	quietWriter struct{}
+)
 
-	req = req.WithContext(ctx)
-	client := http.DefaultClient
-	return client.Do(req)
+// Download is an implementation of domain.Download .
+func Download(ctx context.Context, uri string) (io.ReadCloser, error) {
+	return download.OpenContext(ctx, uri, nil)
 }
 
 // ExistFile is an implementation of domain.ExistFile .
@@ -50,6 +47,11 @@ func NewGzipReader(reader io.Reader) (io.ReadCloser, error) {
 	return gzip.NewReader(reader)
 }
 
+// NewLoggerOutput returns a writer for standard logger.
+func NewLoggerOutput() io.Writer {
+	return quietWriter{}
+}
+
 // MkdirAll is an implementation of domain.MkdirAll .
 func MkdirAll(dst string) error {
 	return os.MkdirAll(dst, 0775)
@@ -70,6 +72,10 @@ func ReadConfigFile(dst string) (domain.Config, error) {
 // TempDir creates a temrapory directory.
 func TempDir() (string, error) {
 	return ioutil.TempDir("", "")
+}
+
+func (writer quietWriter) Write(p []byte) (n int, err error) {
+	return len(p), nil
 }
 
 // WriteFile is an implementation of domain.WriteFile .

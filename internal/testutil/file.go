@@ -3,7 +3,6 @@ package testutil
 import (
 	"context"
 	"io"
-	"net/http"
 	"os"
 
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
@@ -24,9 +23,9 @@ func NewFakeCopy(written int64, err error) domain.Copy {
 }
 
 // NewFakeDownload is a fake of domain.Download .
-func NewFakeDownload(resp *http.Response, err error) domain.Download {
-	return func(context.Context, string) (*http.Response, error) {
-		return resp, err
+func NewFakeDownload(body io.ReadCloser, err error) domain.Download {
+	return func(context.Context, string) (io.ReadCloser, error) {
+		return body, err
 	}
 }
 

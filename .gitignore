@@ -6,7 +6,6 @@ profile.out
 akoi.yml
 dummy
 coverage.txt
-./akoi
 
 # https://github.com/suzuki-shunsuke/git-rm-branch
 .git-rm-branch.yml
