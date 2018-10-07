@@ -19,6 +19,8 @@ func Install(
 	ctx context.Context, params domain.InstallParams,
 	methods domain.InstallMethods,
 ) domain.Result {
+	// suppress output log by third party library
+	// https://github.com/joeybloggs/go-download/blob/b655936947da12d76bee4fa3b6af41a98db23e6f/download.go#L119
 	log.SetOutput(methods.NewLoggerOutput())
 
 	result := domain.Result{
