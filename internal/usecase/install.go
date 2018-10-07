@@ -17,8 +17,8 @@ const (
 func Install(
 	ctx context.Context, params domain.InstallParams,
 	methods domain.InstallMethods,
-) *domain.Result {
-	result := &domain.Result{
+) domain.Result {
+	result := domain.Result{
 		Packages: map[string]domain.PackageResult{}}
 	if err := util.ValidateStruct(methods); err != nil {
 		if methods.Fprintln != nil {
@@ -52,7 +52,9 @@ func Install(
 		wg.Add(1)
 		go func(pkg domain.Package) {
 			defer wg.Done()
-			pkg = installPackage(context.Background(), pkg, params, methods)
+			c, cancel := context.WithCancel(ctx)
+			defer cancel()
+			pkg = installPackage(c, pkg, params, methods)
 			pkgResult := pkg.Result
 			if pkgResult == nil {
 				pkgResult = &domain.PackageResult{Name: pkg.Name}
