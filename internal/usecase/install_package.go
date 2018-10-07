@@ -50,9 +50,9 @@ func getInstalledFiles(
 }
 
 func installPackage(
-	ctx context.Context, pkg *domain.Package, params domain.InstallParams,
+	ctx context.Context, pkg domain.Package, params domain.InstallParams,
 	methods domain.InstallMethods,
-) {
+) domain.Package {
 	installedFiles := getInstalledFiles(pkg.Files, methods)
 	if len(installedFiles) != 0 {
 		// Download
@@ -64,14 +64,14 @@ func installPackage(
 		if err != nil {
 			methods.Fprintln(os.Stderr, err)
 			pkg.Result.Error = err.Error()
-			return
+			return pkg
 		}
 		defer resp.Body.Close()
 		if resp.StatusCode != 200 {
 			methods.Fprintf(os.Stderr, "failed to download %s from %s: %d\n", pkg.Name, ustr, resp.StatusCode)
 			pkg.Result.Error = fmt.Sprintf(
 				"failed to download %s from %s: %d", pkg.Name, ustr, resp.StatusCode)
-			return
+			return pkg
 		}
 
 		tmpDir := ""
@@ -82,7 +82,7 @@ func installPackage(
 			if err != nil {
 				methods.Fprintln(os.Stderr, err)
 				pkg.Result.Error = err.Error()
-				return
+				return pkg
 			}
 			defer methods.RemoveAll(tmpDir)
 
@@ -96,14 +96,14 @@ func installPackage(
 					pkg.Result.Error = fmt.Sprintf("failed to unarchive file: unsupported archive type: %s\n", t)
 					methods.Fprintf(os.Stderr, "failed to unarchive file: unsupported archive type: %s\n", t)
 				}
-				return
+				return pkg
 			}
 			// Unarchive
 			methods.Printf("unarchive %s\n", pkg.Name)
 			if err := arc.Read(resp.Body, tmpDir); err != nil {
 				pkg.Result.Error = err.Error()
 				methods.Fprintln(os.Stderr, err)
-				return
+				return pkg
 			}
 		}
 
@@ -170,4 +170,5 @@ func installPackage(
 		}
 		pkg.Files[i] = f
 	}
+	return pkg
 }
