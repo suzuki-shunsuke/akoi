@@ -35,7 +35,8 @@ func Install(
 		result.Failed = true
 		return result
 	}
-	if err := setupConfig(cfg, methods); err != nil {
+	cfg, err = setupConfig(cfg, methods)
+	if err != nil {
 		methods.Fprintln(os.Stderr, err)
 		result.Msg = err.Error()
 		result.Failed = true

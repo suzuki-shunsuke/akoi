@@ -11,19 +11,18 @@ import (
 )
 
 // setupConfig compiles and renders templates of domain.Config .
-func setupConfig(cfg *domain.Config, methods domain.InstallMethods) error {
+func setupConfig(cfg domain.Config, methods domain.InstallMethods) (domain.Config, error) {
 	cfg.BinPath = methods.ExpandEnv(cfg.BinPath)
 	cfg.LinkPath = methods.ExpandEnv(cfg.LinkPath)
-
 	tpl, err := template.New("cfg_bin_path").Parse(cfg.BinPath)
 	if err != nil {
-		return err
+		return cfg, err
 	}
 	cfg.BinPathTpl = tpl
 
 	tpl, err = template.New("cfg_link_path").Parse(cfg.LinkPath)
 	if err != nil {
-		return err
+		return cfg, err
 	}
 	cfg.LinkPathTpl = tpl
 
@@ -42,7 +41,7 @@ func setupConfig(cfg *domain.Config, methods domain.InstallMethods) error {
 			pkg.LinkPath = methods.ExpandEnv(pkg.LinkPath)
 			tpl, err := template.New("pkg_link_path").Parse(pkg.LinkPath)
 			if err != nil {
-				return err
+				return cfg, err
 			}
 			pkg.LinkPathTpl = tpl
 		}
@@ -54,7 +53,7 @@ func setupConfig(cfg *domain.Config, methods domain.InstallMethods) error {
 			pkg.BinPath = methods.ExpandEnv(pkg.BinPath)
 			tpl, err := template.New("pkg_bin_path").Parse(pkg.BinPath)
 			if err != nil {
-				return err
+				return cfg, err
 			}
 			pkg.BinPathTpl = tpl
 		}
@@ -62,15 +61,15 @@ func setupConfig(cfg *domain.Config, methods domain.InstallMethods) error {
 		pkg.Name = pkgName
 		tpl, err := template.New("pkg_url").Parse(pkg.RawURL)
 		if err != nil {
-			return err
+			return cfg, err
 		}
 		u, err := util.RenderTpl(tpl, pkg)
 		if err != nil {
-			return err
+			return cfg, err
 		}
 		u2, err := url.Parse(u)
 		if err != nil {
-			return err
+			return cfg, err
 		}
 		pkg.URL = u2
 		pkg.Archiver = methods.GetArchiver(u2.Path, pkg.ArchiveType)
@@ -89,7 +88,7 @@ func setupConfig(cfg *domain.Config, methods domain.InstallMethods) error {
 				file.LinkPath = methods.ExpandEnv(file.LinkPath)
 				tpl, err := template.New("file_link_path").Parse(file.LinkPath)
 				if err != nil {
-					return err
+					return cfg, err
 				}
 				file.LinkPathTpl = tpl
 			}
@@ -101,7 +100,7 @@ func setupConfig(cfg *domain.Config, methods domain.InstallMethods) error {
 				file.BinPath = methods.ExpandEnv(file.BinPath)
 				tpl, err := template.New("file_bin_path").Parse(file.BinPath)
 				if err != nil {
-					return err
+					return cfg, err
 				}
 				file.BinPathTpl = tpl
 			}
@@ -111,24 +110,25 @@ func setupConfig(cfg *domain.Config, methods domain.InstallMethods) error {
 					Name: file.Name, Version: pkg.Version,
 				})
 			if err != nil {
-				return err
+				return cfg, err
 			}
 			if !filepath.IsAbs(dst) {
-				return fmt.Errorf("installed path must be absolute: %s %s %s", pkg.Name, file.Name, dst)
+				return cfg, fmt.Errorf(
+					"installed path must be absolute: %s %s %s", pkg.Name, file.Name, dst)
 			}
 			file.Bin = dst
 
 			arcPath := methods.ExpandEnv(file.Archive)
 			arcPathTpl, err := template.New("archive_path").Parse(arcPath)
 			if err != nil {
-				return err
+				return cfg, err
 			}
 			file.Archive, err = util.RenderTpl(
 				arcPathTpl, &domain.TemplateParams{
 					Name: file.Name, Version: pkg.Version,
 				})
 			if err != nil {
-				return err
+				return cfg, err
 			}
 
 			lnPath, err := util.RenderTpl(
@@ -136,16 +136,16 @@ func setupConfig(cfg *domain.Config, methods domain.InstallMethods) error {
 					Name: file.Name, Version: pkg.Version,
 				})
 			if err != nil {
-				return err
+				return cfg, err
 			}
 			if !filepath.IsAbs(lnPath) {
-				return fmt.Errorf("link path must be absolute: %s %s %s", pkg.Name, file.Name, lnPath)
+				return cfg, fmt.Errorf(
+					"link path must be absolute: %s %s %s", pkg.Name, file.Name, lnPath)
 			}
 			file.Link = lnPath
 			pkg.Files[i] = file
 		}
 		cfg.Packages[pkgName] = pkg
 	}
-
-	return nil
+	return cfg, nil
 }

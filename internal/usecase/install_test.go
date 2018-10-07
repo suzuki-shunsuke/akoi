@@ -38,7 +38,7 @@ func TestInstall(t *testing.T) {
 		Printf:   infra.NewPrintf(true),
 		Println:  infra.NewPrintln(true),
 		ReadConfigFile: testutil.NewFakeReadConfigFile(
-			&domain.Config{
+			domain.Config{
 				BinPath:  "/usr/local/bin/{{.Name}}-{{.Version}}",
 				LinkPath: "/usr/local/bin/{{.Name}}",
 				Packages: map[string]domain.Package{
@@ -66,7 +66,7 @@ func TestInstall(t *testing.T) {
 		t.Fatal(result.String("ansible"))
 	}
 	methods.ReadConfigFile = testutil.NewFakeReadConfigFile(
-		nil, fmt.Errorf("failed to read config"))
+		domain.Config{}, fmt.Errorf("failed to read config"))
 	if result := Install(context.Background(), params, methods); !result.Failed {
 		t.Fatal("it should be failed to read config")
 	}

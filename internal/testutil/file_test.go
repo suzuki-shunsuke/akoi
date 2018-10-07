@@ -99,7 +99,7 @@ func TestNewFakeOpenFile(t *testing.T) {
 
 func TestNewFakeReadConfigFile(t *testing.T) {
 	cfg := domain.Config{}
-	f := NewFakeReadConfigFile(&cfg, nil)
+	f := NewFakeReadConfigFile(cfg, nil)
 	if _, err := f("src"); err != nil {
 		t.Fatal(err)
 	}

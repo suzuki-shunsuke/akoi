@@ -42,18 +42,15 @@ func MkdirAll(dst string) error {
 }
 
 // ReadConfigFile reads a configuration from a file.
-func ReadConfigFile(dst string) (*domain.Config, error) {
+func ReadConfigFile(dst string) (domain.Config, error) {
+	cfg := domain.Config{}
 	f, err := os.Open(dst)
 	if err != nil {
-		return nil, err
+		return cfg, err
 	}
 	defer f.Close()
-	decoder := yaml.NewDecoder(f)
-	cfg := domain.Config{}
-	if err := decoder.Decode(&cfg); err != nil {
-		return nil, err
-	}
-	return &cfg, nil
+	err = yaml.NewDecoder(f).Decode(&cfg)
+	return cfg, err
 }
 
 // TempDir creates a temrapory directory.
