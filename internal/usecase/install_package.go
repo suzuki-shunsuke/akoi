@@ -10,8 +10,7 @@ import (
 )
 
 func getInstalledFiles(
-	files []domain.File, params *domain.InstallParams,
-	methods domain.InstallMethods,
+	files []domain.File, methods domain.InstallMethods,
 ) []domain.File {
 	installedFiles := []domain.File{}
 	for _, file := range files {
@@ -51,7 +50,7 @@ func getInstalledFiles(
 }
 
 func installPackage(ctx context.Context, pkg *domain.Package, params *domain.InstallParams, methods domain.InstallMethods) {
-	installedFiles := getInstalledFiles(pkg.Files, params, methods)
+	installedFiles := getInstalledFiles(pkg.Files, methods)
 	if len(installedFiles) != 0 {
 		// Download
 		ustr := pkg.URL.String()
