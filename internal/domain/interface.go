@@ -12,7 +12,7 @@ type (
 	// Copy is the interface of io.Copy .
 	Copy func(dst io.Writer, src io.Reader) (int64, error)
 	// Download downloads a file.
-	Download func(ctx context.Context, uri string) (io.ReadCloser, error)
+	Download func(ctx context.Context, uri string, numOfDLPartitions int) (io.ReadCloser, error)
 	// ExistFile is an interface to check file existence.
 	ExistFile func(string) bool
 	// ExpandEnv is an interface of os.ExpandEnv .

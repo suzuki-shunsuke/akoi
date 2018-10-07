@@ -60,7 +60,7 @@ func installPackage(
 		methods.Printf("downloading %s: %s\n", pkg.Name, ustr)
 		c, cancel := context.WithCancel(ctx)
 		defer cancel()
-		body, err := methods.Download(c, ustr)
+		body, err := methods.Download(c, ustr, pkg.NumOfDLPartitions)
 		if err != nil {
 			methods.Fprintln(os.Stderr, err)
 			pkg.Result.Error = err.Error()

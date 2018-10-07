@@ -7,6 +7,7 @@ const ConfigTemplate = `
 # https://github.com/suzuki-shunsuke/akoi
 bin_path: /usr/local/bin/{{.Name}}-{{.Version}}
 link_path: /usr/local/bin/{{.Name}}
+# num_of_dl_partitions:
 # packages:
 #   consul:
 #     url: https://releases.hashicorp.com/consul/{{.Version}}/consul_{{.Version}}_darwin_amd64.zip

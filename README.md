@@ -45,7 +45,9 @@ For example,
 
 ## Features
 
-* parallel installation
+* efficiency
+  * install packages in parallel
+  * support parallel download with Accept-Ranges
 * declarative and idempotence
 * [small dependencies and easy to install (written in Go)](#install)
 * [work good with ansible's shell module](#use-akoi-at-ansible)
@@ -169,6 +171,11 @@ $ akoi help [init|install]
 bin_path: $HOME/bin/{{.Name}}-{{.Version}}
 # the symbolic link to the binary
 link_path: $HOME/bin/{{.Name}}
+# number of download partitions with Accept-Ranges
+# Note that this parameter is ignored if server doesn't support Accept-Ranges.
+# If this parameter is not set or is less equal than 0, the value of `runtime.NumCPU()` is used.
+# If this parameter is 1, Accept-Ranges isn't used.
+num_of_dl_partitions: 4
 packages:
   consul: # package name
     # akoi downloads a file from this url and unarchive it according to the base file name.
@@ -186,6 +193,7 @@ packages:
     bin_path: /usr/local/bin/{{.Name}}-{{.Version}}
     # the symbolic link to the binary
     link_path: /usr/local/bin/{{.Name}}
+    num_of_dl_partitions: 1
     # files included in the downloaded file
     files:
     - name: consul

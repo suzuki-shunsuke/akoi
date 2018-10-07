@@ -24,7 +24,7 @@ func NewFakeCopy(written int64, err error) domain.Copy {
 
 // NewFakeDownload is a fake of domain.Download .
 func NewFakeDownload(body io.ReadCloser, err error) domain.Download {
-	return func(context.Context, string) (io.ReadCloser, error) {
+	return func(context.Context, string, int) (io.ReadCloser, error) {
 		return body, err
 	}
 }
