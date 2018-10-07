@@ -157,7 +157,7 @@ func installPackage(ctx context.Context, pkg *domain.Package, params *domain.Ins
 			continue
 		}
 
-		if err := createLink(pkg, &file, params, methods); err != nil {
+		if err := createLink(&file, methods); err != nil {
 			if fileResult.Error == "" {
 				fileResult.Error = err.Error()
 			}
