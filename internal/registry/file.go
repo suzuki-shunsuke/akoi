@@ -56,7 +56,7 @@ func NewInstallMethods(params domain.InstallParams) domain.InstallMethods {
 	return domain.InstallMethods{
 		Chmod:          os.Chmod,
 		Copy:           io.Copy,
-		Download:       http.Get,
+		Download:       infra.Download,
 		ExpandEnv:      os.ExpandEnv,
 		Fprintf:        infra.NewFprintf(flag),
 		Fprintln:       infra.NewFprintln(flag),

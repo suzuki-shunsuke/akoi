@@ -2,8 +2,10 @@ package infra
 
 import (
 	"compress/gzip"
+	"context"
 	"io"
 	"io/ioutil"
+	"net/http"
 	"os"
 
 	"gopkg.in/yaml.v2"
@@ -12,6 +14,18 @@ import (
 
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
 )
+
+// Download is an implementation of domain.Download .
+func Download(ctx context.Context, uri string) (*http.Response, error) {
+	req, err := http.NewRequest("GET", uri, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req = req.WithContext(ctx)
+	client := http.DefaultClient
+	return client.Do(req)
+}
 
 // ExistFile is an implementation of domain.ExistFile .
 func ExistFile(dst string) bool {

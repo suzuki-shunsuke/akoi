@@ -58,7 +58,7 @@ func installPackage(
 		// Download
 		ustr := pkg.URL.String()
 		methods.Printf("downloading %s: %s\n", pkg.Name, ustr)
-		resp, err := methods.Download(ustr)
+		resp, err := methods.Download(context.Background(), ustr)
 		if err != nil {
 			methods.Fprintln(os.Stderr, err)
 			pkg.Result.Error = err.Error()

@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"os"
@@ -12,7 +13,7 @@ type (
 	// Copy is the interface of io.Copy .
 	Copy func(dst io.Writer, src io.Reader) (int64, error)
 	// Download downloads a file.
-	Download func(url string) (*http.Response, error)
+	Download func(ctx context.Context, uri string) (*http.Response, error)
 	// ExistFile is an interface to check file existence.
 	ExistFile func(string) bool
 	// ExpandEnv is an interface of os.ExpandEnv .
