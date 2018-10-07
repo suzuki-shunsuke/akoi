@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"os"
@@ -61,11 +62,12 @@ func TestInstall(t *testing.T) {
 	}
 	params := &domain.InstallParams{
 		ConfigFilePath: "/etc/akoi/akoi.yml", Format: "ansible"}
-	if result := Install(params, methods); result.Failed {
+	if result := Install(context.Background(), params, methods); result.Failed {
 		t.Fatal(result.String(params))
 	}
-	methods.ReadConfigFile = testutil.NewFakeReadConfigFile(nil, fmt.Errorf("failed to read config"))
-	if result := Install(params, methods); !result.Failed {
+	methods.ReadConfigFile = testutil.NewFakeReadConfigFile(
+		nil, fmt.Errorf("failed to read config"))
+	if result := Install(context.Background(), params, methods); !result.Failed {
 		t.Fatal("it should be failed to read config")
 	}
 }

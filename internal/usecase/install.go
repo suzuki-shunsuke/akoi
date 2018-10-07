@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"os"
 	"sync"
 
@@ -13,7 +14,7 @@ const (
 )
 
 // Install intalls binraries.
-func Install(params *domain.InstallParams, methods *domain.InstallMethods) *domain.Result {
+func Install(ctx context.Context, params *domain.InstallParams, methods *domain.InstallMethods) *domain.Result {
 	result := &domain.Result{
 		Packages: map[string]domain.PackageResult{}}
 	if err := util.ValidateStruct(methods); err != nil {
@@ -48,7 +49,7 @@ func Install(params *domain.InstallParams, methods *domain.InstallMethods) *doma
 		wg.Add(1)
 		go func(pkg domain.Package) {
 			defer wg.Done()
-			installPackage(&pkg, params, methods)
+			installPackage(context.Background(), &pkg, params, methods)
 			pkgResult := pkg.Result
 			if pkgResult == nil {
 				pkgResult = &domain.PackageResult{Name: pkg.Name}

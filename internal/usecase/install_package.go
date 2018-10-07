@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -46,7 +47,7 @@ func getInstalledFiles(pkg *domain.Package, params *domain.InstallParams, method
 	return installedFiles
 }
 
-func installPackage(pkg *domain.Package, params *domain.InstallParams, methods *domain.InstallMethods) {
+func installPackage(ctx context.Context, pkg *domain.Package, params *domain.InstallParams, methods *domain.InstallMethods) {
 	installedFiles := getInstalledFiles(pkg, params, methods)
 	if len(installedFiles) != 0 {
 		// Download

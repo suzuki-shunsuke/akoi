@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/urfave/cli"
@@ -41,7 +42,8 @@ func Install(c *cli.Context) error {
 		Format:         c.String("format"),
 		DryRun:         c.Bool("dry-run"),
 	}
-	result := usecase.Install(params, registry.NewInstallMethods(params))
+	result := usecase.Install(
+		context.Background(), params, registry.NewInstallMethods(params))
 	if result == nil {
 		result = &domain.Result{}
 	}
