@@ -14,6 +14,6 @@ func TestNewInitMethods(t *testing.T) {
 }
 
 func TestNewInstallMethods(t *testing.T) {
-	NewInstallMethods(&domain.InstallParams{DryRun: true})
-	NewInstallMethods(&domain.InstallParams{DryRun: false})
+	NewInstallMethods(domain.InstallParams{DryRun: true})
+	NewInstallMethods(domain.InstallParams{DryRun: false})
 }

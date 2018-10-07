@@ -5,8 +5,8 @@ import (
 )
 
 // String converts result into a string.
-func (result *Result) String(params *InstallParams) string {
-	switch params.Format {
+func (result *Result) String(format string) string {
+	switch format {
 	case "ansible":
 		b, err := json.Marshal(result)
 		if err != nil {

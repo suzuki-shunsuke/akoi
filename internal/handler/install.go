@@ -37,7 +37,7 @@ var InstallCommand = cli.Command{
 
 // Install is the sub command "install".
 func Install(c *cli.Context) error {
-	params := &domain.InstallParams{
+	params := domain.InstallParams{
 		ConfigFilePath: c.String("config"),
 		Format:         c.String("format"),
 		DryRun:         c.Bool("dry-run"),
@@ -48,11 +48,11 @@ func Install(c *cli.Context) error {
 		result = &domain.Result{}
 	}
 	if !result.Failed {
-		s := result.String(params)
+		s := result.String(params.Format)
 		if s != "" {
 			fmt.Println(s)
 		}
 		return nil
 	}
-	return cli.NewExitError(result.String(params), 1)
+	return cli.NewExitError(result.String(params.Format), 1)
 }

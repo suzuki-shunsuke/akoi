@@ -60,10 +60,10 @@ func TestInstall(t *testing.T) {
 		RemoveLink: testutil.NewFakeRemoveFile(nil),
 		TempDir:    testutil.NewFakeTempDir("/tmp/foo", nil),
 	}
-	params := &domain.InstallParams{
+	params := domain.InstallParams{
 		ConfigFilePath: "/etc/akoi/akoi.yml", Format: "ansible"}
 	if result := Install(context.Background(), params, methods); result.Failed {
-		t.Fatal(result.String(params))
+		t.Fatal(result.String("ansible"))
 	}
 	methods.ReadConfigFile = testutil.NewFakeReadConfigFile(
 		nil, fmt.Errorf("failed to read config"))

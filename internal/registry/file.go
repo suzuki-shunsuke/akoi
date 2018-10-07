@@ -20,7 +20,7 @@ func NewInitMethods() *domain.InitMethods {
 }
 
 // NewInstallMethods returns a domain.InstallMethods .
-func NewInstallMethods(params *domain.InstallParams) domain.InstallMethods {
+func NewInstallMethods(params domain.InstallParams) domain.InstallMethods {
 	flag := params.Format != "ansible"
 	if params.DryRun {
 		return domain.InstallMethods{
