@@ -3,7 +3,6 @@ package usecase
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"os"
 	"testing"
 
@@ -17,10 +16,7 @@ func TestInstall(t *testing.T) {
 		Chmod: testutil.NewFakeChmod(nil),
 		Copy:  testutil.NewFakeCopy(10, nil),
 		Download: testutil.NewFakeDownload(
-			&http.Response{
-				StatusCode: 200,
-				Body:       testutil.NewFakeIOReadCloser("hello"),
-			}, nil),
+			testutil.NewFakeIOReadCloser("hello"), nil),
 		ExpandEnv:   os.ExpandEnv,
 		Fprintf:     infra.NewFprintf(true),
 		Fprintln:    infra.NewFprintln(true),
@@ -33,10 +29,11 @@ func TestInstall(t *testing.T) {
 		MkLink:   testutil.NewFakeMkLink(nil),
 		NewGzipReader: testutil.NewFakeNewGzipReader(
 			testutil.NewFakeIOReadCloser("hello"), nil),
-		Open:     testutil.NewFakeOpen(&os.File{}, nil),
-		OpenFile: testutil.NewFakeOpenFile(&os.File{}, nil),
-		Printf:   infra.NewPrintf(true),
-		Println:  infra.NewPrintln(true),
+		NewLoggerOutput: infra.NewLoggerOutput,
+		Open:            testutil.NewFakeOpen(&os.File{}, nil),
+		OpenFile:        testutil.NewFakeOpenFile(&os.File{}, nil),
+		Printf:          infra.NewPrintf(true),
+		Println:         infra.NewPrintln(true),
 		ReadConfigFile: testutil.NewFakeReadConfigFile(
 			domain.Config{
 				BinPath:  "/usr/local/bin/{{.Name}}-{{.Version}}",

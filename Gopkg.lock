@@ -3,6 +3,7 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:988cfde37f089c50ba1ac8a1032c3f81d2ac0359e1872093b946a30139665eb6"
   name = "github.com/dsnet/compress"
   packages = [
     ".",
@@ -10,84 +11,119 @@
     "bzip2/internal/sais",
     "internal",
     "internal/errors",
-    "internal/prefix"
+    "internal/prefix",
   ]
+  pruneopts = "UT"
   revision = "cc9eb1d7ad760af14e8f918698f745e80377af4f"
 
 [[projects]]
+  digest = "1:e1ff887e232b2d8f4f7c7db15a5fac7be418025afc4dda53c59c765dbb5aa6b4"
   name = "github.com/go-playground/locales"
   packages = [
     ".",
-    "currency"
+    "currency",
   ]
+  pruneopts = "UT"
   revision = "f63010822830b6fe52288ee52d5a1151088ce039"
   version = "v0.12.1"
 
 [[projects]]
+  digest = "1:e022cf244bcac1b6ef933f1a2e0adcf6a6dfd7b872d8d41e4d4179bb09a87cbc"
   name = "github.com/go-playground/universal-translator"
   packages = ["."]
+  pruneopts = "UT"
   revision = "b32fa301c9fe55953584134cb6853a13c87ec0a1"
   version = "v0.16.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:4a0c6bb4805508a6287675fac876be2ac1182539ca8a32468d8128882e9d5009"
   name = "github.com/golang/snappy"
   packages = ["."]
+  pruneopts = "UT"
   revision = "2e65f85255dbc3072edf28d6b5b8efc472979f5a"
 
 [[projects]]
+  digest = "1:3be0963bb740d6f32522d05836d317a1e5a4f6f31254f5d7df46c144cd1769c8"
+  name = "github.com/joeybloggs/go-download"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "26df310821f0e7614a736a2ee38ecd7e2f6ef6da"
+  version = "v2.1.0"
+
+[[projects]]
   branch = "master"
+  digest = "1:54810f1da274687d725732a273e250c59ac0374cdbf6288ac206ef24c53c5478"
   name = "github.com/mholt/archiver"
   packages = ["."]
+  pruneopts = "UT"
   revision = "e4ef56d48eb029648b0e895bb0b6a393ef0829c3"
 
 [[projects]]
   branch = "master"
+  digest = "1:3bdb4203c03569a564d6a4bd54d84315575cebb2d76471f8676f8ee8c402005e"
   name = "github.com/nwaples/rardecode"
   packages = ["."]
+  pruneopts = "UT"
   revision = "e06696f847aeda6f39a8f0b7cdff193b7690aef6"
 
 [[projects]]
+  digest = "1:29803f52611cbcc1dfe55b456e9fdac362af7248b3d29d7ea1bec0a12e71dff4"
   name = "github.com/pierrec/lz4"
   packages = [
     ".",
-    "internal/xxh32"
+    "internal/xxh32",
   ]
+  pruneopts = "UT"
   revision = "1958fd8fff7f115e79725b1288e0b878b3e06b00"
   version = "v2.0.3"
 
 [[projects]]
+  digest = "1:4aeb3860275fa1fd60cccfb5a6ef85da438bf17402e1e84412ade4d4b55066a0"
   name = "github.com/ulikunitz/xz"
   packages = [
     ".",
     "internal/hash",
     "internal/xlog",
-    "lzma"
+    "lzma",
   ]
+  pruneopts = "UT"
   revision = "0c6b41e72360850ca4f98dc341fd999726ea007f"
   version = "v0.5.4"
 
 [[projects]]
+  digest = "1:b24d38b282bacf9791408a080f606370efa3d364e4b5fd9ba0f7b87786d3b679"
   name = "github.com/urfave/cli"
   packages = ["."]
+  pruneopts = "UT"
   revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
   version = "v1.20.0"
 
 [[projects]]
+  digest = "1:a351fd4cb95e313ecb345a521f276e7a00913d1f2e84c61543bc4fa1785ba7f3"
   name = "gopkg.in/go-playground/validator.v9"
   packages = ["."]
+  pruneopts = "UT"
   revision = "ab2a8a99087e827c9af87ed6777ba897348fb178"
   version = "v9.20.2"
 
 [[projects]]
+  digest = "1:342378ac4dcb378a5448dd723f0784ae519383532f5e70ade24132c4c8693202"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
+  pruneopts = "UT"
   revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
   version = "v2.2.1"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c14c72446e31e0c5403407deadaec9a3dbf6080e4dfae98c461ca045d365ad16"
+  input-imports = [
+    "github.com/joeybloggs/go-download",
+    "github.com/mholt/archiver",
+    "github.com/urfave/cli",
+    "gopkg.in/go-playground/validator.v9",
+    "gopkg.in/yaml.v2",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1

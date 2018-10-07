@@ -9,11 +9,12 @@ import (
 type (
 	// Config represents application's configuration.
 	Config struct {
-		BinPathTpl  *template.Template `yaml:"-"`
-		LinkPathTpl *template.Template `yaml:"-"`
-		BinPath     string             `yaml:"bin_path"`
-		LinkPath    string             `yaml:"link_path"`
-		Packages    map[string]Package `yaml:"packages"`
+		BinPathTpl        *template.Template `yaml:"-"`
+		LinkPathTpl       *template.Template `yaml:"-"`
+		BinPath           string             `yaml:"bin_path"`
+		LinkPath          string             `yaml:"link_path"`
+		NumOfDLPartitions int                `yaml:"num_of_dl_partitions"`
+		Packages          map[string]Package `yaml:"packages"`
 	}
 
 	// File represents a file configuration.
@@ -58,28 +59,29 @@ type (
 
 	// InstallMethods is functions which are used at usecase.Install .
 	InstallMethods struct {
-		Chmod          Chmod          `validate:"required"`
-		Copy           Copy           `validate:"required"`
-		Download       Download       `validate:"required"`
-		ExpandEnv      ExpandEnv      `validate:"required"`
-		Fprintf        Fprintf        `validate:"required"`
-		Fprintln       Fprintln       `validate:"required"`
-		GetArchiver    GetArchiver    `validate:"required"`
-		GetFileStat    GetFileStat    `validate:"required"`
-		GetFileLstat   GetFileStat    `validate:"required"`
-		MkdirAll       MkdirAll       `validate:"required"`
-		MkLink         MkLink         `validate:"required"`
-		NewGzipReader  NewGzipReader  `validate:"required"`
-		Open           Open           `validate:"required"`
-		OpenFile       OpenFile       `validate:"required"`
-		Printf         Printf         `validate:"required"`
-		Println        Println        `validate:"required"`
-		ReadConfigFile ReadConfigFile `validate:"required"`
-		ReadLink       ReadLink       `validate:"required"`
-		RemoveAll      RemoveFile     `validate:"required"`
-		RemoveFile     RemoveFile     `validate:"required"`
-		RemoveLink     RemoveFile     `validate:"required"`
-		TempDir        TempDir        `validate:"required"`
+		Chmod           Chmod           `validate:"required"`
+		Copy            Copy            `validate:"required"`
+		Download        Download        `validate:"required"`
+		ExpandEnv       ExpandEnv       `validate:"required"`
+		Fprintf         Fprintf         `validate:"required"`
+		Fprintln        Fprintln        `validate:"required"`
+		GetArchiver     GetArchiver     `validate:"required"`
+		GetFileStat     GetFileStat     `validate:"required"`
+		GetFileLstat    GetFileStat     `validate:"required"`
+		MkdirAll        MkdirAll        `validate:"required"`
+		MkLink          MkLink          `validate:"required"`
+		NewGzipReader   NewGzipReader   `validate:"required"`
+		NewLoggerOutput NewLoggerOutput `validate:"required"`
+		Open            Open            `validate:"required"`
+		OpenFile        OpenFile        `validate:"required"`
+		Printf          Printf          `validate:"required"`
+		Println         Println         `validate:"required"`
+		ReadConfigFile  ReadConfigFile  `validate:"required"`
+		ReadLink        ReadLink        `validate:"required"`
+		RemoveAll       RemoveFile      `validate:"required"`
+		RemoveFile      RemoveFile      `validate:"required"`
+		RemoveLink      RemoveFile      `validate:"required"`
+		TempDir         TempDir         `validate:"required"`
 	}
 
 	// InstallParams is parameters of usecase.Install .
@@ -91,18 +93,19 @@ type (
 
 	// Package represents a package configuration.
 	Package struct {
-		ArchiveType string             `yaml:"archive_type"`
-		Name        string             `yaml:"-" validate:"required"`
-		RawURL      string             `yaml:"url" validate:"required"`
-		Version     string             `yaml:"version" validate:"required"`
-		BinPath     string             `yaml:"bin_path"`
-		LinkPath    string             `yaml:"link_path"`
-		BinPathTpl  *template.Template `yaml:"-"`
-		LinkPathTpl *template.Template `yaml:"-"`
-		Archiver    Archiver           `yaml:"-" validate:"required"`
-		Files       []File             `yaml:"files"`
-		URL         *url.URL           `yaml:"-"`
-		Result      *PackageResult     `yaml:"-"`
+		ArchiveType       string             `yaml:"archive_type"`
+		Name              string             `yaml:"-" validate:"required"`
+		RawURL            string             `yaml:"url" validate:"required"`
+		Version           string             `yaml:"version" validate:"required"`
+		BinPath           string             `yaml:"bin_path"`
+		LinkPath          string             `yaml:"link_path"`
+		NumOfDLPartitions int                `yaml:"num_of_dl_partitions"`
+		BinPathTpl        *template.Template `yaml:"-"`
+		LinkPathTpl       *template.Template `yaml:"-"`
+		Archiver          Archiver           `yaml:"-" validate:"required"`
+		Files             []File             `yaml:"files"`
+		URL               *url.URL           `yaml:"-"`
+		Result            *PackageResult     `yaml:"-"`
 	}
 
 	// PackageResult represents a result of package installation.

@@ -32,7 +32,7 @@ func TestNewFakeCopy(t *testing.T) {
 
 func TestNewFakeDownload(t *testing.T) {
 	f := NewFakeDownload(nil, nil)
-	if _, err := f(context.Background(), "http://example.com"); err != nil {
+	if _, err := f(context.Background(), "http://example.com", 1); err != nil {
 		t.Fatal(err)
 	}
 }

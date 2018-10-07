@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"path/filepath"
+	"runtime"
 	"text/template"
 
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
@@ -25,6 +26,11 @@ func setupConfig(cfg domain.Config, methods domain.InstallMethods) (domain.Confi
 		return cfg, err
 	}
 	cfg.LinkPathTpl = tpl
+
+	numCPUs := runtime.NumCPU()
+	if cfg.NumOfDLPartitions <= 0 {
+		cfg.NumOfDLPartitions = numCPUs
+	}
 
 	for pkgName, pkg := range cfg.Packages {
 		if pkg.Result == nil {
@@ -73,6 +79,15 @@ func setupConfig(cfg domain.Config, methods domain.InstallMethods) (domain.Confi
 		}
 		pkg.URL = u2
 		pkg.Archiver = methods.GetArchiver(u2.Path, pkg.ArchiveType)
+
+		if pkg.NumOfDLPartitions < 0 {
+			pkg.NumOfDLPartitions = numCPUs
+		} else {
+			if pkg.NumOfDLPartitions == 0 {
+				pkg.NumOfDLPartitions = cfg.NumOfDLPartitions
+			}
+		}
+
 		for i, file := range pkg.Files {
 			if file.Result == nil {
 				file.Result = &domain.FileResult{}

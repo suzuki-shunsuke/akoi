@@ -60,20 +60,13 @@ func installPackage(
 		methods.Printf("downloading %s: %s\n", pkg.Name, ustr)
 		c, cancel := context.WithCancel(ctx)
 		defer cancel()
-		resp, err := methods.Download(c, ustr)
+		body, err := methods.Download(c, ustr, pkg.NumOfDLPartitions)
 		if err != nil {
 			methods.Fprintln(os.Stderr, err)
 			pkg.Result.Error = err.Error()
 			return pkg
 		}
-		defer resp.Body.Close()
-		if resp.StatusCode != 200 {
-			methods.Fprintf(os.Stderr, "failed to download %s from %s: %d\n", pkg.Name, ustr, resp.StatusCode)
-			pkg.Result.Error = fmt.Sprintf(
-				"failed to download %s from %s: %d", pkg.Name, ustr, resp.StatusCode)
-			return pkg
-		}
-
+		defer body.Close()
 		tmpDir := ""
 		if pkg.Archived() {
 			// Create temporary directory
@@ -100,7 +93,7 @@ func installPackage(
 			}
 			// Unarchive
 			methods.Printf("unarchive %s\n", pkg.Name)
-			if err := arc.Read(resp.Body, tmpDir); err != nil {
+			if err := arc.Read(body, tmpDir); err != nil {
 				pkg.Result.Error = err.Error()
 				methods.Fprintln(os.Stderr, err)
 				return pkg
@@ -136,7 +129,7 @@ func installPackage(
 				fileResult.Installed = true
 			} else {
 				if pkg.ArchiveType == "Gzip" {
-					reader, err := methods.NewGzipReader(resp.Body)
+					reader, err := methods.NewGzipReader(body)
 					if err != nil {
 						methods.Fprintln(os.Stderr, err)
 						fileResult.Error = err.Error()
@@ -149,7 +142,7 @@ func installPackage(
 						continue
 					}
 				}
-				if _, err := methods.Copy(writer, resp.Body); err != nil {
+				if _, err := methods.Copy(writer, body); err != nil {
 					methods.Fprintln(os.Stderr, err)
 					fileResult.Error = err.Error()
 					continue
