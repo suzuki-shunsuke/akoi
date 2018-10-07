@@ -153,16 +153,16 @@ func installPackage(ctx context.Context, pkg *domain.Package, params *domain.Ins
 			}
 		}
 	}
-	for _, file := range pkg.Files {
-		fileResult := file.Result
-		if fileResult.Error != "" {
+	for i, file := range pkg.Files {
+		if file.Result.Error != "" {
 			continue
 		}
-
-		if err := createLink(&file, methods); err != nil {
-			if fileResult.Error == "" {
-				fileResult.Error = err.Error()
+		f, err := createLink(file, methods)
+		if err != nil {
+			if f.Result.Error == "" {
+				f.Result.Error = err.Error()
 			}
 		}
+		pkg.Files[i] = f
 	}
 }
