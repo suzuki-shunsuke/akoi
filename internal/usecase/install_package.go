@@ -15,7 +15,6 @@ func getInstalledFiles(
 	installedFiles := []domain.File{}
 	for _, file := range files {
 		dst := file.Bin
-		fileResult := file.Result
 		mode := file.Mode
 		if fi, err := methods.GetFileStat(dst); err == nil {
 			if fi.Mode() == mode {
@@ -24,11 +23,10 @@ func getInstalledFiles(
 			methods.Printf("chmod %s %s\n", mode.String(), dst)
 			if err := methods.Chmod(dst, mode); err != nil {
 				methods.Fprintln(os.Stderr, err)
-				fileResult.Error = err.Error()
+				file.Result.Error = err.Error()
 				continue
 			}
-			fileResult.Changed = true
-			fileResult.ModeChanged = true
+			file.Result.ModeChanged = true
 			continue
 		}
 
@@ -38,11 +36,10 @@ func getInstalledFiles(
 			methods.Printf("create directory %s\n", dir)
 			if err := methods.MkdirAll(dir); err != nil {
 				methods.Fprintln(os.Stderr, err)
-				fileResult.Error = err.Error()
+				file.Result.Error = err.Error()
 				continue
 			}
-			fileResult.Changed = true
-			fileResult.DirCreated = true
+			file.Result.DirCreated = true
 		}
 		installedFiles = append(installedFiles, file)
 	}
@@ -106,10 +103,9 @@ func installPackage(
 			dst := file.Bin
 			methods.Printf("install %s\n", dst)
 			writer, err := methods.OpenFile(dst, os.O_RDWR|os.O_CREATE, mode)
-			fileResult := file.Result
 			if err != nil {
 				methods.Fprintf(os.Stderr, "failed to install %s: %s\n", dst, err)
-				fileResult.Error = err.Error()
+				file.Result.Error = err.Error()
 				continue
 			}
 			defer writer.Close()
@@ -117,37 +113,37 @@ func installPackage(
 				src, err := methods.Open(filepath.Join(tmpDir, file.Archive))
 				if err != nil {
 					methods.Fprintln(os.Stderr, err)
-					fileResult.Error = err.Error()
+					file.Result.Error = err.Error()
 					continue
 				}
 				defer src.Close()
 				if _, err := methods.Copy(writer, src); err != nil {
 					methods.Fprintln(os.Stderr, err)
-					fileResult.Error = err.Error()
+					file.Result.Error = err.Error()
 					continue
 				}
-				fileResult.Installed = true
+				file.Result.Installed = true
 			} else {
 				if pkg.ArchiveType == "Gzip" {
 					reader, err := methods.NewGzipReader(body)
 					if err != nil {
 						methods.Fprintln(os.Stderr, err)
-						fileResult.Error = err.Error()
+						file.Result.Error = err.Error()
 						continue
 					}
 					defer reader.Close()
 					if _, err := methods.Copy(writer, reader); err != nil {
 						methods.Fprintln(os.Stderr, err)
-						fileResult.Error = err.Error()
+						file.Result.Error = err.Error()
 						continue
 					}
 				}
 				if _, err := methods.Copy(writer, body); err != nil {
 					methods.Fprintln(os.Stderr, err)
-					fileResult.Error = err.Error()
+					file.Result.Error = err.Error()
 					continue
 				}
-				fileResult.Installed = true
+				file.Result.Installed = true
 			}
 		}
 	}

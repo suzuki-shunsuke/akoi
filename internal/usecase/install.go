@@ -30,21 +30,18 @@ func Install(
 			methods.Fprintln(os.Stderr, err)
 		}
 		result.Msg = err.Error()
-		result.Failed = true
 		return result
 	}
 	cfg, err := methods.ReadConfigFile(params.ConfigFilePath)
 	if err != nil {
 		methods.Fprintln(os.Stderr, err)
 		result.Msg = err.Error()
-		result.Failed = true
 		return result
 	}
 	cfg, err = setupConfig(cfg, methods)
 	if err != nil {
 		methods.Fprintln(os.Stderr, err)
 		result.Msg = err.Error()
-		result.Failed = true
 		return result
 	}
 	numOfPkgs := len(cfg.Packages)
@@ -66,12 +63,6 @@ func Install(
 			}
 			for _, file := range pkg.Files {
 				fileResult := file.Result
-				if fileResult.Changed {
-					pkgResult.Changed = true
-				}
-				if fileResult.Error != "" {
-					pkgResult.Failed = true
-				}
 				pkgResult.Files[file.Name] = *fileResult
 			}
 			pkgResultChan <- *pkgResult
@@ -81,12 +72,6 @@ func Install(
 	close(pkgResultChan)
 	for pkgResult := range pkgResultChan {
 		result.Packages[pkgResult.Name] = pkgResult
-		if pkgResult.Changed {
-			result.Changed = true
-		}
-		if pkgResult.Failed {
-			result.Failed = true
-		}
 	}
 	return result
 }
