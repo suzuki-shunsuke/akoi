@@ -19,7 +19,7 @@ func createLink(
 			methods.Fprintln(os.Stderr, err)
 			return file, err
 		}
-		file.Result.Changed = true
+		file.Result.LinkCreated = true
 		return file, nil
 	}
 	switch mode := fi.Mode(); {
@@ -40,7 +40,6 @@ func createLink(
 			methods.Fprintln(os.Stderr, err)
 			return file, err
 		}
-		file.Result.Changed = true
 		file.Result.FileRemoved = true
 		methods.Printf("create link %s -> %s\n", file.Link, file.Bin)
 		if err := methods.MkLink(file.Bin, file.Link); err != nil {
@@ -48,7 +47,6 @@ func createLink(
 			return file, err
 		}
 		file.Result.Migrated = true
-		file.Result.Changed = true
 		return file, nil
 	case mode&os.ModeSymlink != 0:
 		// if file is a symlink but a dest is different, recreate a symlink.
@@ -65,7 +63,7 @@ func createLink(
 			methods.Fprintln(os.Stderr, err)
 			return file, err
 		}
-		file.Result.Changed = true
+		file.Result.LinkRemoved = true
 		methods.Printf("create link %s -> %s\n", file.Link, file.Bin)
 		if err := methods.MkLink(file.Bin, file.Link); err != nil {
 			methods.Fprintln(os.Stderr, err)

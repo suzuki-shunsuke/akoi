@@ -60,7 +60,7 @@ func Install(c *cli.Context) error {
 	select {
 	case result := <-resultChan:
 		close(signalChan)
-		if !result.Failed {
+		if !result.Failed() {
 			s := result.String(params.Format)
 			if s != "" {
 				fmt.Println(s)
