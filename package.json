@@ -1,8 +1,8 @@
 {
   "scripts": {
     "commitmsg": "commitlint -e $GIT_PARAMS",
-    "precommit": "bash scripts/test.sh",
-    "test": "bash scripts/test.sh",
+    "precommit": "npm run vet && npm t && npm run lint",
+    "test": "go test ./... -covermode=atomic",
     "fmt": "bash scripts/fmt.sh",
     "vet": "go vet ./...",
     "lint": "gometalinter ./...",
