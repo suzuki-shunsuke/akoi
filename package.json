@@ -7,6 +7,7 @@
     "vet": "go vet ./...",
     "lint": "gometalinter ./...",
     "c": "bash scripts/coverage.sh",
+    "gen-mock": "gomic gen && npm run fmt",
     "tag": "bash scripts/tag.sh"
   },
   "devDependencies": {

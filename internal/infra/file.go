@@ -2,16 +2,10 @@ package infra
 
 import (
 	"compress/gzip"
-	"context"
-	"fmt"
 	"io"
 	"io/ioutil"
-	"net/http"
 	"os"
 
-	"gopkg.in/yaml.v2"
-
-	"github.com/joeybloggs/go-download"
 	"github.com/mholt/archiver"
 
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
@@ -19,39 +13,11 @@ import (
 
 type (
 	quietWriter struct{}
+	// GetArchiver implements domain.GetArchiver .
+	GetArchiver struct{}
+	// GetGzipReader implements domain.GetGzipReader .
+	GetGzipReader struct{}
 )
-
-func normalDownload(ctx context.Context, uri string) (io.ReadCloser, error) {
-	req, err := http.NewRequest("GET", uri, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	req = req.WithContext(ctx)
-	client := http.DefaultClient
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	if resp.StatusCode >= 400 {
-		resp.Body.Close()
-		return nil, fmt.Errorf("status code = %d >= 400", resp.StatusCode)
-	}
-	return resp.Body, nil
-}
-
-// Download is an implementation of domain.Download .
-func Download(ctx context.Context, uri string, numOfDLPartitions int) (io.ReadCloser, error) {
-	if numOfDLPartitions == 1 {
-		return normalDownload(ctx, uri)
-	}
-	return download.OpenContext(
-		ctx, uri, &download.Options{
-			Concurrency: func(size int64) int {
-				return numOfDLPartitions
-			},
-		})
-}
 
 // ExistFile is an implementation of domain.ExistFile .
 func ExistFile(dst string) bool {
@@ -59,8 +25,8 @@ func ExistFile(dst string) bool {
 	return err == nil
 }
 
-// GetArchiver converts archiver.Archiver into domain.Archiver .
-func GetArchiver(fpath, ftype string) domain.Archiver {
+// Get converts archiver.Archiver into domain.Archiver .
+func (getArchiver GetArchiver) Get(fpath, ftype string) domain.Archiver {
 	if ftype == "" {
 		return archiver.MatchingFormat(fpath)
 	}
@@ -71,8 +37,8 @@ func GetArchiver(fpath, ftype string) domain.Archiver {
 	return nil
 }
 
-// NewGzipReader converts gzip.NewReader into domain.NewGzipReader .
-func NewGzipReader(reader io.Reader) (io.ReadCloser, error) {
+// Get converts gzip.NewReader into domain.GetGzipReader .
+func (getGzipReader GetGzipReader) Get(reader io.Reader) (io.ReadCloser, error) {
 	return gzip.NewReader(reader)
 }
 
@@ -84,18 +50,6 @@ func NewLoggerOutput() io.Writer {
 // MkdirAll is an implementation of domain.MkdirAll .
 func MkdirAll(dst string) error {
 	return os.MkdirAll(dst, 0775)
-}
-
-// ReadConfigFile reads a configuration from a file.
-func ReadConfigFile(dst string) (domain.Config, error) {
-	cfg := domain.Config{}
-	f, err := os.Open(dst)
-	if err != nil {
-		return cfg, err
-	}
-	defer f.Close()
-	err = yaml.NewDecoder(f).Decode(&cfg)
-	return cfg, err
 }
 
 // TempDir creates a temrapory directory.

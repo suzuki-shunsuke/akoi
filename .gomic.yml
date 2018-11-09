@@ -1,0 +1,44 @@
+---
+items:
+- src:
+    dir: ./internal/domain
+    interface: FileSystem
+  dest:
+    package: test
+    file: internal/test/filesystem.go
+- src:
+    dir: ./internal/domain
+    interface: Printer
+  dest:
+    package: test
+    file: internal/test/printer.go
+- src:
+    dir: ./internal/domain
+    interface: ConfigReader
+  dest:
+    package: test
+    file: internal/test/config_reader.go
+- src:
+    dir: ./internal/domain
+    interface: Downloader
+  dest:
+    package: test
+    file: internal/test/downloader.go
+- src:
+    dir: ./internal/domain
+    interface: GetArchiver
+  dest:
+    package: test
+    file: internal/test/get_archiver.go
+- src:
+    dir: ./internal/domain
+    interface: GetGzipReader
+  dest:
+    package: test
+    file: internal/test/get_gzip_reader.go
+- src:
+    package: io
+    interface: Writer
+  dest:
+    package: usecase
+    file: internal/usecase/writer.go

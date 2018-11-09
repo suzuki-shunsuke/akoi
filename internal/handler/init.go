@@ -4,7 +4,7 @@ import (
 	"github.com/urfave/cli"
 
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
-	"github.com/suzuki-shunsuke/akoi/internal/registry"
+	"github.com/suzuki-shunsuke/akoi/internal/infra"
 	"github.com/suzuki-shunsuke/akoi/internal/usecase/initcmd"
 )
 
@@ -29,7 +29,7 @@ func Init(c *cli.Context) error {
 		&domain.InitParams{
 			Dest: c.String("dest"),
 		},
-		registry.NewInitMethods(),
+		infra.FileSystem{},
 	)
 	if err == nil {
 		return nil

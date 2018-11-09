@@ -12,9 +12,11 @@ import (
 )
 
 // setupConfig compiles and renders templates of domain.Config .
-func setupConfig(cfg domain.Config, methods domain.InstallMethods) (domain.Config, error) {
-	cfg.BinPath = methods.ExpandEnv(cfg.BinPath)
-	cfg.LinkPath = methods.ExpandEnv(cfg.LinkPath)
+func setupConfig(
+	cfg domain.Config, fsys domain.FileSystem, getArchiver domain.GetArchiver,
+) (domain.Config, error) {
+	cfg.BinPath = fsys.ExpandEnv(cfg.BinPath)
+	cfg.LinkPath = fsys.ExpandEnv(cfg.LinkPath)
 	tpl, err := template.New("cfg_bin_path").Parse(cfg.BinPath)
 	if err != nil {
 		return cfg, err
@@ -44,7 +46,7 @@ func setupConfig(cfg domain.Config, methods domain.InstallMethods) (domain.Confi
 			pkg.LinkPath = cfg.LinkPath
 			pkg.LinkPathTpl = cfg.LinkPathTpl
 		} else {
-			pkg.LinkPath = methods.ExpandEnv(pkg.LinkPath)
+			pkg.LinkPath = fsys.ExpandEnv(pkg.LinkPath)
 			tpl, err := template.New("pkg_link_path").Parse(pkg.LinkPath)
 			if err != nil {
 				return cfg, err
@@ -56,7 +58,7 @@ func setupConfig(cfg domain.Config, methods domain.InstallMethods) (domain.Confi
 			pkg.BinPath = cfg.BinPath
 			pkg.BinPathTpl = cfg.BinPathTpl
 		} else {
-			pkg.BinPath = methods.ExpandEnv(pkg.BinPath)
+			pkg.BinPath = fsys.ExpandEnv(pkg.BinPath)
 			tpl, err := template.New("pkg_bin_path").Parse(pkg.BinPath)
 			if err != nil {
 				return cfg, err
@@ -78,7 +80,7 @@ func setupConfig(cfg domain.Config, methods domain.InstallMethods) (domain.Confi
 			return cfg, err
 		}
 		pkg.URL = u2
-		pkg.Archiver = methods.GetArchiver(u2.Path, pkg.ArchiveType)
+		pkg.Archiver = getArchiver.Get(u2.Path, pkg.ArchiveType)
 
 		if pkg.NumOfDLPartitions < 0 {
 			pkg.NumOfDLPartitions = numCPUs
@@ -100,7 +102,7 @@ func setupConfig(cfg domain.Config, methods domain.InstallMethods) (domain.Confi
 				file.LinkPath = pkg.LinkPath
 				file.LinkPathTpl = pkg.LinkPathTpl
 			} else {
-				file.LinkPath = methods.ExpandEnv(file.LinkPath)
+				file.LinkPath = fsys.ExpandEnv(file.LinkPath)
 				tpl, err := template.New("file_link_path").Parse(file.LinkPath)
 				if err != nil {
 					return cfg, err
@@ -112,7 +114,7 @@ func setupConfig(cfg domain.Config, methods domain.InstallMethods) (domain.Confi
 				file.BinPath = pkg.BinPath
 				file.BinPathTpl = pkg.BinPathTpl
 			} else {
-				file.BinPath = methods.ExpandEnv(file.BinPath)
+				file.BinPath = fsys.ExpandEnv(file.BinPath)
 				tpl, err := template.New("file_bin_path").Parse(file.BinPath)
 				if err != nil {
 					return cfg, err
@@ -133,7 +135,7 @@ func setupConfig(cfg domain.Config, methods domain.InstallMethods) (domain.Confi
 			}
 			file.Bin = dst
 
-			arcPath := methods.ExpandEnv(file.Archive)
+			arcPath := fsys.ExpandEnv(file.Archive)
 			arcPathTpl, err := template.New("archive_path").Parse(arcPath)
 			if err != nil {
 				return cfg, err

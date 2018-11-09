@@ -10,7 +10,7 @@ import (
 	"github.com/urfave/cli"
 
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
-	"github.com/suzuki-shunsuke/akoi/internal/registry"
+	"github.com/suzuki-shunsuke/akoi/internal/infra"
 	"github.com/suzuki-shunsuke/akoi/internal/usecase"
 )
 
@@ -55,7 +55,8 @@ func Install(c *cli.Context) error {
 	defer cancel()
 	go func() {
 		resultChan <- usecase.Install(
-			ctx, params, registry.NewInstallMethods(params))
+			ctx, params, infra.FileSystem{}, infra.Printer{},
+			infra.ConfigReader{}, infra.GetArchiver{}, infra.Downloader{}, infra.GetGzipReader{})
 	}()
 	select {
 	case result := <-resultChan:

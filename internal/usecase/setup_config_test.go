@@ -3,8 +3,10 @@ package usecase
 import (
 	"testing"
 
+	"github.com/suzuki-shunsuke/gomic/gomic"
+
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
-	"github.com/suzuki-shunsuke/akoi/internal/registry"
+	"github.com/suzuki-shunsuke/akoi/internal/test"
 )
 
 func Test_setupConfig(t *testing.T) {
@@ -24,10 +26,12 @@ func Test_setupConfig(t *testing.T) {
 			},
 		},
 	}
-	params := domain.InstallParams{
-		DryRun: true,
-	}
-	if _, err := setupConfig(cfg, registry.NewInstallMethods(params)); err != nil {
+	fsys := test.NewFileSystem(t, gomic.DoNothing).
+		SetFuncExpandEnv(func(p string) string {
+			return p
+		})
+	getArchiver := test.NewGetArchiver(t, gomic.DoNothing)
+	if _, err := setupConfig(cfg, fsys, getArchiver); err != nil {
 		t.Fatal(err)
 	}
 }

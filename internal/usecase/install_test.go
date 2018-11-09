@@ -3,68 +3,32 @@ package usecase
 import (
 	"context"
 	"fmt"
-	"os"
 	"testing"
 
+	"github.com/suzuki-shunsuke/gomic/gomic"
+
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
-	"github.com/suzuki-shunsuke/akoi/internal/infra"
-	"github.com/suzuki-shunsuke/akoi/internal/testutil"
+	"github.com/suzuki-shunsuke/akoi/internal/test"
 )
 
 func TestInstall(t *testing.T) {
-	methods := domain.InstallMethods{
-		Chmod: testutil.NewFakeChmod(nil),
-		Copy:  testutil.NewFakeCopy(10, nil),
-		Download: testutil.NewFakeDownload(
-			testutil.NewFakeIOReadCloser("hello"), nil),
-		ExpandEnv:   os.ExpandEnv,
-		Fprintf:     infra.NewFprintf(true),
-		Fprintln:    infra.NewFprintln(true),
-		GetArchiver: testutil.NewFakeGetArchiver(nil),
-		GetFileStat: testutil.NewFakeGetFileStat(
-			testutil.NewFakeFileInfo("foo", 0666), nil),
-		GetFileLstat: testutil.NewFakeGetFileStat(
-			testutil.NewFakeFileInfo("foo", 0666), nil),
-		MkdirAll: testutil.NewFakeMkdirAll(nil),
-		MkLink:   testutil.NewFakeMkLink(nil),
-		NewGzipReader: testutil.NewFakeNewGzipReader(
-			testutil.NewFakeIOReadCloser("hello"), nil),
-		NewLoggerOutput: infra.NewLoggerOutput,
-		Open:            testutil.NewFakeOpen(&os.File{}, nil),
-		OpenFile:        testutil.NewFakeOpenFile(&os.File{}, nil),
-		Printf:          infra.NewPrintf(true),
-		Println:         infra.NewPrintln(true),
-		ReadConfigFile: testutil.NewFakeReadConfigFile(
-			domain.Config{
-				BinPath:  "/usr/local/bin/{{.Name}}-{{.Version}}",
-				LinkPath: "/usr/local/bin/{{.Name}}",
-				Packages: map[string]domain.Package{
-					"consul": {
-						RawURL:  "https://releases.hashicorp.com/consul/{{.Version}}/consul_{{.Version}}_darwin_amd64.zip",
-						Version: "1.2.0",
-						Files: []domain.File{
-							{
-								Name:    "consul",
-								Archive: "consul",
-							},
-						},
-					},
-				},
-			}, nil),
-		ReadLink:   testutil.NewFakeReadLink("/usr/local/bin/consul", nil),
-		RemoveAll:  testutil.NewFakeRemoveFile(nil),
-		RemoveFile: testutil.NewFakeRemoveFile(nil),
-		RemoveLink: testutil.NewFakeRemoveFile(nil),
-		TempDir:    testutil.NewFakeTempDir("/tmp/foo", nil),
-	}
 	params := domain.InstallParams{
 		ConfigFilePath: "/etc/akoi/akoi.yml", Format: "ansible"}
-	if result := Install(context.Background(), params, methods); result.Failed() {
+	cfgReader := test.NewConfigReader(t, gomic.DoNothing)
+	downloader := test.NewDownloader(t, gomic.DoNothing)
+	getArchiver := test.NewGetArchiver(t, gomic.DoNothing)
+	getGzipReader := test.NewGetGzipReader(t, gomic.DoNothing)
+	result := Install(
+		context.Background(), params, test.NewFileSystem(t, gomic.DoNothing),
+		test.NewPrinter(t, gomic.DoNothing), cfgReader, getArchiver, downloader, getGzipReader)
+	if result.Failed() {
 		t.Fatal(result.String("ansible"))
 	}
-	methods.ReadConfigFile = testutil.NewFakeReadConfigFile(
-		domain.Config{}, fmt.Errorf("failed to read config"))
-	if result := Install(context.Background(), params, methods); !result.Failed() {
+	cfgReader.SetReturnRead(domain.Config{}, fmt.Errorf("failed to read config"))
+	result = Install(
+		context.Background(), params, test.NewFileSystem(t, gomic.DoNothing),
+		test.NewPrinter(t, gomic.DoNothing), cfgReader, getArchiver, downloader, getGzipReader)
+	if !result.Failed() {
 		t.Fatal("it should be failed to read config")
 	}
 }
