@@ -8,7 +8,7 @@
 [![GitHub tag](https://img.shields.io/github/tag/suzuki-shunsuke/akoi.svg)](https://github.com/suzuki-shunsuke/akoi/releases)
 [![License](http://img.shields.io/badge/license-mit-blue.svg?style=flat-square)](https://raw.githubusercontent.com/suzuki-shunsuke/akoi/master/LICENSE)
 
-binary version control system
+binary installer
 
 * [Overview](#overview)
 * [Features](#features)
@@ -25,7 +25,7 @@ binary version control system
 
 ## Overview
 
-`akoi` is a binary version control system.
+`akoi` is a binary installer.
 `akoi` installs binaries according to the configuration file.
 
 `akoi`'s task is simple.
@@ -55,7 +55,7 @@ For example,
 ## Demo
 
 <p align="center">
-  <img src="https://rawgit.com/suzuki-shunsuke/artifact/master/akoi/demo.gif">
+  <img src="https://cdn.jsdelivr.net/gh/suzuki-shunsuke/artifact@master/akoi/demo.gif">
 </p>
 
 ## Getting Started
