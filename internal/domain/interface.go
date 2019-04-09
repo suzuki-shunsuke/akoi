@@ -7,53 +7,56 @@ import (
 )
 
 type (
-	// Chmod is the interface of os.Chmod .
-	Chmod func(name string, mode os.FileMode) error
-	// Copy is the interface of io.Copy .
-	Copy func(dst io.Writer, src io.Reader) (int64, error)
-	// Download downloads a file.
-	Download func(ctx context.Context, uri string, numOfDLPartitions int) (io.ReadCloser, error)
-	// ExistFile is an interface to check file existence.
-	ExistFile func(string) bool
-	// ExpandEnv is an interface of os.ExpandEnv .
-	ExpandEnv func(string) string
-	// Fprintf is an interface of fmt.Fprintf .
-	Fprintf func(w io.Writer, format string, a ...interface{}) (n int, err error)
-	// Fprintln is an interface of fmt.Fprintln .
-	Fprintln func(w io.Writer, a ...interface{}) (n int, err error)
 	// GetArchiver returns an archiver for a given file
-	GetArchiver func(fpath, ftype string) Archiver
-	// GetFileStat returns a FileInfo.
-	GetFileStat func(string) (os.FileInfo, error)
-	// MkdirAll is an interface to create directories.
-	MkdirAll func(string) error
-	// MkLink creates a symbolic link.
-	MkLink func(src, dst string) error
-	// NewGzipReader creates a reader for gzip.
-	NewGzipReader func(io.Reader) (io.ReadCloser, error)
-	// NewLoggerOutput creates a writer for standard logger.
-	NewLoggerOutput func() io.Writer
-	// Open opens a file.
-	Open func(name string) (*os.File, error)
-	// OpenFile opens a file.
-	OpenFile func(name string, flag int, perm os.FileMode) (*os.File, error)
-	// Printf is an interface of fmt.Printf .
-	Printf func(format string, a ...interface{}) (n int, err error)
-	// Println is an interface of fmt.Println .
-	Println func(a ...interface{}) (n int, err error)
-	// ReadConfigFile reads a configuration file.
-	ReadConfigFile func(string) (Config, error)
-	// ReadLink gets a symbolic's destination path.
-	ReadLink func(string) (string, error)
-	// RemoveFile is an interface of os.Remove .
-	RemoveFile func(string) error
-	// TempDir creates a temporary directory.
-	TempDir func() (string, error)
-	// WriteFile is an interface to write test to file.
-	WriteFile func(dest string, data []byte) error
+	GetArchiver interface {
+		Get(fpath, ftype string) Archiver
+	}
+
+	// GetGzipReader creates a reader for gzip.
+	GetGzipReader interface {
+		Get(io.Reader) (io.ReadCloser, error)
+	}
 
 	// Archiver is an interface to read an archive file.
 	Archiver interface {
 		Read(input io.Reader, destination string) error
+	}
+
+	// FileSystem abstracts file system's operation.
+	FileSystem interface {
+		Chmod(name string, mode os.FileMode) error
+		Copy(dst io.Writer, src io.Reader) (int64, error)
+		ExistFile(string) bool
+		ExpandEnv(string) string
+		GetFileLstat(string) (os.FileInfo, error)
+		GetFileStat(string) (os.FileInfo, error)
+		MkdirAll(string) error
+		MkLink(src, dst string) error
+		Open(name string) (*os.File, error)
+		OpenFile(name string, flag int, perm os.FileMode) (*os.File, error)
+		ReadLink(string) (string, error)
+		RemoveAll(string) error
+		RemoveFile(string) error
+		RemoveLink(string) error
+		TempDir() (string, error)
+		WriteFile(dest string, data []byte) error
+	}
+
+	// Printer outputs messages.
+	Printer interface {
+		Fprintf(w io.Writer, format string, a ...interface{}) (n int, err error)
+		Fprintln(w io.Writer, a ...interface{}) (n int, err error)
+		Printf(format string, a ...interface{}) (n int, err error)
+		Println(a ...interface{}) (n int, err error)
+	}
+
+	// ConfigReader reads the configuration file.
+	ConfigReader interface {
+		Read(string) (Config, error)
+	}
+
+	// Downloader downloads a file.
+	Downloader interface {
+		Download(ctx context.Context, uri string, numOfDLPartitions int) (io.ReadCloser, error)
 	}
 )

@@ -6,8 +6,9 @@ import (
 	"os"
 	"sync"
 
+	"github.com/suzuki-shunsuke/gomic/gomic"
+
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
-	"github.com/suzuki-shunsuke/akoi/internal/util"
 )
 
 const (
@@ -17,30 +18,24 @@ const (
 // Install intalls binraries.
 func Install(
 	ctx context.Context, params domain.InstallParams,
-	methods domain.InstallMethods,
+	fsys domain.FileSystem, printer domain.Printer, cfgReader domain.ConfigReader, getArchiver domain.GetArchiver,
+	downloader domain.Downloader, getGzipReader domain.GetGzipReader,
 ) domain.Result {
 	// suppress output log by third party library
 	// https://github.com/joeybloggs/go-download/blob/b655936947da12d76bee4fa3b6af41a98db23e6f/download.go#L119
-	log.SetOutput(methods.NewLoggerOutput())
+	log.SetOutput(NewWriter(nil, gomic.DoNothing))
 
 	result := domain.Result{
 		Packages: map[string]domain.PackageResult{}}
-	if err := util.ValidateStruct(methods); err != nil {
-		if methods.Fprintln != nil {
-			methods.Fprintln(os.Stderr, err)
-		}
+	cfg, err := cfgReader.Read(params.ConfigFilePath)
+	if err != nil {
+		printer.Fprintln(os.Stderr, err)
 		result.Msg = err.Error()
 		return result
 	}
-	cfg, err := methods.ReadConfigFile(params.ConfigFilePath)
+	cfg, err = setupConfig(cfg, fsys, getArchiver)
 	if err != nil {
-		methods.Fprintln(os.Stderr, err)
-		result.Msg = err.Error()
-		return result
-	}
-	cfg, err = setupConfig(cfg, methods)
-	if err != nil {
-		methods.Fprintln(os.Stderr, err)
+		printer.Fprintln(os.Stderr, err)
 		result.Msg = err.Error()
 		return result
 	}
@@ -56,7 +51,7 @@ func Install(
 			defer wg.Done()
 			c, cancel := context.WithCancel(ctx)
 			defer cancel()
-			pkg = installPackage(c, pkg, params, methods)
+			pkg = installPackage(c, pkg, params, fsys, printer, downloader, getGzipReader)
 			pkgResult := pkg.Result
 			if pkgResult == nil {
 				pkgResult = &domain.PackageResult{Name: pkg.Name}

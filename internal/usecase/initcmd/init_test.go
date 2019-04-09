@@ -4,26 +4,25 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/suzuki-shunsuke/gomic/gomic"
+
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
-	"github.com/suzuki-shunsuke/akoi/internal/testutil"
+	"github.com/suzuki-shunsuke/akoi/internal/test"
 )
 
 func TestInitConfigFile(t *testing.T) {
-	methods := &domain.InitMethods{
-		MkdirAll: testutil.NewFakeMkdirAll(nil),
-		Exist:    testutil.NewFakeExistFile(true),
-		Write:    testutil.NewFakeWrite(nil),
-	}
+	fsys := test.NewFileSystem(t, gomic.DoNothing).
+		SetReturnExistFile(true)
 	params := &domain.InitParams{Dest: "dest"}
-	if err := InitConfigFile(params, methods); err != nil {
+	if err := InitConfigFile(params, fsys); err != nil {
 		t.Fatal(err)
 	}
-	methods.Exist = testutil.NewFakeExistFile(false)
-	if err := InitConfigFile(params, methods); err != nil {
+	fsys.SetReturnExistFile(false)
+	if err := InitConfigFile(params, fsys); err != nil {
 		t.Fatal(err)
 	}
-	methods.MkdirAll = testutil.NewFakeMkdirAll(fmt.Errorf("failed to create a directory"))
-	if err := InitConfigFile(params, methods); err == nil {
+	fsys.SetReturnMkdirAll(fmt.Errorf("failed to create a directory"))
+	if err := InitConfigFile(params, fsys); err == nil {
 		t.Fatal("it should be failed to create a directory")
 	}
 }
