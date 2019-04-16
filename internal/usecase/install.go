@@ -49,9 +49,7 @@ func Install(
 		wg.Add(1)
 		go func(pkg domain.Package) {
 			defer wg.Done()
-			c, cancel := context.WithCancel(ctx)
-			defer cancel()
-			pkg = installPackage(c, pkg, params, fsys, printer, downloader, getGzipReader)
+			pkg = installPackage(ctx, pkg, params, fsys, printer, downloader, getGzipReader)
 			pkgResult := pkg.Result
 			if pkgResult == nil {
 				pkgResult = &domain.PackageResult{Name: pkg.Name}

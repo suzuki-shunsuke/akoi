@@ -55,9 +55,7 @@ func installPackage(
 		// Download
 		ustr := pkg.URL.String()
 		printer.Printf("downloading %s: %s\n", pkg.Name, ustr)
-		c, cancel := context.WithCancel(ctx)
-		defer cancel()
-		body, err := downloader.Download(c, ustr, pkg.NumOfDLPartitions)
+		body, err := downloader.Download(ctx, ustr, pkg.NumOfDLPartitions)
 		if err != nil {
 			printer.Fprintln(os.Stderr, err)
 			pkg.Result.Error = err.Error()
