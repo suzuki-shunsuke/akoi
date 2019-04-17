@@ -16,7 +16,7 @@ const (
 )
 
 // Install intalls binraries.
-func Install(
+func (lgc *logic) Install(
 	ctx context.Context, params domain.InstallParams,
 	fsys domain.FileSystem, printer domain.Printer, cfgReader domain.ConfigReader, getArchiver domain.GetArchiver,
 	downloader domain.Downloader, getGzipReader domain.GetGzipReader,
@@ -33,7 +33,7 @@ func Install(
 		result.Msg = err.Error()
 		return result
 	}
-	cfg, err = setupConfig(cfg, fsys, getArchiver)
+	cfg, err = lgc.logic.SetupConfig(cfg, fsys, getArchiver)
 	if err != nil {
 		printer.Fprintln(os.Stderr, err)
 		result.Msg = err.Error()
@@ -49,7 +49,7 @@ func Install(
 		wg.Add(1)
 		go func(pkg domain.Package) {
 			defer wg.Done()
-			pkg = installPackage(ctx, pkg, params, fsys, printer, downloader, getGzipReader)
+			pkg = lgc.logic.InstallPackage(ctx, pkg, params, fsys, printer, downloader, getGzipReader)
 			pkgResult := pkg.Result
 			if pkgResult == nil {
 				pkgResult = &domain.PackageResult{Name: pkg.Name}

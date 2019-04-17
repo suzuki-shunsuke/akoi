@@ -9,7 +9,7 @@ import (
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
 )
 
-func getInstalledFiles(
+func (lgc *logic) GetInstalledFiles(
 	files []domain.File, fsys domain.FileSystem, printer domain.Printer,
 ) []domain.File {
 	installedFiles := []domain.File{}
@@ -46,11 +46,11 @@ func getInstalledFiles(
 	return installedFiles
 }
 
-func installPackage(
+func (lgc *logic) InstallPackage(
 	ctx context.Context, pkg domain.Package, params domain.InstallParams,
 	fsys domain.FileSystem, printer domain.Printer, downloader domain.Downloader, getGzipReader domain.GetGzipReader,
 ) domain.Package {
-	installedFiles := getInstalledFiles(pkg.Files, fsys, printer)
+	installedFiles := lgc.logic.GetInstalledFiles(pkg.Files, fsys, printer)
 	if len(installedFiles) != 0 {
 		// Download
 		ustr := pkg.URL.String()
@@ -149,7 +149,7 @@ func installPackage(
 		if file.Result.Error != "" {
 			continue
 		}
-		f, err := createLink(file, fsys, printer)
+		f, err := lgc.logic.CreateLink(file, fsys, printer)
 		if err != nil {
 			if f.Result.Error == "" {
 				f.Result.Error = err.Error()
