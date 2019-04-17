@@ -66,6 +66,6 @@ type (
 		InstallPackage(ctx context.Context, pkg Package, params InstallParams, printer Printer, downloader Downloader, getGzipReader GetGzipReader) Package
 		GetInstalledFiles(files []File, printer Printer) []File
 		CreateLink(file File, printer Printer) (File, error)
-		SetupConfig(cfg Config, fsys FileSystem, getArchiver GetArchiver) (Config, error)
+		SetupConfig(cfg Config, getArchiver GetArchiver) (Config, error)
 	}
 )
