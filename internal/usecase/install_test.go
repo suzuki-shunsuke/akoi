@@ -18,7 +18,7 @@ func Test_logicInstall(t *testing.T) {
 	downloader := test.NewDownloader(t, gomic.DoNothing)
 	getArchiver := test.NewGetArchiver(t, gomic.DoNothing)
 	getGzipReader := test.NewGetGzipReader(t, gomic.DoNothing)
-	lgc := NewLogic()
+	lgc := NewLogic(nil)
 	result := lgc.Install(
 		context.Background(), params, test.NewFileSystem(t, gomic.DoNothing),
 		test.NewPrinter(t, gomic.DoNothing), cfgReader, getArchiver, downloader, getGzipReader)
