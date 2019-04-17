@@ -48,7 +48,7 @@ func (lgc *logic) Install(
 		wg.Add(1)
 		go func(pkg domain.Package) {
 			defer wg.Done()
-			pkg = lgc.logic.InstallPackage(ctx, pkg, params, lgc.fsys, printer, downloader, getGzipReader)
+			pkg = lgc.logic.InstallPackage(ctx, pkg, params, printer, downloader, getGzipReader)
 			pkgResult := pkg.Result
 			if pkgResult == nil {
 				pkgResult = &domain.PackageResult{Name: pkg.Name}
