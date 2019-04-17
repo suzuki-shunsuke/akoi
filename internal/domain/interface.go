@@ -64,5 +64,6 @@ type (
 	Logic interface {
 		Install(ctx context.Context, params InstallParams, fsys FileSystem, printer Printer, cfgReader ConfigReader, getArchiver GetArchiver, downloader Downloader, getGzipReader GetGzipReader) Result
 		InstallPackage(ctx context.Context, pkg Package, params InstallParams, fsys FileSystem, printer Printer, downloader Downloader, getGzipReader GetGzipReader) Package
+		GetInstalledFiles(files []File, fsys FileSystem, printer Printer) []File
 	}
 )
