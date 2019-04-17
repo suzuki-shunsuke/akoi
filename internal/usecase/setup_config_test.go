@@ -31,8 +31,8 @@ func Test_logicSetupConfig(t *testing.T) {
 			return p
 		})
 	getArchiver := test.NewGetArchiver(t, gomic.DoNothing)
-	lgc := NewLogic()
-	if _, err := lgc.SetupConfig(cfg, fsys, getArchiver); err != nil {
+	lgc := NewLogic(fsys)
+	if _, err := lgc.SetupConfig(cfg, getArchiver); err != nil {
 		t.Fatal(err)
 	}
 }

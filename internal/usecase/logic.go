@@ -7,11 +7,14 @@ import (
 type (
 	logic struct {
 		logic domain.Logic
+		fsys  domain.FileSystem
 	}
 )
 
-func NewLogic() domain.Logic {
-	lgc := &logic{}
+func NewLogic(fsys domain.FileSystem) domain.Logic {
+	lgc := &logic{
+		fsys: fsys,
+	}
 	lgc.logic = lgc
 	return lgc
 }

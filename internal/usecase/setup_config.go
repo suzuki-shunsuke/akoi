@@ -12,10 +12,10 @@ import (
 )
 
 func (lgc *logic) SetupConfig(
-	cfg domain.Config, fsys domain.FileSystem, getArchiver domain.GetArchiver,
+	cfg domain.Config, getArchiver domain.GetArchiver,
 ) (domain.Config, error) {
-	cfg.BinPath = fsys.ExpandEnv(cfg.BinPath)
-	cfg.LinkPath = fsys.ExpandEnv(cfg.LinkPath)
+	cfg.BinPath = lgc.fsys.ExpandEnv(cfg.BinPath)
+	cfg.LinkPath = lgc.fsys.ExpandEnv(cfg.LinkPath)
 	tpl, err := template.New("cfg_bin_path").Parse(cfg.BinPath)
 	if err != nil {
 		return cfg, err
@@ -45,7 +45,7 @@ func (lgc *logic) SetupConfig(
 			pkg.LinkPath = cfg.LinkPath
 			pkg.LinkPathTpl = cfg.LinkPathTpl
 		} else {
-			pkg.LinkPath = fsys.ExpandEnv(pkg.LinkPath)
+			pkg.LinkPath = lgc.fsys.ExpandEnv(pkg.LinkPath)
 			tpl, err := template.New("pkg_link_path").Parse(pkg.LinkPath)
 			if err != nil {
 				return cfg, err
@@ -57,7 +57,7 @@ func (lgc *logic) SetupConfig(
 			pkg.BinPath = cfg.BinPath
 			pkg.BinPathTpl = cfg.BinPathTpl
 		} else {
-			pkg.BinPath = fsys.ExpandEnv(pkg.BinPath)
+			pkg.BinPath = lgc.fsys.ExpandEnv(pkg.BinPath)
 			tpl, err := template.New("pkg_bin_path").Parse(pkg.BinPath)
 			if err != nil {
 				return cfg, err
@@ -101,7 +101,7 @@ func (lgc *logic) SetupConfig(
 				file.LinkPath = pkg.LinkPath
 				file.LinkPathTpl = pkg.LinkPathTpl
 			} else {
-				file.LinkPath = fsys.ExpandEnv(file.LinkPath)
+				file.LinkPath = lgc.fsys.ExpandEnv(file.LinkPath)
 				tpl, err := template.New("file_link_path").Parse(file.LinkPath)
 				if err != nil {
 					return cfg, err
@@ -113,7 +113,7 @@ func (lgc *logic) SetupConfig(
 				file.BinPath = pkg.BinPath
 				file.BinPathTpl = pkg.BinPathTpl
 			} else {
-				file.BinPath = fsys.ExpandEnv(file.BinPath)
+				file.BinPath = lgc.fsys.ExpandEnv(file.BinPath)
 				tpl, err := template.New("file_bin_path").Parse(file.BinPath)
 				if err != nil {
 					return cfg, err
@@ -134,7 +134,7 @@ func (lgc *logic) SetupConfig(
 			}
 			file.Bin = dst
 
-			arcPath := fsys.ExpandEnv(file.Archive)
+			arcPath := lgc.fsys.ExpandEnv(file.Archive)
 			arcPathTpl, err := template.New("archive_path").Parse(arcPath)
 			if err != nil {
 				return cfg, err
