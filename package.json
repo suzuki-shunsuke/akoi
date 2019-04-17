@@ -5,7 +5,7 @@
     "test": "go test ./... -covermode=atomic",
     "fmt": "bash scripts/fmt.sh",
     "vet": "go vet ./...",
-    "lint": "gometalinter ./...",
+    "lint": "golangci-lint run",
     "c": "bash scripts/coverage.sh",
     "gen-mock": "gomic gen && npm run fmt",
     "tag": "bash scripts/tag.sh"
