@@ -53,8 +53,9 @@ func Install(c *cli.Context) error {
 	resultChan := make(chan domain.Result)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+	logic := usecase.NewLogic()
 	go func() {
-		resultChan <- usecase.Install(
+		resultChan <- logic.Install(
 			ctx, params, infra.FileSystem{}, infra.Printer{},
 			infra.ConfigReader{}, infra.GetArchiver{}, infra.Downloader{}, infra.GetGzipReader{})
 	}()

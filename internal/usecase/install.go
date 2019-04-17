@@ -16,7 +16,7 @@ const (
 )
 
 // Install intalls binraries.
-func Install(
+func (lgc *logic) Install(
 	ctx context.Context, params domain.InstallParams,
 	fsys domain.FileSystem, printer domain.Printer, cfgReader domain.ConfigReader, getArchiver domain.GetArchiver,
 	downloader domain.Downloader, getGzipReader domain.GetGzipReader,

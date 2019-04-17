@@ -59,4 +59,10 @@ type (
 	Downloader interface {
 		Download(ctx context.Context, uri string, numOfDLPartitions int) (io.ReadCloser, error)
 	}
+
+	// Logic abstracts application logic.
+	Logic interface {
+		Install(
+			ctx context.Context, params InstallParams, fsys FileSystem, printer Printer, cfgReader ConfigReader, getArchiver GetArchiver, downloader Downloader, getGzipReader GetGzipReader) Result
+	}
 )
