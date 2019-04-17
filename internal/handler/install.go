@@ -56,7 +56,7 @@ func Install(c *cli.Context) error {
 	logic := usecase.NewLogic(infra.FileSystem{})
 	go func() {
 		resultChan <- logic.Install(
-			ctx, params, infra.FileSystem{}, infra.Printer{},
+			ctx, params, infra.Printer{},
 			infra.ConfigReader{}, infra.GetArchiver{}, infra.Downloader{}, infra.GetGzipReader{})
 	}()
 	select {

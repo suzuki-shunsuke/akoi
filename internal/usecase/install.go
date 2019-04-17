@@ -15,10 +15,9 @@ const (
 	keyWordAnsible = "ansible"
 )
 
-// Install intalls binraries.
 func (lgc *logic) Install(
 	ctx context.Context, params domain.InstallParams,
-	fsys domain.FileSystem, printer domain.Printer, cfgReader domain.ConfigReader, getArchiver domain.GetArchiver,
+	printer domain.Printer, cfgReader domain.ConfigReader, getArchiver domain.GetArchiver,
 	downloader domain.Downloader, getGzipReader domain.GetGzipReader,
 ) domain.Result {
 	// suppress output log by third party library
@@ -33,7 +32,7 @@ func (lgc *logic) Install(
 		result.Msg = err.Error()
 		return result
 	}
-	cfg, err = lgc.logic.SetupConfig(cfg, fsys, getArchiver)
+	cfg, err = lgc.logic.SetupConfig(cfg, lgc.fsys, getArchiver)
 	if err != nil {
 		printer.Fprintln(os.Stderr, err)
 		result.Msg = err.Error()
@@ -49,7 +48,7 @@ func (lgc *logic) Install(
 		wg.Add(1)
 		go func(pkg domain.Package) {
 			defer wg.Done()
-			pkg = lgc.logic.InstallPackage(ctx, pkg, params, fsys, printer, downloader, getGzipReader)
+			pkg = lgc.logic.InstallPackage(ctx, pkg, params, lgc.fsys, printer, downloader, getGzipReader)
 			pkgResult := pkg.Result
 			if pkgResult == nil {
 				pkgResult = &domain.PackageResult{Name: pkg.Name}

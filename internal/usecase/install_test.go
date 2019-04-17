@@ -18,16 +18,16 @@ func Test_logicInstall(t *testing.T) {
 	downloader := test.NewDownloader(t, gomic.DoNothing)
 	getArchiver := test.NewGetArchiver(t, gomic.DoNothing)
 	getGzipReader := test.NewGetGzipReader(t, gomic.DoNothing)
-	lgc := NewLogic(nil)
+	lgc := NewLogic(test.NewFileSystem(t, gomic.DoNothing))
 	result := lgc.Install(
-		context.Background(), params, test.NewFileSystem(t, gomic.DoNothing),
+		context.Background(), params,
 		test.NewPrinter(t, gomic.DoNothing), cfgReader, getArchiver, downloader, getGzipReader)
 	if result.Failed() {
 		t.Fatal(result.String("ansible"))
 	}
 	cfgReader.SetReturnRead(domain.Config{}, fmt.Errorf("failed to read config"))
 	result = lgc.Install(
-		context.Background(), params, test.NewFileSystem(t, gomic.DoNothing),
+		context.Background(), params,
 		test.NewPrinter(t, gomic.DoNothing), cfgReader, getArchiver, downloader, getGzipReader)
 	if !result.Failed() {
 		t.Fatal("it should be failed to read config")
