@@ -11,8 +11,7 @@ import (
 	"github.com/suzuki-shunsuke/akoi/internal/util"
 )
 
-// setupConfig compiles and renders templates of domain.Config .
-func setupConfig(
+func (lgc *logic) SetupConfig(
 	cfg domain.Config, fsys domain.FileSystem, getArchiver domain.GetArchiver,
 ) (domain.Config, error) {
 	cfg.BinPath = fsys.ExpandEnv(cfg.BinPath)

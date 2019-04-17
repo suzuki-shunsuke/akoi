@@ -9,7 +9,7 @@ import (
 	"github.com/suzuki-shunsuke/akoi/internal/test"
 )
 
-func Test_setupConfig(t *testing.T) {
+func Test_logicSetupConfig(t *testing.T) {
 	cfg := domain.Config{
 		BinPath:  "/usr/local/bin/{{.Name}}-{{.Version}}",
 		LinkPath: "/usr/local/bin/{{.Name}}",
@@ -31,7 +31,8 @@ func Test_setupConfig(t *testing.T) {
 			return p
 		})
 	getArchiver := test.NewGetArchiver(t, gomic.DoNothing)
-	if _, err := setupConfig(cfg, fsys, getArchiver); err != nil {
+	lgc := NewLogic()
+	if _, err := lgc.SetupConfig(cfg, fsys, getArchiver); err != nil {
 		t.Fatal(err)
 	}
 }

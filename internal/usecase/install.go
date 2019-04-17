@@ -33,7 +33,7 @@ func (lgc *logic) Install(
 		result.Msg = err.Error()
 		return result
 	}
-	cfg, err = setupConfig(cfg, fsys, getArchiver)
+	cfg, err = lgc.logic.SetupConfig(cfg, fsys, getArchiver)
 	if err != nil {
 		printer.Fprintln(os.Stderr, err)
 		result.Msg = err.Error()
