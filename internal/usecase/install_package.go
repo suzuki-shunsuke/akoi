@@ -10,18 +10,18 @@ import (
 )
 
 func (lgc *logic) GetInstalledFiles(
-	files []domain.File, fsys domain.FileSystem, printer domain.Printer,
+	files []domain.File, printer domain.Printer,
 ) []domain.File {
 	installedFiles := []domain.File{}
 	for _, file := range files {
 		dst := file.Bin
 		mode := file.Mode
-		if fi, err := fsys.GetFileStat(dst); err == nil {
+		if fi, err := lgc.fsys.GetFileStat(dst); err == nil {
 			if fi.Mode() == mode {
 				continue
 			}
 			printer.Printf("chmod %s %s\n", mode.String(), dst)
-			if err := fsys.Chmod(dst, mode); err != nil {
+			if err := lgc.fsys.Chmod(dst, mode); err != nil {
 				printer.Fprintln(os.Stderr, err)
 				file.Result.Error = err.Error()
 				continue
@@ -32,9 +32,9 @@ func (lgc *logic) GetInstalledFiles(
 
 		// Create parent directory
 		dir := filepath.Dir(dst)
-		if _, err := fsys.GetFileStat(dir); err != nil {
+		if _, err := lgc.fsys.GetFileStat(dir); err != nil {
 			printer.Printf("create directory %s\n", dir)
-			if err := fsys.MkdirAll(dir); err != nil {
+			if err := lgc.fsys.MkdirAll(dir); err != nil {
 				printer.Fprintln(os.Stderr, err)
 				file.Result.Error = err.Error()
 				continue
@@ -50,7 +50,7 @@ func (lgc *logic) InstallPackage(
 	ctx context.Context, pkg domain.Package, params domain.InstallParams,
 	fsys domain.FileSystem, printer domain.Printer, downloader domain.Downloader, getGzipReader domain.GetGzipReader,
 ) domain.Package {
-	installedFiles := lgc.logic.GetInstalledFiles(pkg.Files, fsys, printer)
+	installedFiles := lgc.logic.GetInstalledFiles(pkg.Files, printer)
 	if len(installedFiles) != 0 {
 		// Download
 		ustr := pkg.URL.String()
