@@ -149,7 +149,7 @@ func (lgc *logic) InstallPackage(
 		if file.Result.Error != "" {
 			continue
 		}
-		f, err := lgc.logic.CreateLink(file, lgc.fsys, printer)
+		f, err := lgc.logic.CreateLink(file, printer)
 		if err != nil {
 			if f.Result.Error == "" {
 				f.Result.Error = err.Error()
