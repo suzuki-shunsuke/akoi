@@ -7,7 +7,7 @@ import (
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
 )
 
-func createLink(
+func (lgc *logic) CreateLink(
 	file domain.File,
 	fsys domain.FileSystem, printer domain.Printer,
 ) (domain.File, error) {
