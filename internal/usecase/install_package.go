@@ -46,7 +46,7 @@ func getInstalledFiles(
 	return installedFiles
 }
 
-func installPackage(
+func (lgc *logic) InstallPackage(
 	ctx context.Context, pkg domain.Package, params domain.InstallParams,
 	fsys domain.FileSystem, printer domain.Printer, downloader domain.Downloader, getGzipReader domain.GetGzipReader,
 ) domain.Package {
