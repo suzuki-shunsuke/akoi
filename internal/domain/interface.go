@@ -66,6 +66,9 @@ type (
 		InstallPackage(ctx context.Context, pkg Package, params InstallParams) Package
 		GetInstalledFiles(files []File) []File
 		CreateLink(file File) (File, error)
+		RecreateLink(file File) (File, error)
+		RemoveFileAndCreateLink(file File) (File, error)
 		SetupConfig(cfg Config) (Config, error)
+		SetupPkgConfig(cfg Config, name string, pkg Package, numCPUs int) (Package, error)
 	}
 )
