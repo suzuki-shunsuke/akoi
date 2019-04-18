@@ -19,10 +19,10 @@ type (
 		name                   string
 		callbackNotImplemented gomic.CallbackNotImplemented
 		impl                   struct {
-			Install           func(ctx context.Context, params test.InstallParams, printer test.Printer, cfgReader test.ConfigReader, getArchiver test.GetArchiver, downloader test.Downloader, getGzipReader test.GetGzipReader) test.Result
-			InstallPackage    func(ctx context.Context, pkg test.Package, params test.InstallParams, printer test.Printer, downloader test.Downloader, getGzipReader test.GetGzipReader) test.Package
-			GetInstalledFiles func(files []test.File, printer test.Printer) []test.File
-			CreateLink        func(file test.File, printer test.Printer) (test.File, error)
+			Install           func(ctx context.Context, params test.InstallParams, cfgReader test.ConfigReader, getArchiver test.GetArchiver, downloader test.Downloader, getGzipReader test.GetGzipReader) test.Result
+			InstallPackage    func(ctx context.Context, pkg test.Package, params test.InstallParams, downloader test.Downloader, getGzipReader test.GetGzipReader) test.Package
+			GetInstalledFiles func(files []test.File) []test.File
+			CreateLink        func(file test.File) (test.File, error)
 			SetupConfig       func(cfg test.Config, getArchiver test.GetArchiver) (test.Config, error)
 		}
 	}
@@ -35,35 +35,35 @@ func NewLogic(t *testing.T, cb gomic.CallbackNotImplemented) *Logic {
 }
 
 // Install is a mock method.
-func (mock Logic) Install(ctx context.Context, params test.InstallParams, printer test.Printer, cfgReader test.ConfigReader, getArchiver test.GetArchiver, downloader test.Downloader, getGzipReader test.GetGzipReader) test.Result {
+func (mock Logic) Install(ctx context.Context, params test.InstallParams, cfgReader test.ConfigReader, getArchiver test.GetArchiver, downloader test.Downloader, getGzipReader test.GetGzipReader) test.Result {
 	methodName := "Install" // nolint: goconst
 	if mock.impl.Install != nil {
-		return mock.impl.Install(ctx, params, printer, cfgReader, getArchiver, downloader, getGzipReader)
+		return mock.impl.Install(ctx, params, cfgReader, getArchiver, downloader, getGzipReader)
 	}
 	if mock.callbackNotImplemented != nil {
 		mock.callbackNotImplemented(mock.t, mock.name, methodName)
 	} else {
 		gomic.DefaultCallbackNotImplemented(mock.t, mock.name, methodName)
 	}
-	return mock.fakeZeroInstall(ctx, params, printer, cfgReader, getArchiver, downloader, getGzipReader)
+	return mock.fakeZeroInstall(ctx, params, cfgReader, getArchiver, downloader, getGzipReader)
 }
 
 // SetFuncInstall sets a method and returns the mock.
-func (mock *Logic) SetFuncInstall(impl func(ctx context.Context, params test.InstallParams, printer test.Printer, cfgReader test.ConfigReader, getArchiver test.GetArchiver, downloader test.Downloader, getGzipReader test.GetGzipReader) test.Result) *Logic {
+func (mock *Logic) SetFuncInstall(impl func(ctx context.Context, params test.InstallParams, cfgReader test.ConfigReader, getArchiver test.GetArchiver, downloader test.Downloader, getGzipReader test.GetGzipReader) test.Result) *Logic {
 	mock.impl.Install = impl
 	return mock
 }
 
 // SetReturnInstall sets a fake method.
 func (mock *Logic) SetReturnInstall(r0 test.Result) *Logic {
-	mock.impl.Install = func(context.Context, test.InstallParams, test.Printer, test.ConfigReader, test.GetArchiver, test.Downloader, test.GetGzipReader) test.Result {
+	mock.impl.Install = func(context.Context, test.InstallParams, test.ConfigReader, test.GetArchiver, test.Downloader, test.GetGzipReader) test.Result {
 		return r0
 	}
 	return mock
 }
 
 // fakeZeroInstall is a fake method which returns zero values.
-func (mock Logic) fakeZeroInstall(ctx context.Context, params test.InstallParams, printer test.Printer, cfgReader test.ConfigReader, getArchiver test.GetArchiver, downloader test.Downloader, getGzipReader test.GetGzipReader) test.Result {
+func (mock Logic) fakeZeroInstall(ctx context.Context, params test.InstallParams, cfgReader test.ConfigReader, getArchiver test.GetArchiver, downloader test.Downloader, getGzipReader test.GetGzipReader) test.Result {
 	var (
 		r0 test.Result
 	)
@@ -71,35 +71,35 @@ func (mock Logic) fakeZeroInstall(ctx context.Context, params test.InstallParams
 }
 
 // InstallPackage is a mock method.
-func (mock Logic) InstallPackage(ctx context.Context, pkg test.Package, params test.InstallParams, printer test.Printer, downloader test.Downloader, getGzipReader test.GetGzipReader) test.Package {
+func (mock Logic) InstallPackage(ctx context.Context, pkg test.Package, params test.InstallParams, downloader test.Downloader, getGzipReader test.GetGzipReader) test.Package {
 	methodName := "InstallPackage" // nolint: goconst
 	if mock.impl.InstallPackage != nil {
-		return mock.impl.InstallPackage(ctx, pkg, params, printer, downloader, getGzipReader)
+		return mock.impl.InstallPackage(ctx, pkg, params, downloader, getGzipReader)
 	}
 	if mock.callbackNotImplemented != nil {
 		mock.callbackNotImplemented(mock.t, mock.name, methodName)
 	} else {
 		gomic.DefaultCallbackNotImplemented(mock.t, mock.name, methodName)
 	}
-	return mock.fakeZeroInstallPackage(ctx, pkg, params, printer, downloader, getGzipReader)
+	return mock.fakeZeroInstallPackage(ctx, pkg, params, downloader, getGzipReader)
 }
 
 // SetFuncInstallPackage sets a method and returns the mock.
-func (mock *Logic) SetFuncInstallPackage(impl func(ctx context.Context, pkg test.Package, params test.InstallParams, printer test.Printer, downloader test.Downloader, getGzipReader test.GetGzipReader) test.Package) *Logic {
+func (mock *Logic) SetFuncInstallPackage(impl func(ctx context.Context, pkg test.Package, params test.InstallParams, downloader test.Downloader, getGzipReader test.GetGzipReader) test.Package) *Logic {
 	mock.impl.InstallPackage = impl
 	return mock
 }
 
 // SetReturnInstallPackage sets a fake method.
 func (mock *Logic) SetReturnInstallPackage(r0 test.Package) *Logic {
-	mock.impl.InstallPackage = func(context.Context, test.Package, test.InstallParams, test.Printer, test.Downloader, test.GetGzipReader) test.Package {
+	mock.impl.InstallPackage = func(context.Context, test.Package, test.InstallParams, test.Downloader, test.GetGzipReader) test.Package {
 		return r0
 	}
 	return mock
 }
 
 // fakeZeroInstallPackage is a fake method which returns zero values.
-func (mock Logic) fakeZeroInstallPackage(ctx context.Context, pkg test.Package, params test.InstallParams, printer test.Printer, downloader test.Downloader, getGzipReader test.GetGzipReader) test.Package {
+func (mock Logic) fakeZeroInstallPackage(ctx context.Context, pkg test.Package, params test.InstallParams, downloader test.Downloader, getGzipReader test.GetGzipReader) test.Package {
 	var (
 		r0 test.Package
 	)
@@ -107,35 +107,35 @@ func (mock Logic) fakeZeroInstallPackage(ctx context.Context, pkg test.Package, 
 }
 
 // GetInstalledFiles is a mock method.
-func (mock Logic) GetInstalledFiles(files []test.File, printer test.Printer) []test.File {
+func (mock Logic) GetInstalledFiles(files []test.File) []test.File {
 	methodName := "GetInstalledFiles" // nolint: goconst
 	if mock.impl.GetInstalledFiles != nil {
-		return mock.impl.GetInstalledFiles(files, printer)
+		return mock.impl.GetInstalledFiles(files)
 	}
 	if mock.callbackNotImplemented != nil {
 		mock.callbackNotImplemented(mock.t, mock.name, methodName)
 	} else {
 		gomic.DefaultCallbackNotImplemented(mock.t, mock.name, methodName)
 	}
-	return mock.fakeZeroGetInstalledFiles(files, printer)
+	return mock.fakeZeroGetInstalledFiles(files)
 }
 
 // SetFuncGetInstalledFiles sets a method and returns the mock.
-func (mock *Logic) SetFuncGetInstalledFiles(impl func(files []test.File, printer test.Printer) []test.File) *Logic {
+func (mock *Logic) SetFuncGetInstalledFiles(impl func(files []test.File) []test.File) *Logic {
 	mock.impl.GetInstalledFiles = impl
 	return mock
 }
 
 // SetReturnGetInstalledFiles sets a fake method.
 func (mock *Logic) SetReturnGetInstalledFiles(r0 []test.File) *Logic {
-	mock.impl.GetInstalledFiles = func([]test.File, test.Printer) []test.File {
+	mock.impl.GetInstalledFiles = func([]test.File) []test.File {
 		return r0
 	}
 	return mock
 }
 
 // fakeZeroGetInstalledFiles is a fake method which returns zero values.
-func (mock Logic) fakeZeroGetInstalledFiles(files []test.File, printer test.Printer) []test.File {
+func (mock Logic) fakeZeroGetInstalledFiles(files []test.File) []test.File {
 	var (
 		r0 []test.File
 	)
@@ -143,35 +143,35 @@ func (mock Logic) fakeZeroGetInstalledFiles(files []test.File, printer test.Prin
 }
 
 // CreateLink is a mock method.
-func (mock Logic) CreateLink(file test.File, printer test.Printer) (test.File, error) {
+func (mock Logic) CreateLink(file test.File) (test.File, error) {
 	methodName := "CreateLink" // nolint: goconst
 	if mock.impl.CreateLink != nil {
-		return mock.impl.CreateLink(file, printer)
+		return mock.impl.CreateLink(file)
 	}
 	if mock.callbackNotImplemented != nil {
 		mock.callbackNotImplemented(mock.t, mock.name, methodName)
 	} else {
 		gomic.DefaultCallbackNotImplemented(mock.t, mock.name, methodName)
 	}
-	return mock.fakeZeroCreateLink(file, printer)
+	return mock.fakeZeroCreateLink(file)
 }
 
 // SetFuncCreateLink sets a method and returns the mock.
-func (mock *Logic) SetFuncCreateLink(impl func(file test.File, printer test.Printer) (test.File, error)) *Logic {
+func (mock *Logic) SetFuncCreateLink(impl func(file test.File) (test.File, error)) *Logic {
 	mock.impl.CreateLink = impl
 	return mock
 }
 
 // SetReturnCreateLink sets a fake method.
 func (mock *Logic) SetReturnCreateLink(r0 test.File, r1 error) *Logic {
-	mock.impl.CreateLink = func(test.File, test.Printer) (test.File, error) {
+	mock.impl.CreateLink = func(test.File) (test.File, error) {
 		return r0, r1
 	}
 	return mock
 }
 
 // fakeZeroCreateLink is a fake method which returns zero values.
-func (mock Logic) fakeZeroCreateLink(file test.File, printer test.Printer) (test.File, error) {
+func (mock Logic) fakeZeroCreateLink(file test.File) (test.File, error) {
 	var (
 		r0 test.File
 		r1 error

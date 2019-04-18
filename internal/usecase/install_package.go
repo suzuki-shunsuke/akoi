@@ -9,9 +9,7 @@ import (
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
 )
 
-func (lgc *Logic) GetInstalledFiles(
-	files []domain.File, printer domain.Printer,
-) []domain.File {
+func (lgc *Logic) GetInstalledFiles(files []domain.File) []domain.File {
 	installedFiles := []domain.File{}
 	for _, file := range files {
 		dst := file.Bin
@@ -20,9 +18,9 @@ func (lgc *Logic) GetInstalledFiles(
 			if fi.Mode() == mode {
 				continue
 			}
-			printer.Printf("chmod %s %s\n", mode.String(), dst)
+			lgc.Printer.Printf("chmod %s %s\n", mode.String(), dst)
 			if err := lgc.Fsys.Chmod(dst, mode); err != nil {
-				printer.Fprintln(os.Stderr, err)
+				lgc.Printer.Fprintln(os.Stderr, err)
 				file.Result.Error = err.Error()
 				continue
 			}
@@ -33,9 +31,9 @@ func (lgc *Logic) GetInstalledFiles(
 		// Create parent directory
 		dir := filepath.Dir(dst)
 		if _, err := lgc.Fsys.GetFileStat(dir); err != nil {
-			printer.Printf("create directory %s\n", dir)
+			lgc.Printer.Printf("create directory %s\n", dir)
 			if err := lgc.Fsys.MkdirAll(dir); err != nil {
-				printer.Fprintln(os.Stderr, err)
+				lgc.Printer.Fprintln(os.Stderr, err)
 				file.Result.Error = err.Error()
 				continue
 			}
@@ -48,16 +46,16 @@ func (lgc *Logic) GetInstalledFiles(
 
 func (lgc *Logic) InstallPackage(
 	ctx context.Context, pkg domain.Package, params domain.InstallParams,
-	printer domain.Printer, downloader domain.Downloader, getGzipReader domain.GetGzipReader,
+	downloader domain.Downloader, getGzipReader domain.GetGzipReader,
 ) domain.Package {
-	installedFiles := lgc.Logic.GetInstalledFiles(pkg.Files, printer)
+	installedFiles := lgc.Logic.GetInstalledFiles(pkg.Files)
 	if len(installedFiles) != 0 {
 		// Download
 		ustr := pkg.URL.String()
-		printer.Printf("downloading %s: %s\n", pkg.Name, ustr)
+		lgc.Printer.Printf("downloading %s: %s\n", pkg.Name, ustr)
 		body, err := downloader.Download(ctx, ustr, pkg.NumOfDLPartitions)
 		if err != nil {
-			printer.Fprintln(os.Stderr, err)
+			lgc.Printer.Fprintln(os.Stderr, err)
 			pkg.Result.Error = err.Error()
 			return pkg
 		}
@@ -68,7 +66,7 @@ func (lgc *Logic) InstallPackage(
 			var err error
 			tmpDir, err = lgc.Fsys.TempDir()
 			if err != nil {
-				printer.Fprintln(os.Stderr, err)
+				lgc.Printer.Fprintln(os.Stderr, err)
 				pkg.Result.Error = err.Error()
 				return pkg
 			}
@@ -82,15 +80,15 @@ func (lgc *Logic) InstallPackage(
 						t = pkg.ArchiveType
 					}
 					pkg.Result.Error = fmt.Sprintf("failed to unarchive file: unsupported archive type: %s\n", t)
-					printer.Fprintf(os.Stderr, "failed to unarchive file: unsupported archive type: %s\n", t)
+					lgc.Printer.Fprintf(os.Stderr, "failed to unarchive file: unsupported archive type: %s\n", t)
 				}
 				return pkg
 			}
 			// Unarchive
-			printer.Printf("unarchive %s\n", pkg.Name)
+			lgc.Printer.Printf("unarchive %s\n", pkg.Name)
 			if err := arc.Read(body, tmpDir); err != nil {
 				pkg.Result.Error = err.Error()
-				printer.Fprintln(os.Stderr, err)
+				lgc.Printer.Fprintln(os.Stderr, err)
 				return pkg
 			}
 		}
@@ -99,10 +97,10 @@ func (lgc *Logic) InstallPackage(
 			// Install
 			mode := file.Mode
 			dst := file.Bin
-			printer.Printf("install %s\n", dst)
+			lgc.Printer.Printf("install %s\n", dst)
 			writer, err := lgc.Fsys.OpenFile(dst, os.O_RDWR|os.O_CREATE, mode)
 			if err != nil {
-				printer.Fprintf(os.Stderr, "failed to install %s: %s\n", dst, err)
+				lgc.Printer.Fprintf(os.Stderr, "failed to install %s: %s\n", dst, err)
 				file.Result.Error = err.Error()
 				continue
 			}
@@ -110,13 +108,13 @@ func (lgc *Logic) InstallPackage(
 			if pkg.Archived() {
 				src, err := lgc.Fsys.Open(filepath.Join(tmpDir, file.Archive))
 				if err != nil {
-					printer.Fprintln(os.Stderr, err)
+					lgc.Printer.Fprintln(os.Stderr, err)
 					file.Result.Error = err.Error()
 					continue
 				}
 				defer src.Close()
 				if _, err := lgc.Fsys.Copy(writer, src); err != nil {
-					printer.Fprintln(os.Stderr, err)
+					lgc.Printer.Fprintln(os.Stderr, err)
 					file.Result.Error = err.Error()
 					continue
 				}
@@ -125,19 +123,19 @@ func (lgc *Logic) InstallPackage(
 				if pkg.ArchiveType == "Gzip" {
 					reader, err := getGzipReader.Get(body)
 					if err != nil {
-						printer.Fprintln(os.Stderr, err)
+						lgc.Printer.Fprintln(os.Stderr, err)
 						file.Result.Error = err.Error()
 						continue
 					}
 					defer reader.Close()
 					if _, err := lgc.Fsys.Copy(writer, reader); err != nil {
-						printer.Fprintln(os.Stderr, err)
+						lgc.Printer.Fprintln(os.Stderr, err)
 						file.Result.Error = err.Error()
 						continue
 					}
 				}
 				if _, err := lgc.Fsys.Copy(writer, body); err != nil {
-					printer.Fprintln(os.Stderr, err)
+					lgc.Printer.Fprintln(os.Stderr, err)
 					file.Result.Error = err.Error()
 					continue
 				}
@@ -149,7 +147,7 @@ func (lgc *Logic) InstallPackage(
 		if file.Result.Error != "" {
 			continue
 		}
-		f, err := lgc.Logic.CreateLink(file, printer)
+		f, err := lgc.Logic.CreateLink(file)
 		if err != nil {
 			if f.Result.Error == "" {
 				f.Result.Error = err.Error()

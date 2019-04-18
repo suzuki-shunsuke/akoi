@@ -21,14 +21,14 @@ func Test_logicInstall(t *testing.T) {
 	lgc := newLogicMock(t)
 	result := lgc.Install(
 		context.Background(), params,
-		test.NewPrinter(t, gomic.DoNothing), cfgReader, getArchiver, downloader, getGzipReader)
+		cfgReader, getArchiver, downloader, getGzipReader)
 	if result.Failed() {
 		t.Fatal(result.String("ansible"))
 	}
 	cfgReader.SetReturnRead(domain.Config{}, fmt.Errorf("failed to read config"))
 	result = lgc.Install(
 		context.Background(), params,
-		test.NewPrinter(t, gomic.DoNothing), cfgReader, getArchiver, downloader, getGzipReader)
+		cfgReader, getArchiver, downloader, getGzipReader)
 	if !result.Failed() {
 		t.Fatal("it should be failed to read config")
 	}

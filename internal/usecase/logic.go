@@ -6,7 +6,8 @@ import (
 
 type (
 	Logic struct {
-		Logic domain.Logic
-		Fsys  domain.FileSystem
+		Logic   domain.Logic
+		Fsys    domain.FileSystem
+		Printer domain.Printer
 	}
 )
