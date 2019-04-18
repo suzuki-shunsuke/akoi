@@ -9,19 +9,19 @@ import (
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
 )
 
-func (lgc *logic) GetInstalledFiles(
+func (lgc *Logic) GetInstalledFiles(
 	files []domain.File, printer domain.Printer,
 ) []domain.File {
 	installedFiles := []domain.File{}
 	for _, file := range files {
 		dst := file.Bin
 		mode := file.Mode
-		if fi, err := lgc.fsys.GetFileStat(dst); err == nil {
+		if fi, err := lgc.Fsys.GetFileStat(dst); err == nil {
 			if fi.Mode() == mode {
 				continue
 			}
 			printer.Printf("chmod %s %s\n", mode.String(), dst)
-			if err := lgc.fsys.Chmod(dst, mode); err != nil {
+			if err := lgc.Fsys.Chmod(dst, mode); err != nil {
 				printer.Fprintln(os.Stderr, err)
 				file.Result.Error = err.Error()
 				continue
@@ -32,9 +32,9 @@ func (lgc *logic) GetInstalledFiles(
 
 		// Create parent directory
 		dir := filepath.Dir(dst)
-		if _, err := lgc.fsys.GetFileStat(dir); err != nil {
+		if _, err := lgc.Fsys.GetFileStat(dir); err != nil {
 			printer.Printf("create directory %s\n", dir)
-			if err := lgc.fsys.MkdirAll(dir); err != nil {
+			if err := lgc.Fsys.MkdirAll(dir); err != nil {
 				printer.Fprintln(os.Stderr, err)
 				file.Result.Error = err.Error()
 				continue
@@ -46,11 +46,11 @@ func (lgc *logic) GetInstalledFiles(
 	return installedFiles
 }
 
-func (lgc *logic) InstallPackage(
+func (lgc *Logic) InstallPackage(
 	ctx context.Context, pkg domain.Package, params domain.InstallParams,
 	printer domain.Printer, downloader domain.Downloader, getGzipReader domain.GetGzipReader,
 ) domain.Package {
-	installedFiles := lgc.logic.GetInstalledFiles(pkg.Files, printer)
+	installedFiles := lgc.Logic.GetInstalledFiles(pkg.Files, printer)
 	if len(installedFiles) != 0 {
 		// Download
 		ustr := pkg.URL.String()
@@ -66,13 +66,13 @@ func (lgc *logic) InstallPackage(
 		if pkg.Archived() {
 			// Create temporary directory
 			var err error
-			tmpDir, err = lgc.fsys.TempDir()
+			tmpDir, err = lgc.Fsys.TempDir()
 			if err != nil {
 				printer.Fprintln(os.Stderr, err)
 				pkg.Result.Error = err.Error()
 				return pkg
 			}
-			defer lgc.fsys.RemoveAll(tmpDir)
+			defer lgc.Fsys.RemoveAll(tmpDir)
 
 			arc := pkg.Archiver
 			if arc == nil {
@@ -100,7 +100,7 @@ func (lgc *logic) InstallPackage(
 			mode := file.Mode
 			dst := file.Bin
 			printer.Printf("install %s\n", dst)
-			writer, err := lgc.fsys.OpenFile(dst, os.O_RDWR|os.O_CREATE, mode)
+			writer, err := lgc.Fsys.OpenFile(dst, os.O_RDWR|os.O_CREATE, mode)
 			if err != nil {
 				printer.Fprintf(os.Stderr, "failed to install %s: %s\n", dst, err)
 				file.Result.Error = err.Error()
@@ -108,14 +108,14 @@ func (lgc *logic) InstallPackage(
 			}
 			defer writer.Close()
 			if pkg.Archived() {
-				src, err := lgc.fsys.Open(filepath.Join(tmpDir, file.Archive))
+				src, err := lgc.Fsys.Open(filepath.Join(tmpDir, file.Archive))
 				if err != nil {
 					printer.Fprintln(os.Stderr, err)
 					file.Result.Error = err.Error()
 					continue
 				}
 				defer src.Close()
-				if _, err := lgc.fsys.Copy(writer, src); err != nil {
+				if _, err := lgc.Fsys.Copy(writer, src); err != nil {
 					printer.Fprintln(os.Stderr, err)
 					file.Result.Error = err.Error()
 					continue
@@ -130,13 +130,13 @@ func (lgc *logic) InstallPackage(
 						continue
 					}
 					defer reader.Close()
-					if _, err := lgc.fsys.Copy(writer, reader); err != nil {
+					if _, err := lgc.Fsys.Copy(writer, reader); err != nil {
 						printer.Fprintln(os.Stderr, err)
 						file.Result.Error = err.Error()
 						continue
 					}
 				}
-				if _, err := lgc.fsys.Copy(writer, body); err != nil {
+				if _, err := lgc.Fsys.Copy(writer, body); err != nil {
 					printer.Fprintln(os.Stderr, err)
 					file.Result.Error = err.Error()
 					continue
@@ -149,7 +149,7 @@ func (lgc *logic) InstallPackage(
 		if file.Result.Error != "" {
 			continue
 		}
-		f, err := lgc.logic.CreateLink(file, printer)
+		f, err := lgc.Logic.CreateLink(file, printer)
 		if err != nil {
 			if f.Result.Error == "" {
 				f.Result.Error = err.Error()

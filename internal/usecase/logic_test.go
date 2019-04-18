@@ -2,11 +2,15 @@ package usecase
 
 import (
 	"testing"
+
+	"github.com/suzuki-shunsuke/gomic/gomic"
+
+	"github.com/suzuki-shunsuke/akoi/internal/test"
 )
 
-func TestNewLogic(t *testing.T) {
-	lgc := NewLogic(nil)
-	if lgc == nil {
-		t.Fatal("logic is nil")
+func newLogicMock(t *testing.T) *Logic {
+	return &Logic{
+		Fsys:  test.NewFileSystem(t, gomic.DoNothing),
+		Logic: test.NewLogic(t, gomic.DoNothing),
 	}
 }

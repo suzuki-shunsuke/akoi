@@ -53,7 +53,7 @@ func Install(c *cli.Context) error {
 	resultChan := make(chan domain.Result)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	logic := usecase.NewLogic(infra.FileSystem{})
+	logic := newLogic()
 	go func() {
 		resultChan <- logic.Install(
 			ctx, params, infra.Printer{},
@@ -74,4 +74,12 @@ func Install(c *cli.Context) error {
 		close(resultChan)
 		return cli.NewExitError(sig.String(), 1)
 	}
+}
+
+func newLogic() domain.Logic {
+	lgc := &usecase.Logic{
+		Fsys: infra.FileSystem{},
+	}
+	lgc.Logic = lgc
+	return lgc
 }

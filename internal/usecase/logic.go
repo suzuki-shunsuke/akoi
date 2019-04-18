@@ -5,16 +5,8 @@ import (
 )
 
 type (
-	logic struct {
-		logic domain.Logic
-		fsys  domain.FileSystem
+	Logic struct {
+		Logic domain.Logic
+		Fsys  domain.FileSystem
 	}
 )
-
-func NewLogic(fsys domain.FileSystem) domain.Logic {
-	lgc := &logic{
-		fsys: fsys,
-	}
-	lgc.logic = lgc
-	return lgc
-}
