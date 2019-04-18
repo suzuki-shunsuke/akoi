@@ -11,9 +11,7 @@ import (
 	"github.com/suzuki-shunsuke/akoi/internal/util"
 )
 
-func (lgc *Logic) SetupConfig(
-	cfg domain.Config, getArchiver domain.GetArchiver,
-) (domain.Config, error) {
+func (lgc *Logic) SetupConfig(cfg domain.Config) (domain.Config, error) {
 	cfg.BinPath = lgc.Fsys.ExpandEnv(cfg.BinPath)
 	cfg.LinkPath = lgc.Fsys.ExpandEnv(cfg.LinkPath)
 	tpl, err := template.New("cfg_bin_path").Parse(cfg.BinPath)
@@ -79,7 +77,7 @@ func (lgc *Logic) SetupConfig(
 			return cfg, err
 		}
 		pkg.URL = u2
-		pkg.Archiver = getArchiver.Get(u2.Path, pkg.ArchiveType)
+		pkg.Archiver = lgc.GetArchiver.Get(u2.Path, pkg.ArchiveType)
 
 		if pkg.NumOfDLPartitions < 0 {
 			pkg.NumOfDLPartitions = numCPUs

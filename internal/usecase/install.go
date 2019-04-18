@@ -17,7 +17,6 @@ const (
 
 func (lgc *Logic) Install(
 	ctx context.Context, params domain.InstallParams,
-	getArchiver domain.GetArchiver,
 	getGzipReader domain.GetGzipReader,
 ) domain.Result {
 	// suppress output log by third party library
@@ -32,7 +31,7 @@ func (lgc *Logic) Install(
 		result.Msg = err.Error()
 		return result
 	}
-	cfg, err = lgc.Logic.SetupConfig(cfg, getArchiver)
+	cfg, err = lgc.Logic.SetupConfig(cfg)
 	if err != nil {
 		lgc.Printer.Fprintln(os.Stderr, err)
 		result.Msg = err.Error()

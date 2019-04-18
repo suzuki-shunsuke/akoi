@@ -62,10 +62,10 @@ type (
 
 	// Logic abstracts application logic.
 	Logic interface {
-		Install(ctx context.Context, params InstallParams, getArchiver GetArchiver, getGzipReader GetGzipReader) Result
+		Install(ctx context.Context, params InstallParams, getGzipReader GetGzipReader) Result
 		InstallPackage(ctx context.Context, pkg Package, params InstallParams, getGzipReader GetGzipReader) Package
 		GetInstalledFiles(files []File) []File
 		CreateLink(file File) (File, error)
-		SetupConfig(cfg Config, getArchiver GetArchiver) (Config, error)
+		SetupConfig(cfg Config) (Config, error)
 	}
 )
