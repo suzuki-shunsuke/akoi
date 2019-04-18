@@ -76,6 +76,12 @@ type (
 		DryRun         bool
 	}
 
+	// LogicParam is parameters of usecase.logic
+	LogicParam struct {
+		Logic Logic
+		Fsys  FileSystem
+	}
+
 	// Package represents a package configuration.
 	Package struct {
 		ArchiveType       string             `yaml:"archive_type"`

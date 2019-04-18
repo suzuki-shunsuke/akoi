@@ -11,10 +11,13 @@ type (
 	}
 )
 
-func NewLogic(fsys domain.FileSystem) domain.Logic {
+func NewLogic(param domain.LogicParam) domain.Logic {
 	lgc := &logic{
-		fsys: fsys,
+		fsys:  param.Fsys,
+		logic: param.Logic,
 	}
-	lgc.logic = lgc
+	if lgc.logic == nil {
+		lgc.logic = lgc
+	}
 	return lgc
 }
