@@ -69,5 +69,6 @@ type (
 		RecreateLink(file File) (File, error)
 		RemoveFileAndCreateLink(file File) (File, error)
 		SetupConfig(cfg Config) (Config, error)
+		SetupPkgConfig(cfg Config, name string, pkg Package, numCPUs int) (Package, error)
 	}
 )
