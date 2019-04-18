@@ -46,7 +46,6 @@ func (lgc *Logic) GetInstalledFiles(files []domain.File) []domain.File {
 
 func (lgc *Logic) InstallPackage(
 	ctx context.Context, pkg domain.Package, params domain.InstallParams,
-	getGzipReader domain.GetGzipReader,
 ) domain.Package {
 	installedFiles := lgc.Logic.GetInstalledFiles(pkg.Files)
 	if len(installedFiles) != 0 {
@@ -121,7 +120,7 @@ func (lgc *Logic) InstallPackage(
 				file.Result.Installed = true
 			} else {
 				if pkg.ArchiveType == "Gzip" {
-					reader, err := getGzipReader.Get(body)
+					reader, err := lgc.GetGzipReader.Get(body)
 					if err != nil {
 						lgc.Printer.Fprintln(os.Stderr, err)
 						file.Result.Error = err.Error()

@@ -55,8 +55,7 @@ func Install(c *cli.Context) error {
 	defer cancel()
 	logic := newLogic()
 	go func() {
-		resultChan <- logic.Install(
-			ctx, params, infra.GetGzipReader{})
+		resultChan <- logic.Install(ctx, params)
 	}()
 	select {
 	case result := <-resultChan:
@@ -77,11 +76,12 @@ func Install(c *cli.Context) error {
 
 func newLogic() domain.Logic {
 	lgc := &usecase.Logic{
-		Fsys:        infra.FileSystem{},
-		Printer:     infra.Printer{},
-		CfgReader:   infra.ConfigReader{},
-		Downloader:  infra.Downloader{},
-		GetArchiver: infra.GetArchiver{},
+		Fsys:          infra.FileSystem{},
+		Printer:       infra.Printer{},
+		CfgReader:     infra.ConfigReader{},
+		Downloader:    infra.Downloader{},
+		GetArchiver:   infra.GetArchiver{},
+		GetGzipReader: infra.GetGzipReader{},
 	}
 	lgc.Logic = lgc
 	return lgc
