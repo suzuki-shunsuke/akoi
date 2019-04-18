@@ -9,9 +9,8 @@ import (
 )
 
 func newLogicMock(t *testing.T) *Logic {
-	logic := &Logic{
-		Fsys: test.NewFileSystem(t, gomic.DoNothing),
+	return &Logic{
+		Fsys:  test.NewFileSystem(t, gomic.DoNothing),
+		Logic: test.NewLogic(t, gomic.DoNothing),
 	}
-	logic.Logic = logic
-	return logic
 }
