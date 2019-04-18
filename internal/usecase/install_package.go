@@ -46,14 +46,14 @@ func (lgc *Logic) GetInstalledFiles(files []domain.File) []domain.File {
 
 func (lgc *Logic) InstallPackage(
 	ctx context.Context, pkg domain.Package, params domain.InstallParams,
-	downloader domain.Downloader, getGzipReader domain.GetGzipReader,
+	getGzipReader domain.GetGzipReader,
 ) domain.Package {
 	installedFiles := lgc.Logic.GetInstalledFiles(pkg.Files)
 	if len(installedFiles) != 0 {
 		// Download
 		ustr := pkg.URL.String()
 		lgc.Printer.Printf("downloading %s: %s\n", pkg.Name, ustr)
-		body, err := downloader.Download(ctx, ustr, pkg.NumOfDLPartitions)
+		body, err := lgc.Downloader.Download(ctx, ustr, pkg.NumOfDLPartitions)
 		if err != nil {
 			lgc.Printer.Fprintln(os.Stderr, err)
 			pkg.Result.Error = err.Error()

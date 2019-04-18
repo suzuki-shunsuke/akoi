@@ -18,7 +18,7 @@ const (
 func (lgc *Logic) Install(
 	ctx context.Context, params domain.InstallParams,
 	getArchiver domain.GetArchiver,
-	downloader domain.Downloader, getGzipReader domain.GetGzipReader,
+	getGzipReader domain.GetGzipReader,
 ) domain.Result {
 	// suppress output log by third party library
 	// https://github.com/joeybloggs/go-download/blob/b655936947da12d76bee4fa3b6af41a98db23e6f/download.go#L119
@@ -48,7 +48,7 @@ func (lgc *Logic) Install(
 		wg.Add(1)
 		go func(pkg domain.Package) {
 			defer wg.Done()
-			pkg = lgc.Logic.InstallPackage(ctx, pkg, params, downloader, getGzipReader)
+			pkg = lgc.Logic.InstallPackage(ctx, pkg, params, getGzipReader)
 			pkgResult := pkg.Result
 			if pkgResult == nil {
 				pkgResult = &domain.PackageResult{Name: pkg.Name}
