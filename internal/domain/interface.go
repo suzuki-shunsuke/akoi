@@ -67,6 +67,7 @@ type (
 		GetInstalledFiles(files []File) []File
 		CreateLink(file File) (File, error)
 		RecreateLink(file File) (File, error)
+		RemoveFileAndCreateLink(file File) (File, error)
 		SetupConfig(cfg Config) (Config, error)
 	}
 )
