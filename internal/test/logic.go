@@ -23,6 +23,7 @@ type (
 			InstallPackage    func(ctx context.Context, pkg test.Package, params test.InstallParams) test.Package
 			GetInstalledFiles func(files []test.File) []test.File
 			CreateLink        func(file test.File) (test.File, error)
+			RecreateLink      func(file test.File) (test.File, error)
 			SetupConfig       func(cfg test.Config) (test.Config, error)
 		}
 	}
@@ -172,6 +173,43 @@ func (mock *Logic) SetReturnCreateLink(r0 test.File, r1 error) *Logic {
 
 // fakeZeroCreateLink is a fake method which returns zero values.
 func (mock Logic) fakeZeroCreateLink(file test.File) (test.File, error) {
+	var (
+		r0 test.File
+		r1 error
+	)
+	return r0, r1
+}
+
+// RecreateLink is a mock method.
+func (mock Logic) RecreateLink(file test.File) (test.File, error) {
+	methodName := "RecreateLink" // nolint: goconst
+	if mock.impl.RecreateLink != nil {
+		return mock.impl.RecreateLink(file)
+	}
+	if mock.callbackNotImplemented != nil {
+		mock.callbackNotImplemented(mock.t, mock.name, methodName)
+	} else {
+		gomic.DefaultCallbackNotImplemented(mock.t, mock.name, methodName)
+	}
+	return mock.fakeZeroRecreateLink(file)
+}
+
+// SetFuncRecreateLink sets a method and returns the mock.
+func (mock *Logic) SetFuncRecreateLink(impl func(file test.File) (test.File, error)) *Logic {
+	mock.impl.RecreateLink = impl
+	return mock
+}
+
+// SetReturnRecreateLink sets a fake method.
+func (mock *Logic) SetReturnRecreateLink(r0 test.File, r1 error) *Logic {
+	mock.impl.RecreateLink = func(test.File) (test.File, error) {
+		return r0, r1
+	}
+	return mock
+}
+
+// fakeZeroRecreateLink is a fake method which returns zero values.
+func (mock Logic) fakeZeroRecreateLink(file test.File) (test.File, error) {
 	var (
 		r0 test.File
 		r1 error
