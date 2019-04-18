@@ -27,6 +27,7 @@ type (
 			RemoveFileAndCreateLink func(file test.File) (test.File, error)
 			SetupConfig             func(cfg test.Config) (test.Config, error)
 			SetupPkgConfig          func(cfg test.Config, name string, pkg test.Package, numCPUs int) (test.Package, error)
+			SetupFileConfig         func(pkg test.Package, file test.File) (test.File, error)
 		}
 	}
 )
@@ -325,6 +326,43 @@ func (mock *Logic) SetReturnSetupPkgConfig(r0 test.Package, r1 error) *Logic {
 func (mock Logic) fakeZeroSetupPkgConfig(cfg test.Config, name string, pkg test.Package, numCPUs int) (test.Package, error) {
 	var (
 		r0 test.Package
+		r1 error
+	)
+	return r0, r1
+}
+
+// SetupFileConfig is a mock method.
+func (mock Logic) SetupFileConfig(pkg test.Package, file test.File) (test.File, error) {
+	methodName := "SetupFileConfig" // nolint: goconst
+	if mock.impl.SetupFileConfig != nil {
+		return mock.impl.SetupFileConfig(pkg, file)
+	}
+	if mock.callbackNotImplemented != nil {
+		mock.callbackNotImplemented(mock.t, mock.name, methodName)
+	} else {
+		gomic.DefaultCallbackNotImplemented(mock.t, mock.name, methodName)
+	}
+	return mock.fakeZeroSetupFileConfig(pkg, file)
+}
+
+// SetFuncSetupFileConfig sets a method and returns the mock.
+func (mock *Logic) SetFuncSetupFileConfig(impl func(pkg test.Package, file test.File) (test.File, error)) *Logic {
+	mock.impl.SetupFileConfig = impl
+	return mock
+}
+
+// SetReturnSetupFileConfig sets a fake method.
+func (mock *Logic) SetReturnSetupFileConfig(r0 test.File, r1 error) *Logic {
+	mock.impl.SetupFileConfig = func(test.Package, test.File) (test.File, error) {
+		return r0, r1
+	}
+	return mock
+}
+
+// fakeZeroSetupFileConfig is a fake method which returns zero values.
+func (mock Logic) fakeZeroSetupFileConfig(pkg test.Package, file test.File) (test.File, error) {
+	var (
+		r0 test.File
 		r1 error
 	)
 	return r0, r1

@@ -100,76 +100,86 @@ func (lgc *Logic) SetupPkgConfig(
 	}
 
 	for i, file := range pkg.Files {
-		if file.Result == nil {
-			file.Result = &domain.FileResult{}
-		}
-		if file.Mode == 0 {
-			file.Mode = 0755
-		}
-
-		if file.LinkPath == "" {
-			file.LinkPath = pkg.LinkPath
-			file.LinkPathTpl = pkg.LinkPathTpl
-		} else {
-			file.LinkPath = lgc.Fsys.ExpandEnv(file.LinkPath)
-			tpl, err := template.New("file_link_path").Parse(file.LinkPath)
-			if err != nil {
-				return pkg, err
-			}
-			file.LinkPathTpl = tpl
-		}
-
-		if file.BinPath == "" {
-			file.BinPath = pkg.BinPath
-			file.BinPathTpl = pkg.BinPathTpl
-		} else {
-			file.BinPath = lgc.Fsys.ExpandEnv(file.BinPath)
-			tpl, err := template.New("file_bin_path").Parse(file.BinPath)
-			if err != nil {
-				return pkg, err
-			}
-			file.BinPathTpl = tpl
-		}
-
-		dst, err := util.RenderTpl(
-			file.BinPathTpl, &domain.TemplateParams{
-				Name: file.Name, Version: pkg.Version,
-			})
+		file, err := lgc.Logic.SetupFileConfig(pkg, file)
 		if err != nil {
 			return pkg, err
 		}
-		if !filepath.IsAbs(dst) {
-			return pkg, fmt.Errorf(
-				"installed path must be absolute: %s %s %s", pkg.Name, file.Name, dst)
-		}
-		file.Bin = dst
-
-		arcPath := lgc.Fsys.ExpandEnv(file.Archive)
-		arcPathTpl, err := template.New("archive_path").Parse(arcPath)
-		if err != nil {
-			return pkg, err
-		}
-		file.Archive, err = util.RenderTpl(
-			arcPathTpl, &domain.TemplateParams{
-				Name: file.Name, Version: pkg.Version,
-			})
-		if err != nil {
-			return pkg, err
-		}
-
-		lnPath, err := util.RenderTpl(
-			file.LinkPathTpl, &domain.TemplateParams{
-				Name: file.Name, Version: pkg.Version,
-			})
-		if err != nil {
-			return pkg, err
-		}
-		if !filepath.IsAbs(lnPath) {
-			return pkg, fmt.Errorf(
-				"link path must be absolute: %s %s %s", pkg.Name, file.Name, lnPath)
-		}
-		file.Link = lnPath
 		pkg.Files[i] = file
 	}
 	return pkg, nil
+}
+
+func (lgc *Logic) SetupFileConfig(
+	pkg domain.Package, file domain.File,
+) (domain.File, error) {
+	if file.Result == nil {
+		file.Result = &domain.FileResult{}
+	}
+	if file.Mode == 0 {
+		file.Mode = 0755
+	}
+
+	if file.LinkPath == "" {
+		file.LinkPath = pkg.LinkPath
+		file.LinkPathTpl = pkg.LinkPathTpl
+	} else {
+		file.LinkPath = lgc.Fsys.ExpandEnv(file.LinkPath)
+		tpl, err := template.New("file_link_path").Parse(file.LinkPath)
+		if err != nil {
+			return file, err
+		}
+		file.LinkPathTpl = tpl
+	}
+
+	if file.BinPath == "" {
+		file.BinPath = pkg.BinPath
+		file.BinPathTpl = pkg.BinPathTpl
+	} else {
+		file.BinPath = lgc.Fsys.ExpandEnv(file.BinPath)
+		tpl, err := template.New("file_bin_path").Parse(file.BinPath)
+		if err != nil {
+			return file, err
+		}
+		file.BinPathTpl = tpl
+	}
+
+	dst, err := util.RenderTpl(
+		file.BinPathTpl, &domain.TemplateParams{
+			Name: file.Name, Version: pkg.Version,
+		})
+	if err != nil {
+		return file, err
+	}
+	if !filepath.IsAbs(dst) {
+		return file, fmt.Errorf(
+			"installed path must be absolute: %s %s %s", pkg.Name, file.Name, dst)
+	}
+	file.Bin = dst
+
+	arcPath := lgc.Fsys.ExpandEnv(file.Archive)
+	arcPathTpl, err := template.New("archive_path").Parse(arcPath)
+	if err != nil {
+		return file, err
+	}
+	file.Archive, err = util.RenderTpl(
+		arcPathTpl, &domain.TemplateParams{
+			Name: file.Name, Version: pkg.Version,
+		})
+	if err != nil {
+		return file, err
+	}
+
+	lnPath, err := util.RenderTpl(
+		file.LinkPathTpl, &domain.TemplateParams{
+			Name: file.Name, Version: pkg.Version,
+		})
+	if err != nil {
+		return file, err
+	}
+	if !filepath.IsAbs(lnPath) {
+		return file, fmt.Errorf(
+			"link path must be absolute: %s %s %s", pkg.Name, file.Name, lnPath)
+	}
+	file.Link = lnPath
+	return file, nil
 }
