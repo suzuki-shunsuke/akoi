@@ -7,15 +7,15 @@ import (
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
 )
 
-func (lgc *logic) CreateLink(
+func (lgc *Logic) CreateLink(
 	file domain.File, printer domain.Printer,
 ) (domain.File, error) {
 	// check file existence and create a symlink.
-	fi, err := lgc.fsys.GetFileLstat(file.Link)
+	fi, err := lgc.Fsys.GetFileLstat(file.Link)
 	if err != nil {
 		// if file isn't found, create a symlink
 		printer.Printf("create link %s -> %s\n", file.Link, file.Bin)
-		if err := lgc.fsys.MkLink(file.Bin, file.Link); err != nil {
+		if err := lgc.Fsys.MkLink(file.Bin, file.Link); err != nil {
 			printer.Fprintln(os.Stderr, err)
 			return file, err
 		}
@@ -36,13 +36,13 @@ func (lgc *logic) CreateLink(
 	case mode.IsRegular():
 		// if file is a regular file, remove it and create a symlink.
 		printer.Printf("remove %s\n", file.Link)
-		if err := lgc.fsys.RemoveFile(file.Link); err != nil {
+		if err := lgc.Fsys.RemoveFile(file.Link); err != nil {
 			printer.Fprintln(os.Stderr, err)
 			return file, err
 		}
 		file.Result.FileRemoved = true
 		printer.Printf("create link %s -> %s\n", file.Link, file.Bin)
-		if err := lgc.fsys.MkLink(file.Bin, file.Link); err != nil {
+		if err := lgc.Fsys.MkLink(file.Bin, file.Link); err != nil {
 			printer.Fprintln(os.Stderr, err)
 			return file, err
 		}
@@ -50,7 +50,7 @@ func (lgc *logic) CreateLink(
 		return file, nil
 	case mode&os.ModeSymlink != 0:
 		// if file is a symlink but a dest is different, recreate a symlink.
-		lnDest, err := lgc.fsys.ReadLink(file.Link)
+		lnDest, err := lgc.Fsys.ReadLink(file.Link)
 		if err != nil {
 			printer.Fprintln(os.Stderr, err)
 			return file, err
@@ -59,13 +59,13 @@ func (lgc *logic) CreateLink(
 			return file, nil
 		}
 		printer.Printf("remove link %s -> %s\n", file.Link, lnDest)
-		if err := lgc.fsys.RemoveLink(file.Link); err != nil {
+		if err := lgc.Fsys.RemoveLink(file.Link); err != nil {
 			printer.Fprintln(os.Stderr, err)
 			return file, err
 		}
 		file.Result.LinkRemoved = true
 		printer.Printf("create link %s -> %s\n", file.Link, file.Bin)
-		if err := lgc.fsys.MkLink(file.Bin, file.Link); err != nil {
+		if err := lgc.Fsys.MkLink(file.Bin, file.Link); err != nil {
 			printer.Fprintln(os.Stderr, err)
 			return file, err
 		}

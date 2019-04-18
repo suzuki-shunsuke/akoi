@@ -27,13 +27,12 @@ func Test_logicSetupConfig(t *testing.T) {
 		},
 	}
 	getArchiver := test.NewGetArchiver(t, gomic.DoNothing)
-	param := newLogicParam(t)
-	param.Fsys = test.NewFileSystem(t, gomic.DoNothing).
+	logic := newLogicMock(t)
+	logic.Fsys = test.NewFileSystem(t, gomic.DoNothing).
 		SetFuncExpandEnv(func(p string) string {
 			return p
 		})
-	lgc := NewLogic(param)
-	if _, err := lgc.SetupConfig(cfg, getArchiver); err != nil {
+	if _, err := logic.SetupConfig(cfg, getArchiver); err != nil {
 		t.Fatal(err)
 	}
 }

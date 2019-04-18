@@ -15,7 +15,7 @@ const (
 	keyWordAnsible = "ansible"
 )
 
-func (lgc *logic) Install(
+func (lgc *Logic) Install(
 	ctx context.Context, params domain.InstallParams,
 	printer domain.Printer, cfgReader domain.ConfigReader, getArchiver domain.GetArchiver,
 	downloader domain.Downloader, getGzipReader domain.GetGzipReader,
@@ -32,7 +32,7 @@ func (lgc *logic) Install(
 		result.Msg = err.Error()
 		return result
 	}
-	cfg, err = lgc.logic.SetupConfig(cfg, getArchiver)
+	cfg, err = lgc.Logic.SetupConfig(cfg, getArchiver)
 	if err != nil {
 		printer.Fprintln(os.Stderr, err)
 		result.Msg = err.Error()
@@ -48,7 +48,7 @@ func (lgc *logic) Install(
 		wg.Add(1)
 		go func(pkg domain.Package) {
 			defer wg.Done()
-			pkg = lgc.logic.InstallPackage(ctx, pkg, params, printer, downloader, getGzipReader)
+			pkg = lgc.Logic.InstallPackage(ctx, pkg, params, printer, downloader, getGzipReader)
 			pkgResult := pkg.Result
 			if pkgResult == nil {
 				pkgResult = &domain.PackageResult{Name: pkg.Name}

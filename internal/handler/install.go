@@ -77,7 +77,9 @@ func Install(c *cli.Context) error {
 }
 
 func newLogic() domain.Logic {
-	return usecase.NewLogic(domain.LogicParam{
+	lgc := &usecase.Logic{
 		Fsys: infra.FileSystem{},
-	})
+	}
+	lgc.Logic = lgc
+	return lgc
 }
