@@ -17,8 +17,6 @@ const (
 
 func (lgc *Logic) Install(
 	ctx context.Context, params domain.InstallParams,
-	printer domain.Printer, cfgReader domain.ConfigReader, getArchiver domain.GetArchiver,
-	downloader domain.Downloader, getGzipReader domain.GetGzipReader,
 ) domain.Result {
 	// suppress output log by third party library
 	// https://github.com/joeybloggs/go-download/blob/b655936947da12d76bee4fa3b6af41a98db23e6f/download.go#L119
@@ -26,15 +24,15 @@ func (lgc *Logic) Install(
 
 	result := domain.Result{
 		Packages: map[string]domain.PackageResult{}}
-	cfg, err := cfgReader.Read(params.ConfigFilePath)
+	cfg, err := lgc.CfgReader.Read(params.ConfigFilePath)
 	if err != nil {
-		printer.Fprintln(os.Stderr, err)
+		lgc.Printer.Fprintln(os.Stderr, err)
 		result.Msg = err.Error()
 		return result
 	}
-	cfg, err = lgc.Logic.SetupConfig(cfg, getArchiver)
+	cfg, err = lgc.Logic.SetupConfig(cfg)
 	if err != nil {
-		printer.Fprintln(os.Stderr, err)
+		lgc.Printer.Fprintln(os.Stderr, err)
 		result.Msg = err.Error()
 		return result
 	}
@@ -48,7 +46,7 @@ func (lgc *Logic) Install(
 		wg.Add(1)
 		go func(pkg domain.Package) {
 			defer wg.Done()
-			pkg = lgc.Logic.InstallPackage(ctx, pkg, params, printer, downloader, getGzipReader)
+			pkg = lgc.Logic.InstallPackage(ctx, pkg, params)
 			pkgResult := pkg.Result
 			if pkgResult == nil {
 				pkgResult = &domain.PackageResult{Name: pkg.Name}

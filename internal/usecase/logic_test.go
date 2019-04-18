@@ -10,7 +10,12 @@ import (
 
 func newLogicMock(t *testing.T) *Logic {
 	return &Logic{
-		Fsys:  test.NewFileSystem(t, gomic.DoNothing),
-		Logic: test.NewLogic(t, gomic.DoNothing),
+		Logic:         test.NewLogic(t, gomic.DoNothing),
+		Fsys:          test.NewFileSystem(t, gomic.DoNothing),
+		Printer:       test.NewPrinter(t, gomic.DoNothing),
+		CfgReader:     test.NewConfigReader(t, gomic.DoNothing),
+		Downloader:    test.NewDownloader(t, gomic.DoNothing),
+		GetArchiver:   test.NewGetArchiver(t, gomic.DoNothing),
+		GetGzipReader: test.NewGetGzipReader(t, gomic.DoNothing),
 	}
 }

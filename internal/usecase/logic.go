@@ -6,7 +6,12 @@ import (
 
 type (
 	Logic struct {
-		Logic domain.Logic
-		Fsys  domain.FileSystem
+		Logic         domain.Logic
+		Fsys          domain.FileSystem
+		Printer       domain.Printer
+		CfgReader     domain.ConfigReader
+		Downloader    domain.Downloader
+		GetArchiver   domain.GetArchiver
+		GetGzipReader domain.GetGzipReader
 	}
 )
