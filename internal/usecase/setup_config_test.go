@@ -3,6 +3,7 @@ package usecase
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
 	"github.com/suzuki-shunsuke/gomic/gomic"
 
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
@@ -31,7 +32,7 @@ func Test_logicSetupConfig(t *testing.T) {
 		SetFuncExpandEnv(func(p string) string {
 			return p
 		})
-	if _, err := logic.SetupConfig(cfg); err != nil {
-		t.Fatal(err)
-	}
+
+	_, err := logic.SetupConfig(cfg)
+	require.Nil(t, err)
 }

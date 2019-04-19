@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/require"
 	"github.com/suzuki-shunsuke/gomic/gomic"
 
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
@@ -16,13 +17,9 @@ func Test_logicInstall(t *testing.T) {
 		ConfigFilePath: "/etc/akoi/akoi.yml", Format: "ansible"}
 	lgc := newLogicMock(t)
 	result := lgc.Install(context.Background(), params)
-	if result.Failed() {
-		t.Fatal(result.String("ansible"))
-	}
+	require.False(t, result.Failed())
 	lgc.CfgReader = test.NewConfigReader(t, gomic.DoNothing).
 		SetReturnRead(domain.Config{}, fmt.Errorf("failed to read config"))
 	result = lgc.Install(context.Background(), params)
-	if !result.Failed() {
-		t.Fatal("it should be failed to read config")
-	}
+	require.True(t, result.Failed())
 }
