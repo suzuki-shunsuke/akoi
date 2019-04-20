@@ -43,6 +43,12 @@ items:
     package: test
     file: internal/test/logic.go
 - src:
+    package: os
+    interface: FileInfo
+  dest:
+    package: test
+    file: internal/test/file_info.go
+- src:
     package: io
     interface: Writer
   dest:
