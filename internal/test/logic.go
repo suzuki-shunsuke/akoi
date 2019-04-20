@@ -6,6 +6,7 @@ package test
 
 import (
 	"context"
+	"io"
 	testing "testing"
 
 	test "github.com/suzuki-shunsuke/akoi/internal/domain"
@@ -21,6 +22,7 @@ type (
 		impl                   struct {
 			Install                 func(ctx context.Context, params test.InstallParams) test.Result
 			InstallPackage          func(ctx context.Context, pkg test.Package, params test.InstallParams) test.Package
+			InstallFile             func(file *test.File, pkg test.Package, params test.InstallParams, tmpDir string, body io.Reader) error
 			GetInstalledFiles       func(files []test.File) []test.File
 			CreateLink              func(file test.File) (test.File, error)
 			RecreateLink            func(file test.File) (test.File, error)
@@ -106,6 +108,42 @@ func (mock *Logic) SetReturnInstallPackage(r0 test.Package) *Logic {
 func (mock Logic) fakeZeroInstallPackage(ctx context.Context, pkg test.Package, params test.InstallParams) test.Package {
 	var (
 		r0 test.Package
+	)
+	return r0
+}
+
+// InstallFile is a mock method.
+func (mock Logic) InstallFile(file *test.File, pkg test.Package, params test.InstallParams, tmpDir string, body io.Reader) error {
+	methodName := "InstallFile" // nolint: goconst
+	if mock.impl.InstallFile != nil {
+		return mock.impl.InstallFile(file, pkg, params, tmpDir, body)
+	}
+	if mock.callbackNotImplemented != nil {
+		mock.callbackNotImplemented(mock.t, mock.name, methodName)
+	} else {
+		gomic.DefaultCallbackNotImplemented(mock.t, mock.name, methodName)
+	}
+	return mock.fakeZeroInstallFile(file, pkg, params, tmpDir, body)
+}
+
+// SetFuncInstallFile sets a method and returns the mock.
+func (mock *Logic) SetFuncInstallFile(impl func(file *test.File, pkg test.Package, params test.InstallParams, tmpDir string, body io.Reader) error) *Logic {
+	mock.impl.InstallFile = impl
+	return mock
+}
+
+// SetReturnInstallFile sets a fake method.
+func (mock *Logic) SetReturnInstallFile(r0 error) *Logic {
+	mock.impl.InstallFile = func(*test.File, test.Package, test.InstallParams, string, io.Reader) error {
+		return r0
+	}
+	return mock
+}
+
+// fakeZeroInstallFile is a fake method which returns zero values.
+func (mock Logic) fakeZeroInstallFile(file *test.File, pkg test.Package, params test.InstallParams, tmpDir string, body io.Reader) error {
+	var (
+		r0 error
 	)
 	return r0
 }

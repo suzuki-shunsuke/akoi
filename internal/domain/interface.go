@@ -64,6 +64,7 @@ type (
 	Logic interface {
 		Install(ctx context.Context, params InstallParams) Result
 		InstallPackage(ctx context.Context, pkg Package, params InstallParams) Package
+		InstallFile(file *File, pkg Package, params InstallParams, tmpDir string, body io.Reader) error
 		GetInstalledFiles(files []File) []File
 		CreateLink(file File) (File, error)
 		RecreateLink(file File) (File, error)
