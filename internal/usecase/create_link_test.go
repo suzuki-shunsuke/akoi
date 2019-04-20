@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -34,6 +35,43 @@ func TestLogicCreateLink(t *testing.T) {
 			fsys: test.NewFileSystem(t, gomic.DoNothing).
 				SetReturnGetFileLstat(nil, fmt.Errorf("file is not found")).
 				SetReturnMkLink(fmt.Errorf("failed to create a link")),
+			isErr: true,
+		}, {
+			title: "file is directory",
+			file:  domain.File{Result: &domain.FileResult{}},
+			fsys: test.NewFileSystem(t, gomic.DoNothing).
+				SetReturnGetFileLstat(
+					test.NewFileInfo(t, gomic.DoNothing).
+						SetReturnMode(os.ModeDir), nil),
+			isErr: true,
+		}, {
+			title: "file is a pipe",
+			file:  domain.File{Result: &domain.FileResult{}},
+			fsys: test.NewFileSystem(t, gomic.DoNothing).
+				SetReturnGetFileLstat(
+					test.NewFileInfo(t, gomic.DoNothing).
+						SetReturnMode(os.ModeNamedPipe), nil),
+			isErr: true,
+		}, {
+			title: "file is a regular file",
+			file:  domain.File{Result: &domain.FileResult{}},
+			fsys: test.NewFileSystem(t, gomic.DoNothing).
+				SetReturnGetFileLstat(
+					test.NewFileInfo(t, gomic.DoNothing), nil),
+		}, {
+			title: "file is a link",
+			file:  domain.File{Result: &domain.FileResult{}},
+			fsys: test.NewFileSystem(t, gomic.DoNothing).
+				SetReturnGetFileLstat(
+					test.NewFileInfo(t, gomic.DoNothing).
+						SetReturnMode(os.ModeSymlink), nil),
+		}, {
+			title: "file is a link",
+			file:  domain.File{Result: &domain.FileResult{}},
+			fsys: test.NewFileSystem(t, gomic.DoNothing).
+				SetReturnGetFileLstat(
+					test.NewFileInfo(t, gomic.DoNothing).
+						SetReturnMode(os.ModeIrregular), nil),
 			isErr: true,
 		},
 	}
