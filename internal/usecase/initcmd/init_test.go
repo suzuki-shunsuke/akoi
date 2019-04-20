@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/require"
 	"github.com/suzuki-shunsuke/gomic/gomic"
 
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
@@ -14,15 +15,9 @@ func TestInitConfigFile(t *testing.T) {
 	fsys := test.NewFileSystem(t, gomic.DoNothing).
 		SetReturnExistFile(true)
 	params := &domain.InitParams{Dest: "dest"}
-	if err := InitConfigFile(params, fsys); err != nil {
-		t.Fatal(err)
-	}
+	require.Nil(t, InitConfigFile(params, fsys))
 	fsys.SetReturnExistFile(false)
-	if err := InitConfigFile(params, fsys); err != nil {
-		t.Fatal(err)
-	}
+	require.Nil(t, InitConfigFile(params, fsys))
 	fsys.SetReturnMkdirAll(fmt.Errorf("failed to create a directory"))
-	if err := InitConfigFile(params, fsys); err == nil {
-		t.Fatal("it should be failed to create a directory")
-	}
+	require.NotNil(t, InitConfigFile(params, fsys), "it should be failed to create a directory")
 }
