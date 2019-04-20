@@ -136,3 +136,65 @@ func TestLogicRemoveFileAndCreateLink(t *testing.T) {
 		})
 	}
 }
+
+func TestLogicRecreateLink(t *testing.T) {
+	data := []struct {
+		title string
+		file  domain.File
+		fsys  domain.FileSystem
+		isErr bool
+		exp   domain.File
+	}{
+		{
+			title: "failed to read a link",
+			file:  domain.File{Result: &domain.FileResult{}},
+			fsys: test.NewFileSystem(t, gomic.DoNothing).
+				SetReturnReadLink("", fmt.Errorf("permission denied")),
+			isErr: true,
+		}, {
+			title: "don't recreate a link",
+			file:  domain.File{Bin: "/foo"},
+			exp:   domain.File{Bin: "/foo"},
+			fsys: test.NewFileSystem(t, gomic.DoNothing).
+				SetReturnReadLink("/foo", nil),
+		}, {
+			title: "failed to remove a link",
+			file:  domain.File{Result: &domain.FileResult{}},
+			fsys: test.NewFileSystem(t, gomic.DoNothing).
+				SetReturnRemoveLink(fmt.Errorf("permission denied")).
+				SetReturnReadLink("/foo", nil),
+			isErr: true,
+		}, {
+			title: "failed to create a link",
+			file:  domain.File{Result: &domain.FileResult{}},
+			fsys: test.NewFileSystem(t, gomic.DoNothing).
+				SetReturnMkLink(fmt.Errorf("permission denied")).
+				SetReturnReadLink("/foo", nil),
+			isErr: true,
+		}, {
+			title: "recreate a link",
+			file:  domain.File{Result: &domain.FileResult{}},
+			exp: domain.File{Result: &domain.FileResult{
+				LinkRemoved: true,
+				Migrated:    true,
+			}},
+			fsys: test.NewFileSystem(t, gomic.DoNothing).
+				SetReturnReadLink("/foo", nil),
+		},
+	}
+	for _, d := range data {
+		t.Run(d.title, func(t *testing.T) {
+			logic := newLogicMock(t)
+			if d.fsys != nil {
+				logic.Fsys = d.fsys
+			}
+			file, err := logic.RecreateLink(d.file)
+			if d.isErr {
+				require.NotNil(t, err)
+				return
+			}
+			require.Nil(t, err)
+			require.Equal(t, d.exp, file)
+		})
+	}
+}
