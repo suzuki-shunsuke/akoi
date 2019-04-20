@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
@@ -51,9 +52,7 @@ func TestLogicGetInstalledFiles(t *testing.T) {
 			title: "create a parent directory",
 			files: []domain.File{{Result: &domain.FileResult{}}},
 			exp: []domain.File{{
-				Result: &domain.FileResult{
-					DirCreated: true,
-				},
+				Result: &domain.FileResult{DirCreated: true},
 			}},
 			fsys: test.NewFileSystem(t, gomic.DoNothing).
 				SetReturnGetFileStat(nil, fmt.Errorf("file is not found")),
@@ -66,6 +65,30 @@ func TestLogicGetInstalledFiles(t *testing.T) {
 				logic.Fsys = d.fsys
 			}
 			require.Equal(t, d.exp, logic.GetInstalledFiles(d.files))
+		})
+	}
+}
+
+func TestLogicInstallPackage(t *testing.T) {
+	data := []struct {
+		title  string
+		pkg    domain.Package
+		exp    domain.Package
+		params domain.InstallParams
+		fsys   domain.FileSystem
+	}{
+		{
+			title: "files is empty",
+			exp:   domain.Package{}},
+	}
+	ctx := context.Background()
+	for _, d := range data {
+		t.Run(d.title, func(t *testing.T) {
+			logic := newLogicMock(t)
+			if d.fsys != nil {
+				logic.Fsys = d.fsys
+			}
+			require.Equal(t, d.exp, logic.InstallPackage(ctx, d.pkg, d.params))
 		})
 	}
 }
