@@ -93,52 +93,9 @@ func (lgc *Logic) InstallPackage(
 		}
 
 		for _, file := range installedFiles {
-			// Install
-			mode := file.Mode
-			dst := file.Bin
-			lgc.Printer.Printf("install %s\n", dst)
-			writer, err := lgc.Fsys.OpenFile(dst, os.O_RDWR|os.O_CREATE, mode)
-			if err != nil {
-				lgc.Printer.Fprintf(os.Stderr, "failed to install %s: %s\n", dst, err)
+			if err := lgc.Logic.InstallFile(&file, pkg, params, tmpDir, body); err != nil {
+				lgc.Printer.Fprintf(os.Stderr, "failed to install %s: %s\n", file.Bin, err)
 				file.Result.Error = err.Error()
-				continue
-			}
-			defer writer.Close()
-			if pkg.Archived() {
-				src, err := lgc.Fsys.Open(filepath.Join(tmpDir, file.Archive))
-				if err != nil {
-					lgc.Printer.Fprintln(os.Stderr, err)
-					file.Result.Error = err.Error()
-					continue
-				}
-				defer src.Close()
-				if _, err := lgc.Fsys.Copy(writer, src); err != nil {
-					lgc.Printer.Fprintln(os.Stderr, err)
-					file.Result.Error = err.Error()
-					continue
-				}
-				file.Result.Installed = true
-			} else {
-				if pkg.ArchiveType == "Gzip" {
-					reader, err := lgc.GetGzipReader.Get(body)
-					if err != nil {
-						lgc.Printer.Fprintln(os.Stderr, err)
-						file.Result.Error = err.Error()
-						continue
-					}
-					defer reader.Close()
-					if _, err := lgc.Fsys.Copy(writer, reader); err != nil {
-						lgc.Printer.Fprintln(os.Stderr, err)
-						file.Result.Error = err.Error()
-						continue
-					}
-				}
-				if _, err := lgc.Fsys.Copy(writer, body); err != nil {
-					lgc.Printer.Fprintln(os.Stderr, err)
-					file.Result.Error = err.Error()
-					continue
-				}
-				file.Result.Installed = true
 			}
 		}
 	}
