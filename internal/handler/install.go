@@ -59,7 +59,6 @@ func Install(c *cli.Context) error {
 	}()
 	select {
 	case result := <-resultChan:
-		close(signalChan)
 		if !result.Failed() {
 			s := result.String(params.Format)
 			if s != "" {
@@ -69,7 +68,6 @@ func Install(c *cli.Context) error {
 		}
 		return cli.NewExitError(result.String(params.Format), 1)
 	case sig := <-signalChan:
-		close(resultChan)
 		return cli.NewExitError(sig.String(), 1)
 	}
 }
