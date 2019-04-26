@@ -93,6 +93,7 @@ func (lgc *Logic) InstallPackage(
 				lgc.Printer.Fprintf(os.Stderr, "failed to install %s: %s\n", file.Bin, err)
 				file.Result.Error = err.Error()
 			}
+			file.Result.Installed = true
 		}
 	}
 	for i, file := range pkg.Files {

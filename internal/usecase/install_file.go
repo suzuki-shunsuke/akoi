@@ -27,7 +27,6 @@ func (lgc *Logic) InstallFile(
 		if _, err := lgc.Fsys.Copy(writer, src); err != nil {
 			return err
 		}
-		file.Result.Installed = true
 		return nil
 	}
 	if pkg.ArchiveType == "Gzip" {
@@ -39,12 +38,10 @@ func (lgc *Logic) InstallFile(
 		if _, err := lgc.Fsys.Copy(writer, reader); err != nil {
 			return err
 		}
-		file.Result.Installed = true
 		return nil
 	}
 	if _, err := lgc.Fsys.Copy(writer, body); err != nil {
 		return err
 	}
-	file.Result.Installed = true
 	return nil
 }
