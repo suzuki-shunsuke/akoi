@@ -32,8 +32,8 @@ type (
 		GetFileStat(string) (os.FileInfo, error)
 		MkdirAll(string) error
 		MkLink(src, dst string) error
-		Open(name string) (*os.File, error)
-		OpenFile(name string, flag int, perm os.FileMode) (*os.File, error)
+		Open(name string) (io.ReadCloser, error)
+		OpenFile(name string, flag int, perm os.FileMode) (io.WriteCloser, error)
 		ReadLink(string) (string, error)
 		RemoveAll(string) error
 		RemoveFile(string) error

@@ -54,3 +54,9 @@ items:
   dest:
     package: usecase
     file: internal/usecase/writer.go
+- src:
+    package: io
+    interface: WriteCloser
+  dest:
+    package: test
+    file: internal/test/write_closer.go
