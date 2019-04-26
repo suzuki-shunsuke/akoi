@@ -105,6 +105,7 @@ func (lgc *Logic) InstallPackage(
 			if f.Result.Error == "" {
 				f.Result.Error = err.Error()
 			}
+			lgc.Printer.Fprintln(os.Stderr, err)
 		}
 		pkg.Files[i] = f
 	}
