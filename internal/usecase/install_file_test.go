@@ -62,6 +62,29 @@ func TestLogicInstallFile(t *testing.T) {
 				SetReturnOpenFile(test.NewWriteCloser(t, gomic.DoNothing), nil).
 				SetReturnCopy(0, fmt.Errorf("permission denied")),
 			isErr: true,
+		}, {
+			title: "copy a gzip file",
+			pkg:   domain.Package{ArchiveType: "Gzip"},
+			getGzipReader: test.NewGetGzipReader(t, gomic.DoNothing).
+				SetReturnGet(ioutil.NopCloser(bytes.NewBufferString("")), nil),
+			fsys: test.NewFileSystem(t, gomic.DoNothing).
+				SetReturnOpenFile(test.NewWriteCloser(t, gomic.DoNothing), nil).
+				SetReturnCopy(0, nil),
+			isErr: false,
+		}, {
+			title: "failed to copy an unarchived file",
+			pkg:   domain.Package{ArchiveType: "unarchived"},
+			fsys: test.NewFileSystem(t, gomic.DoNothing).
+				SetReturnOpenFile(test.NewWriteCloser(t, gomic.DoNothing), nil).
+				SetReturnCopy(0, fmt.Errorf("permission denied")),
+			isErr: true,
+		}, {
+			title: "copy an unarchived file",
+			pkg:   domain.Package{ArchiveType: "unarchived"},
+			fsys: test.NewFileSystem(t, gomic.DoNothing).
+				SetReturnOpenFile(test.NewWriteCloser(t, gomic.DoNothing), nil).
+				SetReturnCopy(0, nil),
+			isErr: false,
 		},
 	}
 	for _, d := range data {
