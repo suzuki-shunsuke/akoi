@@ -53,12 +53,12 @@ func (fsys FileSystem) MkLink(src, dst string) error {
 }
 
 // Open implements domain.FileSystem .
-func (fsys FileSystem) Open(name string) (*os.File, error) {
+func (fsys FileSystem) Open(name string) (io.ReadCloser, error) {
 	return os.Open(name)
 }
 
 // OpenFile implements domain.FileSystem .
-func (fsys FileSystem) OpenFile(name string, flag int, perm os.FileMode) (*os.File, error) {
+func (fsys FileSystem) OpenFile(name string, flag int, perm os.FileMode) (io.WriteCloser, error) {
 	return os.OpenFile(name, flag, perm)
 }
 
