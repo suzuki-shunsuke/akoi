@@ -46,12 +46,15 @@ func (lgc *Logic) Install(
 		wg.Add(1)
 		go func(pkg domain.Package) {
 			defer wg.Done()
-			pkg = lgc.Logic.InstallPackage(ctx, pkg, params)
-			pkgResult := pkg.Result
-			if pkgResult == nil {
-				pkgResult = &domain.PackageResult{Name: pkg.Name}
+			p, err := lgc.Logic.InstallPackage(ctx, pkg, params)
+			if err != nil {
+				p.Result.Error = err.Error()
 			}
-			for _, file := range pkg.Files {
+			pkgResult := p.Result
+			if pkgResult == nil {
+				pkgResult = &domain.PackageResult{Name: p.Name}
+			}
+			for _, file := range p.Files {
 				fileResult := file.Result
 				pkgResult.Files[file.Name] = *fileResult
 			}

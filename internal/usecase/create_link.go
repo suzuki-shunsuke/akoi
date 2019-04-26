@@ -14,7 +14,6 @@ func (lgc *Logic) CreateLink(file domain.File) (domain.File, error) {
 		// if file isn't found, create a symlink
 		lgc.Printer.Printf("create link %s -> %s\n", file.Link, file.Bin)
 		if err := lgc.Fsys.MkLink(file.Bin, file.Link); err != nil {
-			lgc.Printer.Fprintln(os.Stderr, err)
 			return file, err
 		}
 		file.Result.LinkCreated = true
@@ -23,13 +22,9 @@ func (lgc *Logic) CreateLink(file domain.File) (domain.File, error) {
 	switch mode := fi.Mode(); {
 	case mode.IsDir():
 		// if file is a directory, raise error
-		lgc.Printer.Fprintf(
-			os.Stderr, "%s has already existed and is a directory\n", file.Link)
 		return file, fmt.Errorf("%s has already existed and is a directory", file.Link)
 	case mode&os.ModeNamedPipe != 0:
 		// if file is a pipe, raise error
-		lgc.Printer.Fprintf(
-			os.Stderr, "%s has already existed and is a named pipe\n", file.Link)
 		return file, fmt.Errorf("%s has already existed and is a named pipe", file.Link)
 	case mode.IsRegular():
 		// if file is a regular file, remove it and create a symlink.
@@ -44,13 +39,11 @@ func (lgc *Logic) CreateLink(file domain.File) (domain.File, error) {
 func (lgc *Logic) RemoveFileAndCreateLink(file domain.File) (domain.File, error) {
 	lgc.Printer.Printf("remove %s\n", file.Link)
 	if err := lgc.Fsys.RemoveFile(file.Link); err != nil {
-		lgc.Printer.Fprintln(os.Stderr, err)
 		return file, err
 	}
 	file.Result.FileRemoved = true
 	lgc.Printer.Printf("create link %s -> %s\n", file.Link, file.Bin)
 	if err := lgc.Fsys.MkLink(file.Bin, file.Link); err != nil {
-		lgc.Printer.Fprintln(os.Stderr, err)
 		return file, err
 	}
 	file.Result.Migrated = true
@@ -61,7 +54,6 @@ func (lgc *Logic) RecreateLink(file domain.File) (domain.File, error) {
 	// if file is a symlink but a dest is different, recreate a symlink.
 	lnDest, err := lgc.Fsys.ReadLink(file.Link)
 	if err != nil {
-		lgc.Printer.Fprintln(os.Stderr, err)
 		return file, err
 	}
 	if file.Bin == lnDest {
@@ -69,13 +61,11 @@ func (lgc *Logic) RecreateLink(file domain.File) (domain.File, error) {
 	}
 	lgc.Printer.Printf("remove link %s -> %s\n", file.Link, lnDest)
 	if err := lgc.Fsys.RemoveLink(file.Link); err != nil {
-		lgc.Printer.Fprintln(os.Stderr, err)
 		return file, err
 	}
 	file.Result.LinkRemoved = true
 	lgc.Printer.Printf("create link %s -> %s\n", file.Link, file.Bin)
 	if err := lgc.Fsys.MkLink(file.Bin, file.Link); err != nil {
-		lgc.Printer.Fprintln(os.Stderr, err)
 		return file, err
 	}
 	file.Result.Migrated = true

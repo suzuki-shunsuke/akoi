@@ -46,7 +46,7 @@ func (lgc *Logic) GetInstalledFiles(files []domain.File) []domain.File {
 
 func (lgc *Logic) InstallPackage(
 	ctx context.Context, pkg domain.Package, params domain.InstallParams,
-) domain.Package {
+) (domain.Package, error) {
 	installedFiles := lgc.Logic.GetInstalledFiles(pkg.Files)
 	if len(installedFiles) != 0 {
 		// Download
@@ -55,8 +55,7 @@ func (lgc *Logic) InstallPackage(
 		body, err := lgc.Downloader.Download(ctx, ustr, pkg.NumOfDLPartitions)
 		if err != nil {
 			lgc.Printer.Fprintln(os.Stderr, err)
-			pkg.Result.Error = err.Error()
-			return pkg
+			return pkg, err
 		}
 		defer body.Close()
 		tmpDir := ""
@@ -66,29 +65,26 @@ func (lgc *Logic) InstallPackage(
 			tmpDir, err = lgc.Fsys.TempDir()
 			if err != nil {
 				lgc.Printer.Fprintln(os.Stderr, err)
-				pkg.Result.Error = err.Error()
-				return pkg
+				return pkg, err
 			}
 			defer lgc.Fsys.RemoveAll(tmpDir)
 
 			arc := pkg.Archiver
 			if arc == nil {
+				t := ustr
+				if pkg.ArchiveType != "" {
+					t = pkg.ArchiveType
+				}
 				if params.Format != keyWordAnsible {
-					t := ustr
-					if pkg.ArchiveType != "" {
-						t = pkg.ArchiveType
-					}
-					pkg.Result.Error = fmt.Sprintf("failed to unarchive file: unsupported archive type: %s\n", t)
 					lgc.Printer.Fprintf(os.Stderr, "failed to unarchive file: unsupported archive type: %s\n", t)
 				}
-				return pkg
+				return pkg, fmt.Errorf("failed to unarchive file: unsupported archive type: %s", t)
 			}
 			// Unarchive
 			lgc.Printer.Printf("unarchive %s\n", pkg.Name)
 			if err := arc.Read(body, tmpDir); err != nil {
-				pkg.Result.Error = err.Error()
 				lgc.Printer.Fprintln(os.Stderr, err)
-				return pkg
+				return pkg, err
 			}
 		}
 
@@ -97,6 +93,7 @@ func (lgc *Logic) InstallPackage(
 				lgc.Printer.Fprintf(os.Stderr, "failed to install %s: %s\n", file.Bin, err)
 				file.Result.Error = err.Error()
 			}
+			file.Result.Installed = true
 		}
 	}
 	for i, file := range pkg.Files {
@@ -108,8 +105,9 @@ func (lgc *Logic) InstallPackage(
 			if f.Result.Error == "" {
 				f.Result.Error = err.Error()
 			}
+			lgc.Printer.Fprintln(os.Stderr, err)
 		}
 		pkg.Files[i] = f
 	}
-	return pkg
+	return pkg, nil
 }

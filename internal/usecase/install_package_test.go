@@ -88,7 +88,8 @@ func TestLogicInstallPackage(t *testing.T) {
 			if d.fsys != nil {
 				logic.Fsys = d.fsys
 			}
-			require.Equal(t, d.exp, logic.InstallPackage(ctx, d.pkg, d.params))
+			pkg, _ := logic.InstallPackage(ctx, d.pkg, d.params)
+			require.Equal(t, d.exp, pkg)
 		})
 	}
 }
