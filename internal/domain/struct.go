@@ -10,12 +10,13 @@ import (
 type (
 	// Config represents application's configuration.
 	Config struct {
-		BinPathTpl        *template.Template `yaml:"-"`
-		LinkPathTpl       *template.Template `yaml:"-"`
-		BinPath           string             `yaml:"bin_path"`
-		LinkPath          string             `yaml:"link_path"`
-		NumOfDLPartitions int                `yaml:"num_of_dl_partitions"`
-		Packages          map[string]Package `yaml:"packages"`
+		BinPathTpl               *template.Template `yaml:"-"`
+		LinkPathTpl              *template.Template `yaml:"-"`
+		BinPath                  string             `yaml:"bin_path"`
+		LinkPath                 string             `yaml:"link_path"`
+		NumOfDLPartitions        int                `yaml:"num_of_dl_partitions"`
+		MaxParallelDownloadCount int                `yaml:"max_parallel_download_count"`
+		Packages                 map[string]Package `yaml:"packages"`
 	}
 
 	// File represents a file configuration.
