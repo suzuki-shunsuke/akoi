@@ -79,7 +79,7 @@ func (lgc *Logic) SetupPkgConfig(
 	if err != nil {
 		return pkg, err
 	}
-	u, err := util.RenderTpl(tpl, pkg)
+	u, err := util.RenderTpl(tpl, lgc.getTemplateParams(&pkg, nil))
 	if err != nil {
 		return pkg, err
 	}
@@ -178,8 +178,13 @@ func (lgc *Logic) SetupFileConfig(
 }
 
 func (lgc *Logic) getTemplateParams(pkg *domain.Package, file *domain.File) *domain.TemplateParams {
-	return &domain.TemplateParams{
-		Name: file.Name, Version: pkg.Version,
-		OS: lgc.Runtime.OS(), Arch: lgc.Runtime.Arch(),
+	params := &domain.TemplateParams{
+		Version: pkg.Version,
+		OS:      lgc.Runtime.OS(),
+		Arch:    lgc.Runtime.Arch(),
 	}
+	if file != nil {
+		params.Name = file.Name
+	}
+	return params
 }
