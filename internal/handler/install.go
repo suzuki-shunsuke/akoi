@@ -81,6 +81,7 @@ func newLogic() domain.Logic {
 		Downloader:    infra.Downloader{},
 		GetArchiver:   infra.GetArchiver{},
 		GetGzipReader: infra.GetGzipReader{},
+		Runtime:       &infra.Runtime{},
 	}
 	lgc.Logic = lgc
 	return lgc

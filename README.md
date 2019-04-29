@@ -180,7 +180,9 @@ packages:
   consul: # package name
     # akoi downloads a file from this url and unarchive it according to the base file name.
     # akoi uses https://github.com/mholt/archiver to unarchive the file.
-    url: "https://releases.hashicorp.com/consul/{{.Version}}/consul_{{.Version}}_darwin_amd64.zip"
+    # .OS and .Arch are got by runtime.GOOS and runtime.GOARCH .
+    # https://golang.org/pkg/runtime/#pkg-constants
+    url: "https://releases.hashicorp.com/consul/{{.Version}}/consul_{{.Version}}_{{.OS}}_{{.Arch}}.zip"
     # package version
     version: 1.2.1
     # archive file's type. This is optional and by default this is decided by url's path.

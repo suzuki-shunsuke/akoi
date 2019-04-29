@@ -10,8 +10,8 @@ link_path: /usr/local/bin/{{.Name}}
 # num_of_dl_partitions:
 # packages:
 #   consul:
-#     url: https://releases.hashicorp.com/consul/{{.Version}}/consul_{{.Version}}_darwin_amd64.zip
-#     version: 1.2.1
+#     url: https://releases.hashicorp.com/consul/{{.Version}}/consul_{{.Version}}_{{.OS}}_{{.Arch}}.zip
+#     version: 1.4.4
 #     files:
 #     - name: consul
 #       archive: consul
