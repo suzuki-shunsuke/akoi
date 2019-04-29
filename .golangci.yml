@@ -1,18 +1,20 @@
 ---
 linters:
   enable:
-  - govet
-  - nakedret
-  - misspell
-  - maligned
-  - interfacer
-  - unconvert
-  - goimports
-  - gofmt
-  - golint
-  - varcheck
-  - structcheck
+  - deadcode
   - goconst
-  - staticcheck
+  - gofmt
+  - goimports
   - golint
+  - gosimple
+  - govet
+  - interfacer
+  - maligned
+  - misspell
+  - nakedret
+  - staticcheck
+  - structcheck
+  - unconvert
+  - unused
+  - varcheck
   disable-all: true
