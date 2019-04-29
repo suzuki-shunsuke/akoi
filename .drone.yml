@@ -46,6 +46,13 @@ steps:
   environment:
     CODECOV_TOKEN:
       from_secret: codecov_token
+- name: fetch tags
+  image: plugins/git
+  commands:
+  - git fetch --tags
+  when:
+    event:
+    - tag
 - name: release
   image: &goreleaser goreleaser/goreleaser:v0.105.0
   commands:
