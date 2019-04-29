@@ -143,10 +143,9 @@ func (lgc *Logic) SetupFileConfig(
 		file.BinPathTpl = tpl
 	}
 
-	dst, err := util.RenderTpl(
-		file.BinPathTpl, &domain.TemplateParams{
-			Name: file.Name, Version: pkg.Version,
-		})
+	tplParams := getTemplateParams(&pkg, &file)
+
+	dst, err := util.RenderTpl(file.BinPathTpl, tplParams)
 	if err != nil {
 		return file, err
 	}
@@ -161,18 +160,13 @@ func (lgc *Logic) SetupFileConfig(
 	if err != nil {
 		return file, err
 	}
-	file.Archive, err = util.RenderTpl(
-		arcPathTpl, &domain.TemplateParams{
-			Name: file.Name, Version: pkg.Version,
-		})
+	file.Archive, err = util.RenderTpl(arcPathTpl, tplParams)
 	if err != nil {
 		return file, err
 	}
 
 	lnPath, err := util.RenderTpl(
-		file.LinkPathTpl, &domain.TemplateParams{
-			Name: file.Name, Version: pkg.Version,
-		})
+		file.LinkPathTpl, tplParams)
 	if err != nil {
 		return file, err
 	}
@@ -182,4 +176,11 @@ func (lgc *Logic) SetupFileConfig(
 	}
 	file.Link = lnPath
 	return file, nil
+}
+
+func getTemplateParams(pkg *domain.Package, file *domain.File) *domain.TemplateParams {
+	return &domain.TemplateParams{
+		Name: file.Name, Version: pkg.Version,
+		OS: runtime.GOOS, Arch: runtime.GOARCH,
+	}
 }

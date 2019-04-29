@@ -131,6 +131,8 @@ type (
 	TemplateParams struct {
 		Name    string
 		Version string
+		OS      string
+		Arch    string
 	}
 )
 
