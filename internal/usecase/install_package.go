@@ -51,10 +51,19 @@ func (lgc *Logic) InstallPackage(
 	if len(installedFiles) != 0 {
 		// Download
 		ustr := pkg.URL.String()
+		poped := false
+		lgc.pushMaxParallelDownloadCount() // don't forget to pop
+		defer func() {
+			if !poped {
+				lgc.popMaxParallelDownloadCount()
+			}
+		}()
 		lgc.Printer.Printf("downloading %s: %s\n", pkg.Name, ustr)
 		body, err := lgc.Downloader.Download(ctx, ustr, pkg.NumOfDLPartitions)
 		if err != nil {
 			lgc.Printer.Fprintln(os.Stderr, err)
+			lgc.popMaxParallelDownloadCount()
+			poped = true
 			return pkg, err
 		}
 		defer body.Close()
@@ -83,6 +92,8 @@ func (lgc *Logic) InstallPackage(
 			// Unarchive
 			lgc.Printer.Printf("unarchive %s\n", pkg.Name)
 			if err := arc.Read(body, tmpDir); err != nil {
+				lgc.popMaxParallelDownloadCount()
+				poped = true
 				lgc.Printer.Fprintln(os.Stderr, err)
 				return pkg, err
 			}
@@ -95,6 +106,8 @@ func (lgc *Logic) InstallPackage(
 			}
 			file.Result.Installed = true
 		}
+		lgc.popMaxParallelDownloadCount()
+		poped = true
 	}
 	for i, file := range pkg.Files {
 		if file.Result.Error != "" {

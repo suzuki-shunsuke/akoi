@@ -42,6 +42,10 @@ func (lgc *Logic) Install(
 	}
 	var wg sync.WaitGroup
 	pkgResultChan := make(chan domain.PackageResult, numOfPkgs)
+	if cfg.MaxParallelDownloadCount != 0 {
+		lgc.maxParallelDownloadCountChan = make(
+			chan struct{}, cfg.MaxParallelDownloadCount)
+	}
 	for _, pkg := range cfg.Packages {
 		wg.Add(1)
 		go func(pkg domain.Package) {
@@ -67,4 +71,16 @@ func (lgc *Logic) Install(
 		result.Packages[pkgResult.Name] = pkgResult
 	}
 	return result, nil
+}
+
+func (lgc *Logic) pushMaxParallelDownloadCount() {
+	if lgc.maxParallelDownloadCountChan != nil {
+		lgc.maxParallelDownloadCountChan <- struct{}{}
+	}
+}
+
+func (lgc *Logic) popMaxParallelDownloadCount() {
+	if lgc.maxParallelDownloadCountChan != nil {
+		<-lgc.maxParallelDownloadCountChan
+	}
 }

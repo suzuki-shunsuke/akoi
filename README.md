@@ -176,6 +176,7 @@ link_path: $HOME/bin/{{.Name}}
 # If this parameter is not set or is less equal than 0, the value of `runtime.NumCPU()` is used.
 # If this parameter is 1, Accept-Ranges isn't used.
 num_of_dl_partitions: 4
+max_parallel_download_count: 5
 packages:
   consul: # package name
     # akoi downloads a file from this url and unarchive it according to the base file name.
