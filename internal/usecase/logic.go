@@ -13,5 +13,6 @@ type (
 		Downloader    domain.Downloader
 		GetArchiver   domain.GetArchiver
 		GetGzipReader domain.GetGzipReader
+		Runtime       domain.Runtime
 	}
 )

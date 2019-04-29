@@ -17,5 +17,6 @@ func newLogicMock(t *testing.T) *Logic {
 		Downloader:    test.NewDownloader(t, gomic.DoNothing),
 		GetArchiver:   test.NewGetArchiver(t, gomic.DoNothing),
 		GetGzipReader: test.NewGetGzipReader(t, gomic.DoNothing),
+		Runtime:       test.NewRuntime(t, gomic.DoNothing),
 	}
 }

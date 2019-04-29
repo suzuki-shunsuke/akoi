@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/url"
 	"path/filepath"
-	"runtime"
 	"text/template"
 
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
@@ -26,7 +25,7 @@ func (lgc *Logic) SetupConfig(cfg domain.Config) (domain.Config, error) {
 	}
 	cfg.LinkPathTpl = tpl
 
-	numCPUs := runtime.NumCPU()
+	numCPUs := lgc.Runtime.NumCPU()
 	if cfg.NumOfDLPartitions <= 0 {
 		cfg.NumOfDLPartitions = numCPUs
 	}
@@ -143,7 +142,7 @@ func (lgc *Logic) SetupFileConfig(
 		file.BinPathTpl = tpl
 	}
 
-	tplParams := getTemplateParams(&pkg, &file)
+	tplParams := lgc.getTemplateParams(&pkg, &file)
 
 	dst, err := util.RenderTpl(file.BinPathTpl, tplParams)
 	if err != nil {
@@ -178,9 +177,9 @@ func (lgc *Logic) SetupFileConfig(
 	return file, nil
 }
 
-func getTemplateParams(pkg *domain.Package, file *domain.File) *domain.TemplateParams {
+func (lgc *Logic) getTemplateParams(pkg *domain.Package, file *domain.File) *domain.TemplateParams {
 	return &domain.TemplateParams{
 		Name: file.Name, Version: pkg.Version,
-		OS: runtime.GOOS, Arch: runtime.GOARCH,
+		OS: lgc.Runtime.OS(), Arch: lgc.Runtime.Arch(),
 	}
 }
