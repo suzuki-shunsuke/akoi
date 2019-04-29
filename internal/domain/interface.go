@@ -73,4 +73,11 @@ type (
 		SetupPkgConfig(cfg Config, name string, pkg Package, numCPUs int) (Package, error)
 		SetupFileConfig(pkg Package, file File) (File, error)
 	}
+
+	// Runtime abstracts the runtime package.
+	Runtime interface {
+		OS() string
+		Arch() string
+		NumCPU() int
+	}
 )

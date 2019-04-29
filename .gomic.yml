@@ -38,6 +38,12 @@ items:
     file: internal/test/get_gzip_reader.go
 - src:
     dir: ./internal/domain
+    interface: Runtime
+  dest:
+    package: test
+    file: internal/test/runtime.go
+- src:
+    dir: ./internal/domain
     interface: Logic
   dest:
     package: test
