@@ -185,6 +185,8 @@ func (lgc *Logic) getTemplateParams(pkg *domain.Package, file *domain.File) *dom
 	}
 	if file != nil {
 		params.Name = file.Name
+	} else {
+		params.Name = pkg.Name
 	}
 	return params
 }
