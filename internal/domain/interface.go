@@ -62,7 +62,7 @@ type (
 
 	// Logic abstracts application logic.
 	Logic interface {
-		Install(ctx context.Context, params InstallParams) Result
+		Install(ctx context.Context, params InstallParams) (Result, error)
 		InstallPackage(ctx context.Context, pkg Package, params InstallParams) (Package, error)
 		InstallFile(file *File, pkg Package, params InstallParams, tmpDir string, body io.Reader) error
 		GetInstalledFiles(files []File) []File

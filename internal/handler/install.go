@@ -53,13 +53,13 @@ func Install(c *cli.Context) error {
 	resultChan := make(chan domain.Result)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	logic := newLogic()
 	go func() {
-		resultChan <- logic.Install(ctx, params)
+		logic := newLogic()
+		result, _ := logic.Install(ctx, params)
+		resultChan <- result
 	}()
 	select {
 	case result := <-resultChan:
-		close(signalChan)
 		if !result.Failed() {
 			s := result.String(params.Format)
 			if s != "" {
@@ -69,7 +69,6 @@ func Install(c *cli.Context) error {
 		}
 		return cli.NewExitError(result.String(params.Format), 1)
 	case sig := <-signalChan:
-		close(resultChan)
 		return cli.NewExitError(sig.String(), 1)
 	}
 }

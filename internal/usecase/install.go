@@ -17,7 +17,7 @@ const (
 
 func (lgc *Logic) Install(
 	ctx context.Context, params domain.InstallParams,
-) domain.Result {
+) (domain.Result, error) {
 	// suppress output log by third party library
 	// https://github.com/joeybloggs/go-download/blob/b655936947da12d76bee4fa3b6af41a98db23e6f/download.go#L119
 	log.SetOutput(NewWriter(nil, gomic.DoNothing))
@@ -28,17 +28,17 @@ func (lgc *Logic) Install(
 	if err != nil {
 		lgc.Printer.Fprintln(os.Stderr, err)
 		result.Msg = err.Error()
-		return result
+		return result, err
 	}
 	cfg, err = lgc.Logic.SetupConfig(cfg)
 	if err != nil {
 		lgc.Printer.Fprintln(os.Stderr, err)
 		result.Msg = err.Error()
-		return result
+		return result, err
 	}
 	numOfPkgs := len(cfg.Packages)
 	if numOfPkgs == 0 {
-		return result
+		return result, nil
 	}
 	var wg sync.WaitGroup
 	pkgResultChan := make(chan domain.PackageResult, numOfPkgs)
@@ -66,5 +66,5 @@ func (lgc *Logic) Install(
 	for pkgResult := range pkgResultChan {
 		result.Packages[pkgResult.Name] = pkgResult
 	}
-	return result
+	return result, nil
 }

@@ -20,7 +20,7 @@ type (
 		name                   string
 		callbackNotImplemented gomic.CallbackNotImplemented
 		impl                   struct {
-			Install                 func(ctx context.Context, params test.InstallParams) (r0 test.Result)
+			Install                 func(ctx context.Context, params test.InstallParams) (r0 test.Result, r1 error)
 			InstallPackage          func(ctx context.Context, pkg test.Package, params test.InstallParams) (r0 test.Package, r1 error)
 			InstallFile             func(file *test.File, pkg test.Package, params test.InstallParams, tmpDir string, body io.Reader) (r0 error)
 			GetInstalledFiles       func(files []test.File) (r0 []test.File)
@@ -41,7 +41,7 @@ func NewLogic(t *testing.T, cb gomic.CallbackNotImplemented) *Logic {
 }
 
 // Install is a mock method.
-func (mock Logic) Install(ctx context.Context, params test.InstallParams) (r0 test.Result) {
+func (mock Logic) Install(ctx context.Context, params test.InstallParams) (r0 test.Result, r1 error) {
 	methodName := "Install" // nolint: goconst
 	if mock.impl.Install != nil {
 		return mock.impl.Install(ctx, params)
@@ -55,22 +55,22 @@ func (mock Logic) Install(ctx context.Context, params test.InstallParams) (r0 te
 }
 
 // SetFuncInstall sets a method and returns the mock.
-func (mock *Logic) SetFuncInstall(impl func(ctx context.Context, params test.InstallParams) (r0 test.Result)) *Logic {
+func (mock *Logic) SetFuncInstall(impl func(ctx context.Context, params test.InstallParams) (r0 test.Result, r1 error)) *Logic {
 	mock.impl.Install = impl
 	return mock
 }
 
 // SetReturnInstall sets a fake method.
-func (mock *Logic) SetReturnInstall(r0 test.Result) *Logic {
-	mock.impl.Install = func(context.Context, test.InstallParams) test.Result {
-		return r0
+func (mock *Logic) SetReturnInstall(r0 test.Result, r1 error) *Logic {
+	mock.impl.Install = func(context.Context, test.InstallParams) (test.Result, error) {
+		return r0, r1
 	}
 	return mock
 }
 
 // fakeZeroInstall is a fake method which returns zero values.
-func (mock Logic) fakeZeroInstall(ctx context.Context, params test.InstallParams) (r0 test.Result) {
-	return r0
+func (mock Logic) fakeZeroInstall(ctx context.Context, params test.InstallParams) (r0 test.Result, r1 error) {
+	return r0, r1
 }
 
 // InstallPackage is a mock method.
