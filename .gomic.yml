@@ -44,6 +44,12 @@ items:
     file: internal/test/runtime.go
 - src:
     dir: ./internal/domain
+    interface: Archiver
+  dest:
+    package: test
+    file: internal/test/archiver.go
+- src:
+    dir: ./internal/domain
     interface: Logic
   dest:
     package: test

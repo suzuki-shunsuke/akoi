@@ -1,16 +1,20 @@
 package handler
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/signal"
 	"syscall"
 
+	"github.com/suzuki-shunsuke/gomic/gomic"
 	"github.com/urfave/cli"
 
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
 	"github.com/suzuki-shunsuke/akoi/internal/infra"
+	"github.com/suzuki-shunsuke/akoi/internal/test"
 	"github.com/suzuki-shunsuke/akoi/internal/usecase"
 )
 
@@ -54,7 +58,7 @@ func Install(c *cli.Context) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	go func() {
-		logic := newLogic()
+		logic := newLogic(params)
 		result, _ := logic.Install(ctx, params)
 		resultChan <- result
 	}()
@@ -73,15 +77,40 @@ func Install(c *cli.Context) error {
 	}
 }
 
-func newLogic() domain.Logic {
-	lgc := &usecase.Logic{
-		Fsys:          infra.FileSystem{},
-		Printer:       infra.Printer{},
-		CfgReader:     infra.ConfigReader{},
-		Downloader:    infra.Downloader{},
-		GetArchiver:   infra.GetArchiver{},
-		GetGzipReader: infra.GetGzipReader{},
-		Runtime:       &infra.Runtime{},
+func newLogic(params domain.InstallParams) domain.Logic {
+	flag := params.Format == "ansible"
+	fsys := infra.FileSystem{}
+	var lgc *usecase.Logic
+	if params.DryRun {
+		lgc = &usecase.Logic{
+			Fsys: test.NewFileSystem(nil, gomic.DoNothing).
+				SetFuncExistFile(fsys.ExistFile).
+				SetFuncExpandEnv(fsys.ExpandEnv).
+				SetFuncGetFileStat(fsys.GetFileStat).
+				SetFuncGetFileLstat(fsys.GetFileLstat).
+				SetReturnOpen(ioutil.NopCloser(bytes.NewBufferString("hello")), nil).
+				SetReturnOpenFile(test.NewWriteCloser(nil, gomic.DoNothing), nil).
+				SetFuncReadLink(fsys.ReadLink),
+			Printer:   infra.Printer{DryRun: flag},
+			CfgReader: infra.ConfigReader{},
+			Downloader: test.NewDownloader(nil, gomic.DoNothing).
+				SetReturnDownload(ioutil.NopCloser(bytes.NewBufferString("hello")), nil),
+			GetArchiver: test.NewGetArchiver(nil, gomic.DoNothing).
+				SetReturnGet(test.NewArchiver(nil, gomic.DoNothing)),
+			GetGzipReader: test.NewGetGzipReader(nil, gomic.DoNothing).
+				SetReturnGet(ioutil.NopCloser(bytes.NewBufferString("hello")), nil),
+			Runtime: &infra.Runtime{},
+		}
+	} else {
+		lgc = &usecase.Logic{
+			Fsys:          infra.FileSystem{},
+			Printer:       infra.Printer{DryRun: flag},
+			CfgReader:     infra.ConfigReader{},
+			Downloader:    infra.Downloader{},
+			GetArchiver:   infra.GetArchiver{},
+			GetGzipReader: infra.GetGzipReader{},
+			Runtime:       &infra.Runtime{},
+		}
 	}
 	lgc.Logic = lgc
 	return lgc
