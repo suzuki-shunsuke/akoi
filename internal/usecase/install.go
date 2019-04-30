@@ -30,7 +30,7 @@ func (lgc *Logic) Install(
 		result.Msg = err.Error()
 		return result, err
 	}
-	cfg, err = lgc.Logic.SetupConfig(cfg)
+	cfg, err = lgc.Logic.SetupConfig(cfg, params.ConfigFilePath)
 	if err != nil {
 		lgc.Printer.Fprintln(os.Stderr, err)
 		result.Msg = err.Error()

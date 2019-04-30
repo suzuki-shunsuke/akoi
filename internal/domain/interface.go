@@ -69,9 +69,9 @@ type (
 		CreateLink(file File) (File, error)
 		RecreateLink(file File) (File, error)
 		RemoveFileAndCreateLink(file File) (File, error)
-		SetupConfig(cfg Config) (Config, error)
-		SetupPkgConfig(cfg Config, name string, pkg Package, numCPUs int) (Package, error)
-		SetupFileConfig(pkg Package, file File) (File, error)
+		SetupConfig(cfg Config, cfgPath string) (Config, error)
+		SetupPkgConfig(cfg Config, cfgDir, name string, pkg Package, numCPUs int) (Package, error)
+		SetupFileConfig(pkg Package, cfgDir string, file File) (File, error)
 	}
 
 	// Runtime abstracts the runtime package.

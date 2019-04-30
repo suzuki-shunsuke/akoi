@@ -33,7 +33,7 @@ func Test_logicSetupConfig(t *testing.T) {
 			return p
 		})
 
-	_, err := logic.SetupConfig(cfg)
+	_, err := logic.SetupConfig(cfg, ".akoi.yml")
 	require.Nil(t, err)
 }
 
@@ -61,7 +61,7 @@ func Test_logicSetupPkgConfig(t *testing.T) {
 		SetFuncExpandEnv(func(p string) string {
 			return p
 		})
-	_, err := logic.SetupPkgConfig(cfg, pkgName, pkg, 4)
+	_, err := logic.SetupPkgConfig(cfg, "/etc/akoi", pkgName, pkg, 4)
 	require.Nil(t, err)
 }
 
@@ -82,6 +82,6 @@ func Test_logicSetupFileConfig(t *testing.T) {
 		SetFuncExpandEnv(func(p string) string {
 			return p
 		})
-	_, err := logic.SetupFileConfig(pkg, file)
+	_, err := logic.SetupFileConfig(pkg, "/etc/akoi", file)
 	require.Nil(t, err)
 }
