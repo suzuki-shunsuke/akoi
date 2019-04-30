@@ -9,6 +9,7 @@ bin_path: /usr/local/bin/{{.Name}}-{{.Version}}
 link_path: /usr/local/bin/{{.Name}}
 # num_of_dl_partitions:
 # max_parallel_download_count:
+# http_request_timeout: 120
 # packages:
 #   consul:
 #     url: https://releases.hashicorp.com/consul/{{.Version}}/consul_{{.Version}}_{{.OS}}_{{.Arch}}.zip

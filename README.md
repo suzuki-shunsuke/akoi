@@ -177,6 +177,7 @@ link_path: $HOME/bin/{{.Name}}
 # If this parameter is 1, Accept-Ranges isn't used.
 num_of_dl_partitions: 4
 max_parallel_download_count: 5
+http_request_timeout: 300
 packages:
   consul: # package name
     # akoi downloads a file from this url and unarchive it according to the base file name.
@@ -197,6 +198,7 @@ packages:
     # the symbolic link to the binary
     link_path: /usr/local/bin/{{.Name}}
     num_of_dl_partitions: 1
+    http_request_timeout: 120
     # files included in the downloaded file
     files:
     - name: consul

@@ -94,6 +94,10 @@ func (lgc *Logic) SetupPkgConfig(
 		}
 	}
 
+	if pkg.HTTPRequestTimeout == 0 {
+		pkg.HTTPRequestTimeout = cfg.HTTPRequestTimeout
+	}
+
 	for i, file := range pkg.Files {
 		file, err := lgc.Logic.SetupFileConfig(pkg, cfgDir, file)
 		if err != nil {

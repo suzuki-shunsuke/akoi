@@ -59,7 +59,10 @@ func (lgc *Logic) InstallPackage(
 			}
 		}()
 		lgc.Printer.Printf("downloading %s: %s\n", pkg.Name, ustr)
-		body, err := lgc.Downloader.Download(ctx, ustr, pkg.NumOfDLPartitions)
+		body, err := lgc.Downloader.Download(ctx, ustr, domain.DownloadOption{
+			DLPartitionCount: pkg.NumOfDLPartitions,
+			Timeout:          pkg.HTTPRequestTimeout,
+		})
 		if err != nil {
 			lgc.Printer.Fprintln(os.Stderr, err)
 			lgc.popMaxParallelDownloadCount()
