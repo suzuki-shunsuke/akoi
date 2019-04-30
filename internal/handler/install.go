@@ -27,7 +27,6 @@ var InstallCommand = cli.Command{
 		cli.StringFlag{
 			Name:   "config, c",
 			Usage:  "configuration file path",
-			Value:  "/etc/akoi/akoi.yml",
 			EnvVar: "AKOI_CONFIG_PATH",
 		},
 		cli.StringFlag{
@@ -59,7 +58,10 @@ func Install(c *cli.Context) error {
 	defer cancel()
 	go func() {
 		logic := newLogic(params)
-		result, _ := logic.Install(ctx, params)
+		result, err := logic.Install(ctx, params)
+		if result.Msg == "" && err != nil {
+			result.Msg = err.Error()
+		}
 		resultChan <- result
 	}()
 	select {
@@ -88,6 +90,7 @@ func newLogic(params domain.InstallParams) domain.Logic {
 				SetFuncExpandEnv(fsys.ExpandEnv).
 				SetFuncGetFileStat(fsys.GetFileStat).
 				SetFuncGetFileLstat(fsys.GetFileLstat).
+				SetFuncGetwd(fsys.Getwd).
 				SetReturnOpen(ioutil.NopCloser(bytes.NewBufferString("hello")), nil).
 				SetReturnOpenFile(test.NewWriteCloser(nil, gomic.DoNothing), nil).
 				SetFuncReadLink(fsys.ReadLink),

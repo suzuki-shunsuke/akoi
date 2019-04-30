@@ -25,6 +25,7 @@ type (
 			ExpandEnv    func(p0 string) string
 			GetFileLstat func(p0 string) (os.FileInfo, error)
 			GetFileStat  func(p0 string) (os.FileInfo, error)
+			Getwd        func() (string, error)
 			MkdirAll     func(p0 string) error
 			MkLink       func(src, dst string) error
 			Open         func(name string) (io.ReadCloser, error)
@@ -259,6 +260,43 @@ func (mock *FileSystem) SetReturnGetFileStat(r0 os.FileInfo, r1 error) *FileSyst
 func (mock FileSystem) fakeZeroGetFileStat(p0 string) (os.FileInfo, error) {
 	var (
 		r0 os.FileInfo
+		r1 error
+	)
+	return r0, r1
+}
+
+// Getwd is a mock method.
+func (mock FileSystem) Getwd() (string, error) {
+	methodName := "Getwd" // nolint: goconst
+	if mock.impl.Getwd != nil {
+		return mock.impl.Getwd()
+	}
+	if mock.callbackNotImplemented != nil {
+		mock.callbackNotImplemented(mock.t, mock.name, methodName)
+	} else {
+		gomic.DefaultCallbackNotImplemented(mock.t, mock.name, methodName)
+	}
+	return mock.fakeZeroGetwd()
+}
+
+// SetFuncGetwd sets a method and returns the mock.
+func (mock *FileSystem) SetFuncGetwd(impl func() (string, error)) *FileSystem {
+	mock.impl.Getwd = impl
+	return mock
+}
+
+// SetReturnGetwd sets a fake method.
+func (mock *FileSystem) SetReturnGetwd(r0 string, r1 error) *FileSystem {
+	mock.impl.Getwd = func() (string, error) {
+		return r0, r1
+	}
+	return mock
+}
+
+// fakeZeroGetwd is a fake method which returns zero values.
+func (mock FileSystem) fakeZeroGetwd() (string, error) {
+	var (
+		r0 string
 		r1 error
 	)
 	return r0, r1

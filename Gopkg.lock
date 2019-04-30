@@ -106,6 +106,14 @@
   version = "v1.3.0"
 
 [[projects]]
+  digest = "1:f06127e7a8bec1773db2662318b7fbe988b158da748d119b6a70572f81e68ef3"
+  name = "github.com/suzuki-shunsuke/go-cliutil"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "27c6eb3d0965fbd5407bb211bc08733d6f71944d"
+  version = "0.1.0"
+
+[[projects]]
   digest = "1:9487d6bf901f627b9d13e8914970ddebbd726d1f3ef1e3e545619974eaefe1d9"
   name = "github.com/suzuki-shunsuke/gomic"
   packages = ["gomic"]
@@ -157,6 +165,7 @@
     "github.com/joeybloggs/go-download",
     "github.com/mholt/archiver",
     "github.com/stretchr/testify/require",
+    "github.com/suzuki-shunsuke/go-cliutil",
     "github.com/suzuki-shunsuke/gomic/gomic",
     "github.com/urfave/cli",
     "gopkg.in/go-playground/validator.v9",
