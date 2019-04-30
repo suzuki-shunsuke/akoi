@@ -79,7 +79,7 @@ bin_path: /tmp/bin/{{.Name}}-{{.Version}}
 link_path: /tmp/bin/{{.Name}}
 packages:
   consul:
-    url: "https://releases.hashicorp.com/consul/{{.Version}}/consul_{{.Version}}_darwin_amd64.zip"
+    url: "https://releases.hashicorp.com/consul/{{.Version}}/consul_{{.Version}}_{{.OS}}_{{.Arch}}.zip"
     version: 1.2.1
     files:
     - name: consul
@@ -166,7 +166,7 @@ $ akoi help [init|install]
 
 ```yaml
 ---
-# bin_path and link_path must be absolute.
+# bin_path and link_path are absolute path or relative path from the configuration file parent directory.
 # binary install path
 bin_path: $HOME/bin/{{.Name}}-{{.Version}}
 # the symbolic link to the binary

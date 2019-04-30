@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"fmt"
 	"net/url"
 	"path/filepath"
 	"text/template"
@@ -10,20 +9,21 @@ import (
 	"github.com/suzuki-shunsuke/akoi/internal/util"
 )
 
-func (lgc *Logic) SetupConfig(cfg domain.Config) (domain.Config, error) {
-	cfg.BinPath = lgc.Fsys.ExpandEnv(cfg.BinPath)
-	cfg.LinkPath = lgc.Fsys.ExpandEnv(cfg.LinkPath)
-	tpl, err := template.New("cfg_bin_path").Parse(cfg.BinPath)
+func (lgc *Logic) SetupConfig(cfg domain.Config, cfgPath string) (domain.Config, error) {
+	cfgDir, err := filepath.Abs(lgc.Fsys.ExpandEnv(filepath.Dir(cfgPath)))
 	if err != nil {
 		return cfg, err
 	}
-	cfg.BinPathTpl = tpl
-
-	tpl, err = template.New("cfg_link_path").Parse(cfg.LinkPath)
+	cfg.BinPathTpl, err = lgc.parseCfgBinAndLinkPath(
+		cfg.BinPath, cfgDir, "cfg_bin_path")
 	if err != nil {
 		return cfg, err
 	}
-	cfg.LinkPathTpl = tpl
+	cfg.LinkPathTpl, err = lgc.parseCfgBinAndLinkPath(
+		cfg.LinkPath, cfgDir, "cfg_link_path")
+	if err != nil {
+		return cfg, err
+	}
 
 	numCPUs := lgc.Runtime.NumCPU()
 	if cfg.NumOfDLPartitions <= 0 {
@@ -31,7 +31,7 @@ func (lgc *Logic) SetupConfig(cfg domain.Config) (domain.Config, error) {
 	}
 
 	for pkgName, pkg := range cfg.Packages {
-		pkg, err := lgc.Logic.SetupPkgConfig(cfg, pkgName, pkg, numCPUs)
+		pkg, err := lgc.Logic.SetupPkgConfig(cfg, cfgDir, pkgName, pkg, numCPUs)
 		if err != nil {
 			return cfg, err
 		}
@@ -41,7 +41,7 @@ func (lgc *Logic) SetupConfig(cfg domain.Config) (domain.Config, error) {
 }
 
 func (lgc *Logic) SetupPkgConfig(
-	cfg domain.Config, pkgName string, pkg domain.Package, numCPUs int,
+	cfg domain.Config, cfgDir, pkgName string, pkg domain.Package, numCPUs int,
 ) (domain.Package, error) {
 	if pkg.Result == nil {
 		pkg.Result = &domain.PackageResult{
@@ -50,28 +50,24 @@ func (lgc *Logic) SetupPkgConfig(
 		}
 	}
 
+	var err error
 	if pkg.LinkPath == "" {
-		pkg.LinkPath = cfg.LinkPath
 		pkg.LinkPathTpl = cfg.LinkPathTpl
 	} else {
-		pkg.LinkPath = lgc.Fsys.ExpandEnv(pkg.LinkPath)
-		tpl, err := template.New("pkg_link_path").Parse(pkg.LinkPath)
+		pkg.LinkPathTpl, err = lgc.parseCfgBinAndLinkPath(
+			pkg.LinkPath, cfgDir, "pkg_link_path")
 		if err != nil {
 			return pkg, err
 		}
-		pkg.LinkPathTpl = tpl
 	}
-
 	if pkg.BinPath == "" {
-		pkg.BinPath = cfg.BinPath
 		pkg.BinPathTpl = cfg.BinPathTpl
 	} else {
-		pkg.BinPath = lgc.Fsys.ExpandEnv(pkg.BinPath)
-		tpl, err := template.New("pkg_bin_path").Parse(pkg.BinPath)
+		pkg.BinPathTpl, err = lgc.parseCfgBinAndLinkPath(
+			pkg.BinPath, cfgDir, "pkg_bin_path")
 		if err != nil {
 			return pkg, err
 		}
-		pkg.BinPathTpl = tpl
 	}
 
 	pkg.Name = pkgName
@@ -99,7 +95,7 @@ func (lgc *Logic) SetupPkgConfig(
 	}
 
 	for i, file := range pkg.Files {
-		file, err := lgc.Logic.SetupFileConfig(pkg, file)
+		file, err := lgc.Logic.SetupFileConfig(pkg, cfgDir, file)
 		if err != nil {
 			return pkg, err
 		}
@@ -109,7 +105,7 @@ func (lgc *Logic) SetupPkgConfig(
 }
 
 func (lgc *Logic) SetupFileConfig(
-	pkg domain.Package, file domain.File,
+	pkg domain.Package, cfgDir string, file domain.File,
 ) (domain.File, error) {
 	if file.Result == nil {
 		file.Result = &domain.FileResult{}
@@ -118,41 +114,32 @@ func (lgc *Logic) SetupFileConfig(
 		file.Mode = 0755
 	}
 
+	var err error
 	if file.LinkPath == "" {
-		file.LinkPath = pkg.LinkPath
 		file.LinkPathTpl = pkg.LinkPathTpl
 	} else {
-		file.LinkPath = lgc.Fsys.ExpandEnv(file.LinkPath)
-		tpl, err := template.New("file_link_path").Parse(file.LinkPath)
+		file.LinkPathTpl, err = lgc.parseCfgBinAndLinkPath(
+			file.LinkPath, cfgDir, "file_link_path")
 		if err != nil {
 			return file, err
 		}
-		file.LinkPathTpl = tpl
 	}
-
 	if file.BinPath == "" {
-		file.BinPath = pkg.BinPath
 		file.BinPathTpl = pkg.BinPathTpl
 	} else {
-		file.BinPath = lgc.Fsys.ExpandEnv(file.BinPath)
-		tpl, err := template.New("file_bin_path").Parse(file.BinPath)
+		file.BinPathTpl, err = lgc.parseCfgBinAndLinkPath(
+			file.BinPath, cfgDir, "file_bin_path")
 		if err != nil {
 			return file, err
 		}
-		file.BinPathTpl = tpl
 	}
 
 	tplParams := lgc.getTemplateParams(&pkg, &file)
 
-	dst, err := util.RenderTpl(file.BinPathTpl, tplParams)
+	file.Bin, err = util.RenderTpl(file.BinPathTpl, tplParams)
 	if err != nil {
 		return file, err
 	}
-	if !filepath.IsAbs(dst) {
-		return file, fmt.Errorf(
-			"installed path must be absolute: %s %s %s", pkg.Name, file.Name, dst)
-	}
-	file.Bin = dst
 
 	arcPath := lgc.Fsys.ExpandEnv(file.Archive)
 	arcPathTpl, err := template.New("archive_path").Parse(arcPath)
@@ -164,20 +151,13 @@ func (lgc *Logic) SetupFileConfig(
 		return file, err
 	}
 
-	lnPath, err := util.RenderTpl(
-		file.LinkPathTpl, tplParams)
-	if err != nil {
-		return file, err
-	}
-	if !filepath.IsAbs(lnPath) {
-		return file, fmt.Errorf(
-			"link path must be absolute: %s %s %s", pkg.Name, file.Name, lnPath)
-	}
-	file.Link = lnPath
-	return file, nil
+	file.Link, err = util.RenderTpl(file.LinkPathTpl, tplParams)
+	return file, err
 }
 
-func (lgc *Logic) getTemplateParams(pkg *domain.Package, file *domain.File) *domain.TemplateParams {
+func (lgc *Logic) getTemplateParams(
+	pkg *domain.Package, file *domain.File,
+) *domain.TemplateParams {
 	params := &domain.TemplateParams{
 		Version: pkg.Version,
 		OS:      lgc.Runtime.OS(),
@@ -189,4 +169,17 @@ func (lgc *Logic) getTemplateParams(pkg *domain.Package, file *domain.File) *dom
 		params.Name = pkg.Name
 	}
 	return params
+}
+
+func (lgc *Logic) parseCfgBinAndLinkPath(
+	p, cfgDir, tplName string,
+) (*template.Template, error) {
+	if p == "" {
+		return nil, nil
+	}
+	p = lgc.Fsys.ExpandEnv(p)
+	if !filepath.IsAbs(p) {
+		p = filepath.Join(cfgDir, p)
+	}
+	return template.New(tplName).Parse(p)
 }
