@@ -9,6 +9,7 @@ import (
 	"io"
 	testing "testing"
 
+	test "github.com/suzuki-shunsuke/akoi/internal/domain"
 	gomic "github.com/suzuki-shunsuke/gomic/gomic"
 )
 
@@ -19,7 +20,7 @@ type (
 		name                   string
 		callbackNotImplemented gomic.CallbackNotImplemented
 		impl                   struct {
-			Download func(ctx context.Context, uri string, numOfDLPartitions int) (io.ReadCloser, error)
+			Download func(ctx context.Context, uri string, option test.DownloadOption) (io.ReadCloser, error)
 		}
 	}
 )
@@ -31,35 +32,35 @@ func NewDownloader(t *testing.T, cb gomic.CallbackNotImplemented) *Downloader {
 }
 
 // Download is a mock method.
-func (mock Downloader) Download(ctx context.Context, uri string, numOfDLPartitions int) (io.ReadCloser, error) {
+func (mock Downloader) Download(ctx context.Context, uri string, option test.DownloadOption) (io.ReadCloser, error) {
 	methodName := "Download" // nolint: goconst
 	if mock.impl.Download != nil {
-		return mock.impl.Download(ctx, uri, numOfDLPartitions)
+		return mock.impl.Download(ctx, uri, option)
 	}
 	if mock.callbackNotImplemented != nil {
 		mock.callbackNotImplemented(mock.t, mock.name, methodName)
 	} else {
 		gomic.DefaultCallbackNotImplemented(mock.t, mock.name, methodName)
 	}
-	return mock.fakeZeroDownload(ctx, uri, numOfDLPartitions)
+	return mock.fakeZeroDownload(ctx, uri, option)
 }
 
 // SetFuncDownload sets a method and returns the mock.
-func (mock *Downloader) SetFuncDownload(impl func(ctx context.Context, uri string, numOfDLPartitions int) (io.ReadCloser, error)) *Downloader {
+func (mock *Downloader) SetFuncDownload(impl func(ctx context.Context, uri string, option test.DownloadOption) (io.ReadCloser, error)) *Downloader {
 	mock.impl.Download = impl
 	return mock
 }
 
 // SetReturnDownload sets a fake method.
 func (mock *Downloader) SetReturnDownload(r0 io.ReadCloser, r1 error) *Downloader {
-	mock.impl.Download = func(context.Context, string, int) (io.ReadCloser, error) {
+	mock.impl.Download = func(context.Context, string, test.DownloadOption) (io.ReadCloser, error) {
 		return r0, r1
 	}
 	return mock
 }
 
 // fakeZeroDownload is a fake method which returns zero values.
-func (mock Downloader) fakeZeroDownload(ctx context.Context, uri string, numOfDLPartitions int) (io.ReadCloser, error) {
+func (mock Downloader) fakeZeroDownload(ctx context.Context, uri string, option test.DownloadOption) (io.ReadCloser, error) {
 	var (
 		r0 io.ReadCloser
 		r1 error

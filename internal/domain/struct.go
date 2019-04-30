@@ -16,7 +16,14 @@ type (
 		LinkPath                 string             `yaml:"link_path"`
 		NumOfDLPartitions        int                `yaml:"num_of_dl_partitions"`
 		MaxParallelDownloadCount int                `yaml:"max_parallel_download_count"`
+		HTTPRequestTimeout       int                `yaml:"http_request_timeout"`
 		Packages                 map[string]Package `yaml:"packages"`
+	}
+
+	// DownloadOption represents download options.
+	DownloadOption struct {
+		DLPartitionCount int
+		Timeout          int
 	}
 
 	// File represents a file configuration.
@@ -79,19 +86,20 @@ type (
 
 	// Package represents a package configuration.
 	Package struct {
-		ArchiveType       string             `yaml:"archive_type"`
-		Name              string             `yaml:"-" validate:"required"`
-		RawURL            string             `yaml:"url" validate:"required"`
-		Version           string             `yaml:"version" validate:"required"`
-		BinPath           string             `yaml:"bin_path"`
-		LinkPath          string             `yaml:"link_path"`
-		NumOfDLPartitions int                `yaml:"num_of_dl_partitions"`
-		BinPathTpl        *template.Template `yaml:"-"`
-		LinkPathTpl       *template.Template `yaml:"-"`
-		Archiver          Archiver           `yaml:"-" validate:"required"`
-		Files             []File             `yaml:"files"`
-		URL               *url.URL           `yaml:"-"`
-		Result            *PackageResult     `yaml:"-"`
+		ArchiveType        string             `yaml:"archive_type"`
+		Name               string             `yaml:"-" validate:"required"`
+		RawURL             string             `yaml:"url" validate:"required"`
+		Version            string             `yaml:"version" validate:"required"`
+		BinPath            string             `yaml:"bin_path"`
+		LinkPath           string             `yaml:"link_path"`
+		NumOfDLPartitions  int                `yaml:"num_of_dl_partitions"`
+		HTTPRequestTimeout int                `yaml:"http_request_timeout"`
+		BinPathTpl         *template.Template `yaml:"-"`
+		LinkPathTpl        *template.Template `yaml:"-"`
+		Archiver           Archiver           `yaml:"-" validate:"required"`
+		Files              []File             `yaml:"files"`
+		URL                *url.URL           `yaml:"-"`
+		Result             *PackageResult     `yaml:"-"`
 	}
 
 	// PackageResult represents a result of package installation.

@@ -58,7 +58,7 @@ type (
 
 	// Downloader downloads a file.
 	Downloader interface {
-		Download(ctx context.Context, uri string, numOfDLPartitions int) (io.ReadCloser, error)
+		Download(ctx context.Context, uri string, option DownloadOption) (io.ReadCloser, error)
 	}
 
 	// Logic abstracts application logic.
