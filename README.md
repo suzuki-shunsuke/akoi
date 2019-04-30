@@ -219,7 +219,8 @@ Configuration file path. The precedence is
 
 1. command line option
 2. AKOI_CONFIG_PATH
-3. /etc/akoi/akoi.yml
+3. finds the file .akoi.yml from the current directory to the root directory recursively
+4. /etc/akoi/akoi.yml
 
 ## Output Format
 

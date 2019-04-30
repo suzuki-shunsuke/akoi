@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/suzuki-shunsuke/go-cliutil"
 	"github.com/urfave/cli"
 
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
@@ -25,14 +26,10 @@ var InitCommand = cli.Command{
 
 // Init is the sub command "init".
 func Init(c *cli.Context) error {
-	err := initcmd.InitConfigFile(
+	return cliutil.ConvErrToExitError(initcmd.InitConfigFile(
 		&domain.InitParams{
 			Dest: c.String("dest"),
 		},
 		infra.FileSystem{},
-	)
-	if err == nil {
-		return nil
-	}
-	return cli.NewExitError(err.Error(), 1)
+	))
 }

@@ -42,6 +42,11 @@ func (fsys FileSystem) GetFileStat(p string) (os.FileInfo, error) {
 	return os.Stat(p)
 }
 
+// Getwd implements domain.FileSystem .
+func (fsys FileSystem) Getwd() (string, error) {
+	return os.Getwd()
+}
+
 // MkdirAll implements domain.FileSystem .
 func (fsys FileSystem) MkdirAll(dst string) error {
 	return os.MkdirAll(dst, 0775)

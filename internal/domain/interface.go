@@ -30,6 +30,7 @@ type (
 		ExpandEnv(string) string
 		GetFileLstat(string) (os.FileInfo, error)
 		GetFileStat(string) (os.FileInfo, error)
+		Getwd() (string, error)
 		MkdirAll(string) error
 		MkLink(src, dst string) error
 		Open(name string) (io.ReadCloser, error)
