@@ -11,8 +11,8 @@
     "tag": "bash scripts/tag.sh"
   },
   "devDependencies": {
-    "@commitlint/cli": "8.3.5",
-    "@commitlint/config-angular": "8.3.4",
+    "@commitlint/cli": "9.1.2",
+    "@commitlint/config-angular": "9.1.2",
     "husky": "4.2.5"
   }
 }
