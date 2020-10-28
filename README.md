@@ -1,8 +1,6 @@
 # akoi
 
 [![GoDoc](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://godoc.org/github.com/suzuki-shunsuke/akoi)
-[![Build Status](https://cloud.drone.io/api/badges/suzuki-shunsuke/akoi/status.svg)](https://cloud.drone.io/suzuki-shunsuke/akoi)
-[![codecov](https://codecov.io/gh/suzuki-shunsuke/akoi/branch/master/graph/badge.svg)](https://codecov.io/gh/suzuki-shunsuke/akoi)
 [![Go Report Card](https://goreportcard.com/badge/github.com/suzuki-shunsuke/akoi)](https://goreportcard.com/report/github.com/suzuki-shunsuke/akoi)
 [![GitHub last commit](https://img.shields.io/github/last-commit/suzuki-shunsuke/akoi.svg)](https://github.com/suzuki-shunsuke/akoi)
 [![GitHub tag](https://img.shields.io/github/tag/suzuki-shunsuke/akoi.svg)](https://github.com/suzuki-shunsuke/akoi/releases)
