@@ -17,6 +17,10 @@ jobs:
         bash ci/install-golangci-lint.sh
         golangci-lint run
 
+    - name: go test
+      run: |
+        go test -race -covermode=atomic ./...
+
     - name: remove changes
       # Sometimes it is failed to release by goreleaser due to changes of go.sum
       run: git checkout -- .
