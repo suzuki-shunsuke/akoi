@@ -10,3 +10,7 @@ builds:
   - linux
   goarch:
   - amd64
+archives:
+- format: tar.gz
+- id: binary
+  format: binary
