@@ -160,6 +160,17 @@ $ akoi help
 $ akoi help [init|install]
 ```
 
+## Template Engine
+
+The following fields in the configuration file are parsed by [Go's text/template](https://golang.org/pkg/text/template/).
+
+* bin_path
+* link_path
+* archive
+* url
+
+And in template, [sprig functions](http://masterminds.github.io/sprig/) can be used.
+
 ## Configuration
 
 ```yaml
