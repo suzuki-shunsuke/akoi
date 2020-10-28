@@ -5,9 +5,14 @@ import (
 	"path/filepath"
 	"text/template"
 
+	"github.com/Masterminds/sprig"
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
 	"github.com/suzuki-shunsuke/akoi/internal/util"
 )
+
+func newTemplate(name string) *template.Template {
+	return template.New(name).Funcs(sprig.TxtFuncMap())
+}
 
 func (lgc *Logic) SetupConfig(cfg domain.Config, cfgPath string) (domain.Config, error) {
 	cfgDir, err := filepath.Abs(lgc.Fsys.ExpandEnv(filepath.Dir(cfgPath)))
@@ -71,7 +76,7 @@ func (lgc *Logic) SetupPkgConfig(
 	}
 
 	pkg.Name = pkgName
-	tpl, err := template.New("pkg_url").Parse(pkg.RawURL)
+	tpl, err := newTemplate("pkg_url").Parse(pkg.RawURL)
 	if err != nil {
 		return pkg, err
 	}
@@ -146,7 +151,7 @@ func (lgc *Logic) SetupFileConfig(
 	}
 
 	arcPath := lgc.Fsys.ExpandEnv(file.Archive)
-	arcPathTpl, err := template.New("archive_path").Parse(arcPath)
+	arcPathTpl, err := newTemplate("archive_path").Parse(arcPath)
 	if err != nil {
 		return file, err
 	}
@@ -185,5 +190,5 @@ func (lgc *Logic) parseCfgBinAndLinkPath(
 	if !filepath.IsAbs(p) {
 		p = filepath.Join(cfgDir, p)
 	}
-	return template.New(tplName).Parse(p)
+	return newTemplate(tplName).Parse(p)
 }
