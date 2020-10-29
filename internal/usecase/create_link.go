@@ -3,6 +3,7 @@ package usecase
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/suzuki-shunsuke/akoi/internal/domain"
 )
@@ -12,6 +13,11 @@ func (lgc *Logic) CreateLink(file domain.File) (domain.File, error) {
 	fi, err := lgc.Fsys.GetFileLstat(file.Link)
 	if err != nil {
 		// if file isn't found, create a symlink
+		dir := filepath.Dir(file.Link)
+		lgc.Printer.Printf("create directory %s\n", dir)
+		if err := lgc.Fsys.MkdirAll(dir); err != nil {
+			return file, err
+		}
 		lgc.Printer.Printf("create link %s -> %s\n", file.Link, file.Bin)
 		if err := lgc.Fsys.MkLink(file.Bin, file.Link); err != nil {
 			return file, err
