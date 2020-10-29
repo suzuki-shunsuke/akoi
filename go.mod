@@ -9,7 +9,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.1.0
 	github.com/davecgh/go-spew v1.1.1
 	github.com/dsnet/compress v0.0.0-20171208185109-cc9eb1d7ad76
-	github.com/go-playground/locales v0.12.1
+	github.com/go-playground/locales v0.13.0
 	github.com/go-playground/universal-translator v0.16.0
 	github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db
 	github.com/google/uuid v1.1.2 // indirect
