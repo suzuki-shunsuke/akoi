@@ -21,7 +21,7 @@ require (
 	github.com/nwaples/rardecode v0.0.0-20171029023500-e06696f847ae
 	github.com/pierrec/lz4 v2.0.3+incompatible
 	github.com/pmezard/go-difflib v1.0.0
-	github.com/stretchr/testify v1.5.1
+	github.com/stretchr/testify v1.6.1
 	github.com/suzuki-shunsuke/go-cliutil v0.0.0-20181211153707-27c6eb3d0965
 	github.com/suzuki-shunsuke/gomic v0.3.0
 	github.com/ulikunitz/xz v0.5.4
