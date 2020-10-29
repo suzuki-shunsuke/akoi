@@ -36,6 +36,8 @@ github.com/mitchellh/reflectwalk v1.0.0 h1:9D+8oIskB4VJBN5SFlmc27fSlIBZaov1Wpk/I
 github.com/mitchellh/reflectwalk v1.0.0/go.mod h1:mSTlrgnPZtwu0c4WaC2kGObEpuNDbx0jmZXqmk4esnw=
 github.com/nwaples/rardecode v0.0.0-20171029023500-e06696f847ae h1:UF9xsJn7AeQ72TCus3eRO1lh08Id3AoF37vl+qigL/w=
 github.com/nwaples/rardecode v0.0.0-20171029023500-e06696f847ae/go.mod h1:5DzqNKiOdpKKBH87u8VlvAnPZMXcGRhxWkRpHbbfGS0=
+github.com/nwaples/rardecode v1.1.0 h1:vSxaY8vQhOcVr4mm5e8XllHWTiM4JF507A0Katqw7MQ=
+github.com/nwaples/rardecode v1.1.0/go.mod h1:5DzqNKiOdpKKBH87u8VlvAnPZMXcGRhxWkRpHbbfGS0=
 github.com/pierrec/lz4 v2.0.3+incompatible h1:h0ipQUMRrnr+/HHhxhceftyXk4QcZsmxSNliSG75Bi0=
 github.com/pierrec/lz4 v2.0.3+incompatible/go.mod h1:pdkljMzZIN41W+lC3N2tnIh5sFi+IEE17M5jbnwPHcY=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
