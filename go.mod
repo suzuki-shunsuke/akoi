@@ -6,6 +6,7 @@ require (
 	github.com/Masterminds/goutils v1.1.0 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
+	github.com/Masterminds/sprig/v3 v3.1.0
 	github.com/davecgh/go-spew v1.1.1
 	github.com/dsnet/compress v0.0.0-20171208185109-cc9eb1d7ad76
 	github.com/go-playground/locales v0.12.1
@@ -20,7 +21,7 @@ require (
 	github.com/nwaples/rardecode v0.0.0-20171029023500-e06696f847ae
 	github.com/pierrec/lz4 v2.0.3+incompatible
 	github.com/pmezard/go-difflib v1.0.0
-	github.com/stretchr/testify v1.3.0
+	github.com/stretchr/testify v1.5.1
 	github.com/suzuki-shunsuke/go-cliutil v0.0.0-20181211153707-27c6eb3d0965
 	github.com/suzuki-shunsuke/gomic v0.3.0
 	github.com/ulikunitz/xz v0.5.4
