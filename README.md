@@ -201,7 +201,7 @@ packages:
     # https://github.com/mholt/archiver
     # If downloaded file is not archived, set archive_type to "unarchived".
     # And the file type is compressed but not archived (not ".tar.gz"), set archive_type to "Gzip".
-    achive_type: Zip
+    archive_type: Zip
     # binary install path
     bin_path: /usr/local/bin/{{.Name}}-{{.Version}}
     # the symbolic link to the binary
