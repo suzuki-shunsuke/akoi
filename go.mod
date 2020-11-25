@@ -28,5 +28,5 @@ require (
 	github.com/urfave/cli v1.20.0
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897 // indirect
 	gopkg.in/go-playground/validator.v9 v9.20.2
-	gopkg.in/yaml.v2 v2.3.0
+	gopkg.in/yaml.v2 v2.4.0
 )
