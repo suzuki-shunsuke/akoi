@@ -16,7 +16,7 @@ require (
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/joeybloggs/go-download v2.1.0+incompatible
-	github.com/mholt/archiver v2.0.1-0.20180417220235-e4ef56d48eb0+incompatible
+	github.com/mholt/archiver v2.1.0+incompatible
 	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/nwaples/rardecode v0.0.0-20171029023500-e06696f847ae
 	github.com/pierrec/lz4 v2.0.3+incompatible
