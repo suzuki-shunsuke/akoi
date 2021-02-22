@@ -32,6 +32,8 @@ github.com/joeybloggs/go-download v2.1.0+incompatible h1:YtsNwauYoy9qzBByzS2ingX
 github.com/joeybloggs/go-download v2.1.0+incompatible/go.mod h1:KrNc/uJDAK3g4RSe7D5pncBeAMRwTcpJHTNnX6Y5txc=
 github.com/mholt/archiver v2.0.1-0.20180417220235-e4ef56d48eb0+incompatible h1:BXC8TJiFx2LSLu9Mz+mLVJfrhYh4nCWfM9T8F88iuYk=
 github.com/mholt/archiver v2.0.1-0.20180417220235-e4ef56d48eb0+incompatible/go.mod h1:Dh2dOXnSdiLxRiPoVfIr/fI1TwETms9B8CTWfeh7ROU=
+github.com/mholt/archiver v2.1.0+incompatible h1:1ivm7KAHPtPere1YDOdrY6xGdbMNGRWThZbYh5lWZT0=
+github.com/mholt/archiver v2.1.0+incompatible/go.mod h1:Dh2dOXnSdiLxRiPoVfIr/fI1TwETms9B8CTWfeh7ROU=
 github.com/mitchellh/copystructure v1.0.0 h1:Laisrj+bAB6b/yJwB5Bt3ITZhGJdqmxquMKeZ+mmkFQ=
 github.com/mitchellh/copystructure v1.0.0/go.mod h1:SNtv71yrdKgLRyLFxmLdkAbkKEFWgYaq1OVrnRcwhnw=
 github.com/mitchellh/reflectwalk v1.0.0 h1:9D+8oIskB4VJBN5SFlmc27fSlIBZaov1Wpk/IfikLNY=
