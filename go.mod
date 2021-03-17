@@ -16,6 +16,7 @@ require (
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/joeybloggs/go-download v2.1.0+incompatible
+	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mholt/archiver v2.0.1-0.20180417220235-e4ef56d48eb0+incompatible
 	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/nwaples/rardecode v0.0.0-20171029023500-e06696f847ae
@@ -27,6 +28,6 @@ require (
 	github.com/ulikunitz/xz v0.5.4
 	github.com/urfave/cli v1.20.0
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897 // indirect
-	gopkg.in/go-playground/validator.v9 v9.20.2
+	gopkg.in/go-playground/validator.v9 v9.31.0
 	gopkg.in/yaml.v2 v2.4.0
 )
