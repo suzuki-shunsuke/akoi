@@ -8,6 +8,12 @@
 
 binary installer
 
+## ⚠️ Deprecated: Please use aqua instead of akoi :warning:
+
+https://aquaproj.github.io/
+
+---
+
 * [Overview](#overview)
 * [Features](#features)
 * [Getting Started](#getting-started)
